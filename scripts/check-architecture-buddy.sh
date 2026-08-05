@@ -23,3 +23,10 @@ grep -qi '我就是' "$SKILL/SKILL.md" && fail "impersonation phrase" || true
 grep -q 'M1' "$SKILL/SKILL.md" || fail "SKILL.md must mention M1"
 grep -q 'Top N' "$SKILL/SKILL.md" || fail "SKILL.md must mention Top N"
 echo "OK: architecture-buddy static checks passed"
+
+LENS="$ROOT/architecture-buddy-lens-scaffold"
+if [[ -d "$LENS" ]]; then
+  grep -q '^name: architecture-buddy-lens-scaffold$' "$LENS/SKILL.md" || fail "lens name mismatch"
+  grep -q 'On the decision point' "$LENS/SKILL.md" || fail "lens missing contract"
+  echo "OK: lens-scaffold checks passed"
+fi
