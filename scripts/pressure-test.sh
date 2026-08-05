@@ -67,6 +67,9 @@ cat >"$FIX/complete-minimal-deliverable.md" <<'EOF'
 ### B5 与对照的关系
 未对照。
 
+### B6 组合增长与边界检验
+消息 × 渠道 × 通用规则 → 可追踪投递。变化轴=渠道。N+1 只加渠道适配。反例=双向实时会话。能力增长而非缠绕。
+
 ## 完成门禁自检
 - [x] 结构齐全
 EOF
@@ -120,7 +123,17 @@ grep -qE '未过完成门禁不得宣称完成|未过 S6 完成门禁，禁止�
   fail "missing rule: must not claim done before completion gate"
 grep -qE '不对用户做考试|禁止.*A/B/C/D|不打分' "$SKILL/SKILL.md" || fail "missing anti-exam UX rules"
 grep -q '不替用户拍板' "$SKILL/SKILL.md" || fail "missing: 不替用户拍板"
+grep -qE '加法陷阱|乘法式构架|禁止默许加法' "$SKILL/SKILL.md" || fail "missing multiplicative / anti-additive rules"
+grep -q 'N+1' "$SKILL/references/deliverable-gate.md" || fail "gate missing N+1"
+grep -q '反例' "$SKILL/references/deliverable-gate.md" || fail "gate missing 反例"
+grep -q 'B6' "$SKILL/templates/architecture-deliverable.md" || fail "template missing B6"
 pass "host SKILL encodes required behavioral rules"
+
+# --- 2b) Roundtable preflight must be explicit and testable ---
+grep -q '高影响互斥分叉' "$SKILL/SKILL.md" || fail "missing: high-impact mutually exclusive fork preflight"
+grep -q '必须先提议圆桌' "$SKILL/SKILL.md" || fail "missing: mandatory roundtable proposal"
+grep -q '用户选择跳过圆桌' "$SKILL/SKILL.md" || fail "missing: explicit user-decline record"
+pass "host SKILL requires roundtable preflight and consent record"
 
 # --- 3) Structure gate: incomplete fails, complete passes ---
 if bash "$ROOT/scripts/rubric-report.sh" kafka "$FIX/incomplete-deliverable.md" "$FIX/out-incomplete.md" 2>"$FIX/err-incomplete.txt"; then
@@ -141,6 +154,20 @@ if bash "$ROOT/scripts/rubric-report.sh" kafka "$FIX/premature-done.md" "$FIX/ou
   fail "premature-done fixture must fail structure check"
 fi
 pass "premature completion without dual-layer is rejected"
+
+# --- 3b) Git roundtable live calibration must prove the complete path ---
+ROUND_TABLE_GIT="$(ls -1 "$ROOT"/corpus/runs/*-git-roundtable.md 2>/dev/null | tail -n 1 || true)"
+[[ -n "$ROUND_TABLE_GIT" ]] || fail "missing Git roundtable calibration deliverable"
+grep -q '圆桌提议' "$ROUND_TABLE_GIT" || fail "Git roundtable deliverable missing proposal"
+grep -q '用户同意' "$ROUND_TABLE_GIT" || fail "Git roundtable deliverable missing consent"
+grep -q '综合结论' "$ROUND_TABLE_GIT" || fail "Git roundtable deliverable missing synthesis"
+lens_count="$(grep -c '^## Lens:' "$ROUND_TABLE_GIT" || true)"
+[[ "$lens_count" -ge 2 ]] || fail "Git roundtable deliverable needs at least two lenses"
+for contract in '### On the decision point' '### Heuristics applied' '### Risks / what they'
+do
+  grep -q "$contract" "$ROUND_TABLE_GIT" || fail "Git roundtable deliverable missing lens contract: $contract"
+done
+pass "Git roundtable calibration proves proposal, consent, lenses, and synthesis"
 
 # --- 4) agent-runtime themes: golden RUBRIC must name permission / HITL / observe loop ---
 AR_RUBRIC="$ROOT/corpus/golden/agent-runtime/RUBRIC.md"

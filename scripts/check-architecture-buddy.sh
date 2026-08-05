@@ -23,7 +23,10 @@ grep -q 'draft' "$SKILL/SKILL.md" || fail "SKILL.md must mention draft"
 grep -q 'S6' "$SKILL/SKILL.md" || fail "SKILL.md must mention S6 completion gate"
 grep -q 'A1' "$SKILL/templates/architecture-deliverable.md" || fail "deliverable template missing A1"
 grep -q 'B1' "$SKILL/templates/architecture-deliverable.md" || fail "deliverable template missing B1"
+grep -q 'B6' "$SKILL/templates/architecture-deliverable.md" || fail "deliverable template missing B6"
 grep -q '完成门禁' "$SKILL/references/deliverable-gate.md" || fail "gate file missing 完成门禁"
+grep -q 'N+1' "$SKILL/references/deliverable-gate.md" || fail "gate file missing N+1 check"
+grep -q '加法陷阱\|乘法式构架' "$SKILL/SKILL.md" || fail "SKILL.md must teach multiplicative architecture"
 grep -q 'M1' "$SKILL/references/note-mapping.md" || fail "mapping file must mention M1"
 # Calibration must not be user-facing exam UX in host skill
 if grep -qE '开考|盲写交卷|及格|不及格' "$SKILL/SKILL.md"; then
