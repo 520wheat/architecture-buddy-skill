@@ -1,6 +1,9 @@
 ---
 name: architecture-buddy-lens-raft-cp
-description: Raft-CP lens for Architecture Buddy roundtables. Use when a design depends on understandable majority consensus, strongly consistent metadata coordination, leader election, config state, leases, watches, or avoiding split-brain. It asks whether CP metadata coordination is truly the problem, what quorum costs are accepted, and where linearizability stops.
+description: >
+  Use when Architecture Buddy roundtable needs a Raft-CP lens for majority consensus,
+  strongly consistent metadata coordination, leader election, config state, leases,
+  watches, or avoiding split-brain.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Raft CP)

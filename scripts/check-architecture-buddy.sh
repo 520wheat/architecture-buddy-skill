@@ -81,3 +81,8 @@ RUBRIC_REPORT="$ROOT/scripts/rubric-report.sh"
 [[ -x "$RUBRIC_REPORT" ]] || fail "scripts/rubric-report.sh not executable"
 bash "$RUBRIC_REPORT" --help >/dev/null || fail "rubric-report.sh --help failed"
 echo "OK: rubric-report.sh --help"
+
+PRESSURE="$ROOT/scripts/pressure-test.sh"
+[[ -f "$PRESSURE" ]] || fail "missing scripts/pressure-test.sh"
+bash "$PRESSURE" || fail "pressure-test.sh failed"
+echo "OK: pressure-test.sh"

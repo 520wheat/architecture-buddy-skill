@@ -12,10 +12,12 @@ Records which `architecture-buddy` skill versions have known PASS calibration ru
 | 0.3.0 | spark | 2026-08-05-cal-spark | PASS | 2026-08-05 |
 | 0.3.0 | minecraft | 2026-08-05-cal-minecraft | PASS | 2026-08-05 |
 | 0.3.0 | sre-buddy | 2026-08-05-mig-sre-buddy | PASS | 2026-08-05 |
+| 0.3.1 | agent-runtime | 2026-08-05-cal-agent-runtime | PASS | 2026-08-05 |
 
 Notes:
 
 - `sre-buddy` is a **migration** target (`mig-sre-buddy`), not a formal GOLDEN under `corpus/golden/`.
-- Phase 2 goldens `hdfs` / `spark` now have dedicated reproduction cal PASS runs (`skill_calibrated: 0.3.0`); `agent-runtime` still has no dedicated reproduction cal run yet (`skill_calibrated: none` in META).
+- Phase 2 goldens `hdfs` / `spark` have dedicated reproduction cal PASS runs (`skill_calibrated: 0.3.0`); `agent-runtime` now has dedicated reproduction cal PASS (`corpus/runs/2026-08-05-cal-agent-runtime.md`; `skill_calibrated: 0.3.1`).
 - Phase 3 golden `minecraft` now has reproduction cal PASS (`corpus/runs/2026-08-05-cal-minecraft.md`; `skill_calibrated: 0.3.0`).
-- Skill frontmatter version: `skill/architecture-buddy/SKILL.md` → `metadata.version: "0.3.0"`.
+- Skill frontmatter version: host `architecture-buddy` is `0.3.1`.
+- Public-beta readiness checklist: `docs/build/release-readiness.md`. Pressure tests: `bash scripts/pressure-test.sh`.

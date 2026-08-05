@@ -1,13 +1,12 @@
 ---
 name: architecture-buddy
 description: >
-  Architecture co-thinking partner. In draft mode, explores assumptions with the user.
-  When asked for a full architecture design, switches to deliverable mode: first-principles
-  (assumptions → facts → rebuild), dual-layer note (narrative + mechanism/strategy), and a
-  completion gate before claiming done. Use for architecture design, ADRs, system reviews.
+  Use when co-thinking architecture with a partner: designing or reviewing software
+  architecture, writing ADRs, separating mechanism from strategy, or producing a full
+  architecture deliverable. Not for roleplay or taking decisions for the user.
 metadata:
   display-name: Architecture Buddy
-  version: "0.3.0"
+  version: "0.3.1"
 ---
 
 # Architecture Buddy

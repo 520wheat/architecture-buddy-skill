@@ -2,3 +2,5 @@
 .superpowers/sdd/
 .obsidian/
 tools/nuwa-skill/
+scripts/fixtures/pressure/out-*.md
+scripts/fixtures/pressure/err-*.txt

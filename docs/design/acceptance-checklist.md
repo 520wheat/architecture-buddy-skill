@@ -50,3 +50,10 @@ V6 由 `scripts/check-architecture-buddy.sh` 自动检查。
 - [ ] `corpus/COMPAT.md` 记录 skill 0.3.0 与已知 PASS
 - [ ] 金标含 etcd、minecraft
 - [ ] etcd 复现校准 PASS
+
+## V11 公开内测就绪（评价缺口关闭）
+- [ ] 全部 skill `description` 以 `Use when...` 开头（流程细节只在正文）
+- [ ] README 含 Cursor 与 Codex 安装路径
+- [ ] `bash scripts/pressure-test.sh` → OK（门禁结构负例/正例 + agent-runtime 主题）
+- [ ] `agent-runtime` 专用复现校准 PASS（COMPAT 有行）
+- [ ] `docs/build/release-readiness.md` 与对外「public beta」定位一致

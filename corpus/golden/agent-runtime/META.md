@@ -11,4 +11,4 @@
 | 本地 survey | `docs/survey/architecture/D8-openai-agents-sdk.md`；`docs/survey/architecture/D8-anthropic-effective-agents.md`；`docs/survey/architecture/D8-langgraph.md`（择要） |
 | 阶段 | Phase 2 扩展金标 |
 | corpus_version | `1` |
-| skill_calibrated | `none` |
+| skill_calibrated | `0.3.1` |

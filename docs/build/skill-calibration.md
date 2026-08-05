@@ -97,5 +97,6 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 | 0 | 本文件 + `corpus/` 占位；无 GOLDEN 正文 |
 | 1（完成） | 三种子 GOLDEN+RUBRIC；各至少一次维护者 PASS（见上表链接） |
 | 2（完成） | 扩库 hdfs/spark/agent-runtime；mig-sre-buddy PASS；透镜 agent-loop；验收 V9 |
-| 3（完成） | rubric-report；COMPAT 0.3.0；盲区金标 etcd + minecraft（均有 cal PASS）；hdfs/spark 复现 cal PASS；GFS-MR 透镜 0.2.0；验收 V10 |
-| 4+ | 更多扩库 / 加深校准（按需） |
+| 3（完成） | rubric-report；COMPAT；盲区金标 etcd + minecraft；hdfs/spark 复现 cal；GFS-MR 0.2.0；V10 |
+| 公开内测就绪（进行中） | host 0.3.1；Use when descriptions；Cursor+Codex README；pressure-test.sh；agent-runtime 专用 cal PASS；见 `release-readiness.md` / V11 |
+| 之后 | 真模型多轮回归、可选拆分发布物（按需） |

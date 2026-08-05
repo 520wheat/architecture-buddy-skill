@@ -1,6 +1,9 @@
 ---
 name: architecture-buddy-lens-scaffold
-description: Scaffold lens for Architecture Buddy roundtables. Applies generic trade-off heuristics (simplicity, operability, reversibility). Use only when Architecture Buddy hosts a roundtable and this lens is installed—not as a famous person.
+description: >
+  Use when Architecture Buddy hosts a roundtable and only the scaffold lens is installed:
+  apply generic trade-off heuristics (simplicity, operability, reversibility). Not for
+  roleplay or impersonating a famous person.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens Scaffold

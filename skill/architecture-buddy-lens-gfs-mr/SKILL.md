@@ -1,6 +1,10 @@
 ---
 name: architecture-buddy-lens-gfs-mr
-description: GFS-MR lens for Architecture Buddy roundtables. Use when a decision depends on large-scale sequential throughput, distributed storage, commodity-node failure handling, batch analytics, HDFS/GFS-style block storage, MapReduce/Hadoop lineage, Spark-style DAG execution on that substrate, or moving compute to data. It tests whether the workload is truly bulk sequential data processing and what latency, POSIX, metadata, and operational trade-offs are being accepted.
+description: >
+  Use when Architecture Buddy roundtable needs a GFS-MR lens for large-scale sequential
+  throughput, distributed block storage, commodity-node failure, batch analytics,
+  HDFS/GFS/MapReduce/Hadoop lineage, Spark-style DAG on that substrate, or moving compute
+  to data.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (GFS-MR)
