@@ -11,24 +11,27 @@
 3. 按 `best-for` 匹配，优先选**互有张力**的席  
 4. 取 Top ≤3，向用户说明理由；允许用户换席  
 
-索引也可压缩进 `architecture-buddy/references/lens-catalog.md`（P2 实现时）。
+运行时压缩索引：`architecture-buddy/references/lens-catalog.md`。
 
 ---
 
-## 首批候选池（Proposed · 待 ADR-0015 锁定语料后蒸馏）
+## 首批 Locked（ADR-0015 Accepted · 女娲主题蒸馏）
 
-| shortname | 立场（一句话） | best-for | not-for | evidence-anchors |
-|-----------|----------------|----------|---------|------------------|
-| `raft-cp` | 可理解的多数派共识，元数据强一致 | 控制面、配置/成员资格、需要单一真相的协调 | 超高写放大业务事实库；可长期 AP 的数据面 | Raft；etcd；Kubernetes 依赖 |
-| `dynamo-ap` | 可用性与分区下继续写，最终一致 | 购物车/会话类、全球写、可冲突调和的业务数据 | 需要线性化的强一致账本/锁服务 | Dynamo 论文；DynamoDB；Cassandra/Riak 谱系 |
-| `log-stream` | 追加日志作集成与重放的事实来源 | 事件驱动集成、审计流、多消费者独立位点 | 强事务跨服务的同步 RPC 替代幻想 | Kafka；广泛流式实践 |
-| `gfs-mr` | 大规模顺序吞吐：分布式文件 + 数据局部计算 | 批处理、扫描型分析、移动计算而非移动数据 | 低延迟随机点查 OLTP | GFS；MapReduce；Hadoop 生态验证 |
-| `bigtable-wide` | 宽列、行键设计驱动的规模化存储 | 时间序列/实体宽表、扫描+点查混合 | 复杂多行事务主叙事 | Bigtable；HBase 等 |
-| `spanner-sql` | 全球尺度下外部一致 + SQL | 需要强一致全球关系型语义的业务 | 愿用最终一致换极致可用/低成本时 | Spanner；思想影响全球分布式 SQL |
-| `zta-resource` | 不以网络位置授信，PE/PA/PEP 持续裁决 | 零信任接入、混合云身份、微隔离策略 | 「只靠边界防火墙」的遗留叙事当唯一解 | NIST SP 800-207；产业 ZTA 实践 |
-| `content-dag` | 内容寻址对象 + 不可变历史 | 版本协作、制品完整性、可分发工作区 | 需要中心强一致可变行存储当唯一模型 | Git；内容寻址制品实践 |
+| shortname | 立场（一句话） | best-for | not-for | evidence-anchors | 状态 |
+|-----------|----------------|----------|---------|------------------|------|
+| `raft-cp` | 可理解的多数派共识，元数据强一致 | 控制面、配置/成员资格、需要单一真相的协调 | 超高写放大业务事实库；可长期 AP 的数据面 | Raft；etcd；Kubernetes | ✅ 已蒸馏 |
+| `dynamo-ap` | 可用性与分区下继续写，最终一致 | 全球写、可冲突调和的业务数据 | 需要线性化的强一致账本/锁服务 | Dynamo；DynamoDB；Cassandra 谱系 | ✅ 已蒸馏 |
+| `log-stream` | 追加日志作集成与重放的事实来源 | 事件驱动集成、审计流、多消费者独立位点 | 把日志当跨服务强事务银弹 | Kafka；流式实践 | ✅ 已蒸馏 |
+| `gfs-mr` | 大规模顺序吞吐：分布式存储 + 数据局部计算 | 批处理、扫描型分析 | 低延迟随机点查 OLTP | GFS；MapReduce；HDFS/Hadoop | ✅ 已蒸馏 |
+| `spanner-sql` | 全球外部一致 + SQL | 需要强一致全球关系语义 | 愿用最终一致换极致可用/成本时 | Spanner；分布式 SQL | ✅ 已蒸馏 |
+| `zta-resource` | 不以网络位置授信，资源级持续裁决 | 零信任接入、混合云身份 | 只靠边界防火墙当唯一解 | NIST SP 800-207 | ✅ 已蒸馏 |
 
-> 首版蒸馏不必一次做满 8 个；**至少先落 6 个**再谈高可用。上表可增删，但增删须维持「顶级」证据锚点。
+## 后续候选（未入首批）
+
+| shortname | 立场 | evidence-anchors |
+|-----------|------|------------------|
+| `bigtable-wide` | 宽列、行键驱动规模化存储 | Bigtable；HBase |
+| `content-dag` | 内容寻址 + 不可变历史 | Git |
 
 ## 安装与高可用
 

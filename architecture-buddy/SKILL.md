@@ -18,6 +18,7 @@ metadata:
 - 机制锚点：`references/mechanisms.md`
 - 策略速查：`references/strategies-cheatsheet.md`
 - 反模式/红线：`references/anti-patterns.md`
+- 透镜库选席：`references/lens-catalog.md`（多立场；当场动态挑 ≤3）
 - 笔记骨架：`templates/architecture-note.md`
 - 类问题模板：`templates/problem-class-template.md`
 

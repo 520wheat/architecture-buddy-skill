@@ -16,7 +16,7 @@
 | [0012](0012-m9-pattern-tier-and-section3-from-survey.md) | 调研固化 M1–M9 并回写 §3 | Accepted |
 | [0013](0013-autonomous-survey-continuation.md) | 调研自主推进；非重大分歧不打断 | Accepted |
 | [0014](0014-skill-package-dirname.md) | 安装目录名 architecture-buddy | Accepted |
-| [0015](0015-build-time-nuwa-distillation.md) | 构建期女娲蒸馏 FP 与透镜包 | Proposed |
+| [0015](0015-build-time-nuwa-distillation.md) | 构建期女娲蒸馏 FP 与透镜包 | Accepted |
 | [0016](0016-lens-distills-proven-practice-not-voice.md) | 透镜蒸馏经市场验证的思想与做法，不蒸馏口吻 | Accepted |
 | [0017](0017-lens-catalog-dynamic-seating.md) | 多顶级立场透镜库 + 按需挑选 ≤3 席 | Accepted |
 
