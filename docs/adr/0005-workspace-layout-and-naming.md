@@ -20,11 +20,11 @@ Accepted
 | `docs/` | ADR 与设计文档 |
 | `docs/adr/` | 决策记录 |
 | `docs/design/` | 分节设计说明 |
-| `Architecture Buddy/` | 开发完成的 skill 本体 |
+| `architecture-buddy/` | 开发完成的 skill 本体（显示名 Architecture Buddy，见 ADR-0014） |
 
 每个 brainstorm / 设计阶段的结论写入 ADR 或 design 文档，不依赖聊天记录作为唯一真相源。
 
 ## Consequences
 
 - Agent 默认在本工作区读写；skill 交付物不散落在其他仓库。
-- 文档与 skill 分离：docs 解释决策，Architecture Buddy 只放可安装运行的 skill 文件。
+- 文档与 skill 分离：docs 解释决策，`architecture-buddy/` 只放可安装运行的 skill 文件。
