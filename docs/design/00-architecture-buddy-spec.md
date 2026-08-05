@@ -144,3 +144,8 @@ Architecture Buddy/
 | 一致性 | 形态 B、M1–M9、先问 Top N、圆桌先提议 —— 与 §1–§5/ADR 一致 |
 | 范围 | 单产品单实现计划可覆盖；蒸馏人名另 ADR 不阻塞 P0 |
 | 歧义 | 「硬分叉」= 机制已清且策略互斥且影响大；已在 §4 操作化 |
+
+## Implementation status
+- P0/P1: see `architecture-buddy/` + `docs/design/acceptance-checklist.md`
+- Plan: `docs/superpowers/plans/2026-08-05-architecture-buddy.md`
+- P2（女娲蒸馏 FP/真人透镜）: 另开构建期 ADR 与任务，不阻塞 P0/P1

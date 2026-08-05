@@ -7,8 +7,9 @@
 | 路径 | 用途 |
 |------|------|
 | `docs/` | ADR 与设计文档（每个阶段结论落盘） |
+| `docs/design/00-architecture-buddy-spec.md` | **汇总规格**（Approved） |
 | `docs/adr/` | 架构决策记录 |
-| `Architecture Buddy/` | 最终交付的 skill 本体（运行时可安装） |
+| `architecture-buddy/` | 最终交付的 skill 本体（运行时可安装） |
 
 ## 约定
 
