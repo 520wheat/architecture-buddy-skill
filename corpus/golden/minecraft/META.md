@@ -11,4 +11,4 @@
 | 本地 survey | `docs/survey/architecture/D9-minecraft-sim.md` |
 | 阶段 | Phase 3 盲区金标 |
 | corpus_version | `1` |
-| skill_calibrated | `none` |
+| skill_calibrated | `0.3.0` |

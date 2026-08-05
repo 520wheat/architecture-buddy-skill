@@ -11,4 +11,4 @@
 | 本地 survey | `docs/survey/architecture/D3-hdfs.md` |
 | 阶段 | Phase 2 扩展金标 |
 | corpus_version | `1` |
-| skill_calibrated | `none` |
+| skill_calibrated | `0.3.0` |
