@@ -59,3 +59,13 @@ done
 if [[ "$lens_count" -gt 0 ]]; then
   echo "OK: lens checks passed ($lens_count lenses)"
 fi
+
+for id in kafka git kubernetes; do
+  for f in META.md GOLDEN.md RUBRIC.md SOURCES.md; do
+    [[ -f "$ROOT/corpus/golden/$id/$f" ]] || fail "missing corpus/golden/$id/$f"
+  done
+  grep -q '### A1' "$ROOT/corpus/golden/$id/GOLDEN.md" || fail "$id GOLDEN missing ### A1"
+  grep -q '### B1' "$ROOT/corpus/golden/$id/GOLDEN.md" || fail "$id GOLDEN missing ### B1"
+  grep -q '必中' "$ROOT/corpus/golden/$id/RUBRIC.md" || fail "$id RUBRIC missing 必中"
+done
+echo "OK: golden corpus checks passed"

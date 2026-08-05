@@ -24,13 +24,13 @@
 
 ## 种子 id（Phase 1）
 
-| id | 问题类（概要） |
-|----|----------------|
-| `kafka` | 日志/流式集成 |
-| `git` | 内容寻址 + 分布式协作史 |
-| `kubernetes` | 声明式控制面 / 协调循环 |
+| id | 问题类（概要） | GOLDEN | 校准 run（PASS） |
+|----|----------------|--------|------------------|
+| `kafka` | 日志/流式集成 | [`corpus/golden/kafka/`](../../corpus/golden/kafka/) | [`corpus/runs/2026-08-05-cal-kafka.md`](../../corpus/runs/2026-08-05-cal-kafka.md) |
+| `git` | 内容寻址 + 分布式协作史 | [`corpus/golden/git/`](../../corpus/golden/git/) | [`corpus/runs/2026-08-05-cal-git.md`](../../corpus/runs/2026-08-05-cal-git.md) |
+| `kubernetes` | 声明式控制面 / 协调循环 | [`corpus/golden/kubernetes/`](../../corpus/golden/kubernetes/) | [`corpus/runs/2026-08-05-cal-kubernetes.md`](../../corpus/runs/2026-08-05-cal-kubernetes.md) |
 
-Phase 1 再填上述三题的 GOLDEN + RUBRIC；Hadoop、Spark 等属 Phase 2。
+Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 **PASS**。Hadoop、Spark 等属 Phase 2。
 
 ## 复现校准
 
@@ -71,6 +71,6 @@ Phase 1 再填上述三题的 GOLDEN + RUBRIC；Hadoop、Spark 等属 Phase 2。
 
 | Phase | 本文相关交付 |
 |-------|----------------|
-| 0（当前骨架） | 本文件 + `corpus/` 占位；无 GOLDEN 正文 |
-| 1 | 三种子 GOLDEN+RUBRIC；各至少一次维护者 PASS |
+| 0 | 本文件 + `corpus/` 占位；无 GOLDEN 正文 |
+| 1（完成） | 三种子 GOLDEN+RUBRIC；各至少一次维护者 PASS（见上表链接） |
 | 2+ | 扩库、蒸馏、半自动对照报告 |

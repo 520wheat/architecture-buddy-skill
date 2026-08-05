@@ -33,3 +33,8 @@ V6 由 `scripts/check-architecture-buddy.sh` 自动检查。
 - [ ] 交卷前显式过完成门禁（或列出阻塞/待验证）
 - [ ] 正文无 M1–M9 问卷结构；陌生人能讲清解决什么与主路径
 - [ ] 全程无「开考/打分/及格」话术
+
+## V8 Phase 1 金标与校准（维护者）
+- [ ] corpus/golden/{kafka,git,kubernetes} 四文件齐全
+- [ ] 三份 cal runs 判定均为 PASS
+- [ ] 用户侧 SKILL 仍无开考/打分话术
