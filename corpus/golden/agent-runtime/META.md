@@ -10,3 +10,5 @@
 | 许可 | 金标正文为仓库维护者基于公开工程文与本地 survey 的架构叙述升格；不复制官方全文。引用遵循各站点条款；本目录内容用于构建期校准，非运行时用户考试材料。 |
 | 本地 survey | `docs/survey/architecture/D8-openai-agents-sdk.md`；`docs/survey/architecture/D8-anthropic-effective-agents.md`；`docs/survey/architecture/D8-langgraph.md`（择要） |
 | 阶段 | Phase 2 扩展金标 |
+| corpus_version | `1` |
+| skill_calibrated | `none` |

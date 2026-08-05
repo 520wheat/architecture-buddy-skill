@@ -44,3 +44,9 @@ V6 由 `scripts/check-architecture-buddy.sh` 自动检查。
 - [ ] 迁移校准 mig-sre-buddy 判定 PASS
 - [ ] 至少 1 个透镜新建或金标加厚升级
 - [ ] 用户侧 SKILL 仍无开考话术
+
+## V10 Phase 3 工具与盲区（维护者）
+- [ ] `scripts/rubric-report.sh` 可对 cal 候选生成勾选报告
+- [ ] `corpus/COMPAT.md` 记录 skill 0.3.0 与已知 PASS
+- [ ] 金标含 etcd、minecraft
+- [ ] etcd 复现校准 PASS

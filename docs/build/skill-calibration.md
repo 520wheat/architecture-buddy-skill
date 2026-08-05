@@ -42,8 +42,18 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 
 - **迁移校准**：[`corpus/runs/2026-08-05-mig-sre-buddy.md`](../../corpus/runs/2026-08-05-mig-sre-buddy.md) — 判定 **PASS**（SRE-Buddy；非正式 GOLDEN）
 - **蒸馏透镜**：新建 [`architecture-buddy-lens-agent-loop`](../../skill/architecture-buddy-lens-agent-loop/SKILL.md)（对齐 agent-runtime；已登记 `lens-catalog`）
-- **本轮不做**：Minecraft（缺可靠公开架构正典；后续）
 - 计划：[`docs/superpowers/plans/2026-08-05-architecture-buddy-phase2-expand.md`](../superpowers/plans/2026-08-05-architecture-buddy-phase2-expand.md)
+
+## 工具与盲区（Phase 3，完成）
+
+| id | 问题类（概要） | GOLDEN | 校准 run |
+|----|----------------|--------|----------|
+| `etcd` | 强一致元数据存储与协调原语（Raft/MVCC） | [`corpus/golden/etcd/`](../../corpus/golden/etcd/) | [`corpus/runs/2026-08-05-cal-etcd.md`](../../corpus/runs/2026-08-05-cal-etcd.md)（PASS） |
+| `minecraft` | 共享模拟世界 / 客户端预测与权威服 | [`corpus/golden/minecraft/`](../../corpus/golden/minecraft/) | 本轮无复现考（`skill_calibrated: none`） |
+
+- **半自动 RUBRIC 报告**：[`scripts/rubric-report.sh`](../../scripts/rubric-report.sh) · 用法 [`docs/build/rubric-report.md`](rubric-report.md)
+- **版本矩阵**：[`corpus/COMPAT.md`](../../corpus/COMPAT.md)（skill `0.3.0` ↔ 已知 PASS）
+- 计划：[`docs/superpowers/plans/2026-08-05-architecture-buddy-phase3-tooling.md`](../superpowers/plans/2026-08-05-architecture-buddy-phase3-tooling.md)
 
 ## 复现校准
 
@@ -87,4 +97,5 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 | 0 | 本文件 + `corpus/` 占位；无 GOLDEN 正文 |
 | 1（完成） | 三种子 GOLDEN+RUBRIC；各至少一次维护者 PASS（见上表链接） |
 | 2（完成） | 扩库 hdfs/spark/agent-runtime；mig-sre-buddy PASS；透镜 agent-loop；验收 V9 |
-| 3+ | 半自动对照报告、更多扩库（含 Minecraft 等后续） |
+| 3（完成） | rubric-report；COMPAT 0.3.0；盲区金标 etcd（cal PASS）+ minecraft；验收 V10 |
+| 4+ | 更多扩库 / 加深校准（按需） |

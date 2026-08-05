@@ -74,3 +74,10 @@ for dir in "${golden_dirs[@]}"; do
   grep -q '必中' "$dir/RUBRIC.md" || fail "$id RUBRIC missing 必中"
 done
 echo "OK: golden corpus checks passed (${#golden_dirs[@]} dirs)"
+
+# Optional Phase 3 maintainer tooling
+RUBRIC_REPORT="$ROOT/scripts/rubric-report.sh"
+[[ -f "$RUBRIC_REPORT" ]] || fail "missing scripts/rubric-report.sh"
+[[ -x "$RUBRIC_REPORT" ]] || fail "scripts/rubric-report.sh not executable"
+bash "$RUBRIC_REPORT" --help >/dev/null || fail "rubric-report.sh --help failed"
+echo "OK: rubric-report.sh --help"

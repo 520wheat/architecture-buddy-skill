@@ -10,3 +10,5 @@
 | 许可 | 金标正文为仓库维护者基于 AOSA 公开章节与本地 survey 的架构叙述升格；不复制全书全文。AOSA 内容遵循其站点许可条款；本目录内容用于构建期校准，非运行时用户考试材料。 |
 | 本地 survey | `docs/survey/architecture/D5-git.md` |
 | 阶段 | Phase 1 种子金标 |
+| corpus_version | `1` |
+| skill_calibrated | `0.3.0` |
