@@ -16,5 +16,6 @@
 | [0012](0012-m9-pattern-tier-and-section3-from-survey.md) | 调研固化 M1–M9 并回写 §3 | Accepted |
 | [0013](0013-autonomous-survey-continuation.md) | 调研自主推进；非重大分歧不打断 | Accepted |
 | [0014](0014-skill-package-dirname.md) | 安装目录名 architecture-buddy | Accepted |
+| [0015](0015-build-time-nuwa-distillation.md) | 构建期女娲蒸馏 FP 与透镜包 | Proposed |
 
 编号递增；状态变更在原文件内更新，不删历史决策。
