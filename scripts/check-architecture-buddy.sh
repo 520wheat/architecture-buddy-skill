@@ -9,13 +9,26 @@ head -n 1 "$SKILL/SKILL.md" | grep -q '^---$' || fail "missing YAML frontmatter 
 grep -q '^name: architecture-buddy$' "$SKILL/SKILL.md" || fail "name mismatch"
 grep -q '^description:' "$SKILL/SKILL.md" || fail "missing description"
 for f in references/mechanisms.md references/strategies-cheatsheet.md references/anti-patterns.md \
-         references/lens-catalog.md templates/architecture-note.md templates/problem-class-template.md; do
+         references/lens-catalog.md templates/architecture-note.md templates/problem-class-template.md \
+         references/deliverable-gate.md references/note-mapping.md templates/architecture-deliverable.md; do
   [[ -f "$SKILL/$f" ]] || fail "missing $f"
 done
 # UX / FP guards
 grep -q '第一性原理' "$SKILL/SKILL.md" || fail "SKILL.md must define 第一性原理"
 grep -q '禁止' "$SKILL/SKILL.md" || fail "SKILL.md must include UX prohibitions"
 grep -qE '硬/软/不写|A/B/C/D 考试' "$SKILL/SKILL.md" || fail "SKILL.md must ban quiz/matrix UX"
+# Deliverable workflow guards
+grep -q 'deliverable' "$SKILL/SKILL.md" || fail "SKILL.md must mention deliverable"
+grep -q 'draft' "$SKILL/SKILL.md" || fail "SKILL.md must mention draft"
+grep -q 'S6' "$SKILL/SKILL.md" || fail "SKILL.md must mention S6 completion gate"
+grep -q 'A1' "$SKILL/templates/architecture-deliverable.md" || fail "deliverable template missing A1"
+grep -q 'B1' "$SKILL/templates/architecture-deliverable.md" || fail "deliverable template missing B1"
+grep -q '完成门禁' "$SKILL/references/deliverable-gate.md" || fail "gate file missing 完成门禁"
+grep -q 'M1' "$SKILL/references/note-mapping.md" || fail "mapping file must mention M1"
+# Calibration must not be user-facing exam UX in host skill
+if grep -qE '开考|盲写交卷|及格|不及格' "$SKILL/SKILL.md"; then
+  fail "SKILL.md must not use exam UX toward users"
+fi
 # V6
 nuwa_hits="$(grep -RInE 'nuwa-skill|女娲' "$SKILL" --include='*.md' || true)"
 if [[ -n "$nuwa_hits" ]]; then
