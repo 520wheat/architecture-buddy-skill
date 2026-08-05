@@ -12,9 +12,11 @@ ADR-0003 已决定：女娲（nuwa-skill）**仅构建期**使用，运行时主
 - 具体 **2–3 个透镜 shortname** 与对应语料
 - 构建脚本或 CI 的调用入口
 
-P0/P1 已交付可运行的手写版 `architecture-buddy/SKILL.md`（含「第一性原理共抽」节）与 `architecture-buddy-lens-scaffold/` 草稿透镜。P2 目标是在**不引入运行时 nuwa 依赖**的前提下，用女娲蒸馏加厚主持段并产出真人启发式透镜包。
+P0/P1 已交付可运行的手写版 `architecture-buddy/SKILL.md`（含「第一性原理共抽」节）与 `architecture-buddy-lens-scaffold/` 草稿透镜。P2 目标是在**不引入运行时 nuwa 依赖**的前提下，用女娲蒸馏加厚主持段并产出透镜包。
 
-本 ADR 为 P2 **门闩**：先固化构建期决策与验收标准；**人名与语料待用户选定后**方可将 Status 升为 Accepted 并执行蒸馏。
+**选席与内容标准见 ADR-0016**：蒸馏的是**经市场验证的架构思想与做法**（可挂世界级系统/论文谱系），**不是**名人说话口吻；禁止运行时扮演真人。
+
+本 ADR 为 P2 **门闩**：先固化构建期决策与验收标准；**透镜库首批 shortname 名单（>3，见 `docs/design/lens-catalog.md`）+ 各条目语料清单待用户选定后**方可将 Status 升为 Accepted 并执行蒸馏。圆桌当场仍只请 ≤3，但由主持动态挑选（ADR-0017）。
 
 ## Decision
 
@@ -28,7 +30,7 @@ P0/P1 已交付可运行的手写版 `architecture-buddy/SKILL.md`（含「第�
 | 输入 | 说明 |
 |------|------|
 | 活表 | `docs/survey/living/*`（M1–M9、策略、反模式等权威压缩源） |
-| 选定语料 | 用户确认的路径列表（人物著作摘录、调研笔记、公开 canon 对照等）；**本 ADR 不预锁名单** |
+| 选定语料 | 用户确认的路径列表（系统架构论文/官方设计文档、调研笔记、公开 canon）；按**立场谱系**组织，不以口吻模仿为目标；**本 ADR 不预锁名单** |
 | 主持 Skill 基底 | 当前 `architecture-buddy/SKILL.md`（身份、流程 A/B/C、M1–M9、Top N、圆桌主持段保持不变） |
 | 透镜契约 | Design §4 视角输出格式 + `architecture-buddy-lens-scaffold/SKILL.md` 作为结构模板 |
 
@@ -37,7 +39,7 @@ P0/P1 已交付可运行的手写版 `architecture-buddy/SKILL.md`（含「第�
 | 产出 | 目标 |
 |------|------|
 | 主持 Skill | 覆盖或加厚 `architecture-buddy/SKILL.md` 中 **「第一性原理共抽」** 节；其余分区仅因 M/活表升版而做必要同步，不整体重写 |
-| 透镜包 | 每个选定人物/视角生成独立目录 `architecture-buddy-lens-<shortname>/`（见 ADR-0014），含符合 §4 契约的 `SKILL.md` |
+| 透镜包 | 每个选定**架构立场**生成独立目录 `architecture-buddy-lens-<shortname>/`（见 ADR-0014），含符合 §4 契约的 `SKILL.md`；正文以思想/做法/When not 为主 |
 | 构建记录 | 脚本日志或 manifest 记录：语料路径、活表版本、生成时间（便于回归与 diff） |
 
 建议首批 **2–3** 个透镜；超过 3 需与用户确认是否收敛对照点类型（Design §4）。
