@@ -19,5 +19,6 @@
 | [0015](0015-build-time-nuwa-distillation.md) | 构建期女娲蒸馏 FP 与透镜包 | Accepted |
 | [0016](0016-lens-distills-proven-practice-not-voice.md) | 透镜蒸馏经市场验证的思想与做法，不蒸馏口吻 | Accepted |
 | [0017](0017-lens-catalog-dynamic-seating.md) | 多顶级立场透镜库 + 按需挑选 ≤3 席 | Accepted |
+| [0018](0018-collaboration-ux-and-real-first-principles.md) | 共思体验重做 + 纠正第一性原理用法 | Accepted |
 
 编号递增；状态变更在原文件内更新，不删历史决策。

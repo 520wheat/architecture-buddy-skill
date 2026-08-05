@@ -6,21 +6,17 @@
 ## 运行时交付物（用户安装）
 
 ```text
-architecture-buddy/              # ADR-0014 normalized package path
-  SKILL.md                 # 主持：身份、流程 A/B/C、M1–M9、Top N、圆桌主持
-  references/              # 可选：从 survey 活表提炼的短参考（非全书复制）
-    mechanisms.md          # M1–M9 + 关键 K*
-    strategies-cheatsheet.md
-    anti-patterns.md
-  templates/               # 可选：架构笔记空白骨架（§3）
-    architecture-note.md
+skill/architecture-buddy/   # 安装名仍为 architecture-buddy（ADR-0014/0018）
+  SKILL.md
+  references/
+  templates/
 ```
 
-架构师视角（构建期另产，运行时独立安装）：
+架构立场透镜（构建期另产，运行时独立安装）：
 
 ```text
-architecture-buddy-lens-<shortname>/
-  SKILL.md                 # 透镜契约（§4 输出格式）+ 启发式正文
+skill/architecture-buddy-lens-<shortname>/
+  SKILL.md                 # 契约 + 思想/做法（非口吻）
 ```
 
 v1 **不要求**用户安装任何 Lens；仅主持即可共思。
