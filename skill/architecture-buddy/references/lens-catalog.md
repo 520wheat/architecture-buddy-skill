@@ -11,5 +11,6 @@ Dynamic seating: pick ≤3 installed lenses by best-for / not-for (ADR-0017). Di
 | gfs-mr | architecture-buddy-lens-gfs-mr | batch/scan analytics, move compute to data | low-latency OLTP / small files | spanner-sql (OLTP vs batch) |
 | spanner-sql | architecture-buddy-lens-spanner-sql | global external consistency + SQL | AP-first / offline merge | dynamo-ap |
 | zta-resource | architecture-buddy-lens-zta-resource | Zero Trust resource access, PEP placement | perimeter-only security as sole model | orthogonal; seat when trust boundary is the fork |
+| agent-loop | architecture-buddy-lens-agent-loop | LLM tool loops, permissions/HITL, session bounds, tracing, agent runtime | product module maps as architecture; unguarded full autonomy; no observe loop | often pairs with zta-resource on trust; not a substitute for log-stream/CP/AP stores |
 
 Scaffold (`architecture-buddy-lens-scaffold`) is for contract testing only — prefer real stance lenses when installed.
