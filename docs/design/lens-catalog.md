@@ -25,6 +25,7 @@
 | `gfs-mr` | 大规模顺序吞吐：分布式存储 + 数据局部计算 | 批处理、扫描型分析 | 低延迟随机点查 OLTP | GFS；MapReduce；HDFS/Hadoop | ✅ 已蒸馏 |
 | `spanner-sql` | 全球外部一致 + SQL | 需要强一致全球关系语义 | 愿用最终一致换极致可用/成本时 | Spanner；分布式 SQL | ✅ 已蒸馏 |
 | `zta-resource` | 不以网络位置授信，资源级持续裁决 | 零信任接入、混合云身份 | 只靠边界防火墙当唯一解 | NIST SP 800-207 | ✅ 已蒸馏 |
+| `agent-loop` | 规划/调用/观察工具循环 + 权限/会话/轨迹边界 | LLM 编排工具、agent 运行时、护栏与 HITL、复杂度阶梯 | 产品模块图冒充架构；无护栏全自治；否认观察闭环 | OpenAI Agents SDK；Anthropic Effective Agents；LangGraph | ✅ 已蒸馏 |
 
 ## 后续候选（未入首批）
 

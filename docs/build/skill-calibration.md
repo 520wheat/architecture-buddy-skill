@@ -30,7 +30,20 @@
 | `git` | 内容寻址 + 分布式协作史 | [`corpus/golden/git/`](../../corpus/golden/git/) | [`corpus/runs/2026-08-05-cal-git.md`](../../corpus/runs/2026-08-05-cal-git.md) |
 | `kubernetes` | 声明式控制面 / 协调循环 | [`corpus/golden/kubernetes/`](../../corpus/golden/kubernetes/) | [`corpus/runs/2026-08-05-cal-kubernetes.md`](../../corpus/runs/2026-08-05-cal-kubernetes.md) |
 
-Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 **PASS**。Hadoop、Spark 等属 Phase 2。
+Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 **PASS**。
+
+## 扩库与迁移（Phase 2，完成）
+
+| id | 问题类（概要） | GOLDEN |
+|----|----------------|--------|
+| `hdfs` | 大规模可靠存储 + 高带宽供给计算 | [`corpus/golden/hdfs/`](../../corpus/golden/hdfs/) |
+| `spark` | 通用数据并行 / DAG 惰性求值 | [`corpus/golden/spark/`](../../corpus/golden/spark/) |
+| `agent-runtime` | LLM 工具编排循环 + 权限/人审边界 | [`corpus/golden/agent-runtime/`](../../corpus/golden/agent-runtime/) |
+
+- **迁移校准**：[`corpus/runs/2026-08-05-mig-sre-buddy.md`](../../corpus/runs/2026-08-05-mig-sre-buddy.md) — 判定 **PASS**（SRE-Buddy；非正式 GOLDEN）
+- **蒸馏透镜**：新建 [`architecture-buddy-lens-agent-loop`](../../skill/architecture-buddy-lens-agent-loop/SKILL.md)（对齐 agent-runtime；已登记 `lens-catalog`）
+- **本轮不做**：Minecraft（缺可靠公开架构正典；后续）
+- 计划：[`docs/superpowers/plans/2026-08-05-architecture-buddy-phase2-expand.md`](../superpowers/plans/2026-08-05-architecture-buddy-phase2-expand.md)
 
 ## 复现校准
 
@@ -73,4 +86,5 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 |-------|----------------|
 | 0 | 本文件 + `corpus/` 占位；无 GOLDEN 正文 |
 | 1（完成） | 三种子 GOLDEN+RUBRIC；各至少一次维护者 PASS（见上表链接） |
-| 2+ | 扩库、蒸馏、半自动对照报告 |
+| 2（完成） | 扩库 hdfs/spark/agent-runtime；mig-sre-buddy PASS；透镜 agent-loop；验收 V9 |
+| 3+ | 半自动对照报告、更多扩库（含 Minecraft 等后续） |

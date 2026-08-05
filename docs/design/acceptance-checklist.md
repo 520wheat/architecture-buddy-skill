@@ -38,3 +38,9 @@ V6 由 `scripts/check-architecture-buddy.sh` 自动检查。
 - [ ] corpus/golden/{kafka,git,kubernetes} 四文件齐全
 - [ ] 三份 cal runs 判定均为 PASS
 - [ ] 用户侧 SKILL 仍无开考/打分话术
+
+## V9 Phase 2 扩库与迁移（维护者）
+- [ ] 金标目录 ≥6（原 3 + hdfs/spark/agent-runtime）
+- [ ] 迁移校准 mig-sre-buddy 判定 PASS
+- [ ] 至少 1 个透镜新建或金标加厚升级
+- [ ] 用户侧 SKILL 仍无开考话术
