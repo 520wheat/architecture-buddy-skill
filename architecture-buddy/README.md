@@ -4,4 +4,4 @@ Install: copy or symlink this folder into your agent skills directory as `archit
 
 Optional lenses: install any `architecture-buddy-lens-*` beside it.
 
-Verify: from repo root, `bash scripts/check-architecture-buddy.sh`
+Verify: from the `skill-create` repo root, `bash scripts/check-architecture-buddy.sh` (not from the installed skill directory).

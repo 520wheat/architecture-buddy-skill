@@ -6,7 +6,7 @@
 ## 运行时交付物（用户安装）
 
 ```text
-Architecture Buddy/
+architecture-buddy/              # ADR-0014 normalized package path
   SKILL.md                 # 主持：身份、流程 A/B/C、M1–M9、Top N、圆桌主持
   references/              # 可选：从 survey 活表提炼的短参考（非全书复制）
     mechanisms.md          # M1–M9 + 关键 K*
@@ -19,7 +19,7 @@ Architecture Buddy/
 架构师视角（构建期另产，运行时独立安装）：
 
 ```text
-Architecture Buddy Lens <Name>/
+architecture-buddy-lens-<shortname>/
   SKILL.md                 # 透镜契约（§4 输出格式）+ 启发式正文
 ```
 
@@ -33,7 +33,7 @@ docs/survey/living/* + 选定人物/语料
         ▼
   nuwa-skill（构建期）
         │
-        ├─► 蒸馏「第一性原理共抽问题」→ 合并进 Architecture Buddy/SKILL.md
+        ├─► 蒸馏「第一性原理共抽问题」→ 合并进 architecture-buddy/SKILL.md
         └─► 蒸馏 2–3 架构师 → 各 Lens skill 包
 ```
 
@@ -75,4 +75,5 @@ docs/survey/living/* + 选定人物/语料
 ## 相关
 
 - ADR-0003、0005、0007  
+- ADR-0014（skill 包命名规范化）  
 - Design §1–§4  

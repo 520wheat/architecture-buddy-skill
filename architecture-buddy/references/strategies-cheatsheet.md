@@ -16,14 +16,14 @@ Source: docs/survey/living/strategies-and-patterns.md — compressed for skill r
 
 ## 模式 corpus 入口
 
-| ID | 文件 | Buddy 默认层级 |
-|----|------|----------------|
-| P1 GoF | `patterns/P1-gof-index.md` | 细粒度 |
-| P2 POSA1 | `patterns/P2-posa-vol1-index.md` + deep-three | 架构 |
-| P3 PoEAA | `patterns/P3-poeaa-families.md` | 企业 |
-| P4 EIP | `patterns/P4-eip-core.md` | 集成 |
-| P5 并发分布式 | `patterns/P5-concurrency-distributed.md` | 架构/中间件 |
-| P9 Agent | `patterns/P9-agent-patterns-seed.md` | 领域模式（Agent） |
+| ID | repo-only 证据（`docs/survey/patterns/`，未随包安装） | Buddy 默认层级 |
+|----|------------------------------------------------------|----------------|
+| P1 GoF | `docs/survey/patterns/P1-gof-index.md` | 细粒度 |
+| P2 POSA1 | `docs/survey/patterns/P2-posa-vol1-index.md` + deep-three | 架构 |
+| P3 PoEAA | `docs/survey/patterns/P3-poeaa-families.md` | 企业 |
+| P4 EIP | `docs/survey/patterns/P4-eip-core.md` | 集成 |
+| P5 并发分布式 | `docs/survey/patterns/P5-concurrency-distributed.md` | 架构/中间件 |
+| P9 Agent | `docs/survey/patterns/P9-agent-patterns-seed.md` | 领域模式（Agent） |
 
 ## M5 策略表列约定
 `策略或模式 | 层级(架构/企业/集成/并发分布式/Agent/细粒度) | 适用条件 | 代价 | 状态`

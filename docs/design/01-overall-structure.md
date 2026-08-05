@@ -8,7 +8,7 @@ Approved（2026-08-04）
 
 - **名称**：Architecture Buddy
 - **形态**：Agent Skills 协议下的 skill 包（可装 Cursor / Claude Code 等）
-- **存放**：`Architecture Buddy/`（本工作区内）
+- **存放**：`architecture-buddy/`（本工作区内；ADR-0014 规范化）
 - **与业务仓库**：解耦，独立维护
 
 ## 运行时两层（ADR-0003）
@@ -48,3 +48,4 @@ Approved（2026-08-04）
 - ADR-0003 运行时结构
 - ADR-0004 入口/产物/Top N
 - ADR-0005 工作区与命名
+- ADR-0014 skill 包命名规范化

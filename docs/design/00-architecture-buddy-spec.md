@@ -83,13 +83,13 @@ Architecture Buddy（主持）
 **运行时主持包**：
 
 ```text
-Architecture Buddy/
+architecture-buddy/  # ADR-0014 normalized package path
   SKILL.md
   references/     # 自 living 压缩，非全书
   templates/      # 笔记骨架
 ```
 
-**透镜包**：`Architecture Buddy Lens <Name>/SKILL.md`（契约 + 启发式）。
+**透镜包**：`architecture-buddy-lens-<shortname>/SKILL.md`（ADR-0014；契约 + 启发式）。
 
 **构建期**：nuwa 蒸馏 FP → 写入主持；蒸馏 2–3 透镜 → 独立包。人名与语料另开构建期 ADR。
 

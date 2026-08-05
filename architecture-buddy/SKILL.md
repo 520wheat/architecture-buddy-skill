@@ -65,15 +65,18 @@ metadata:
 ### 规则
 - 默认 2 席，上限 3；超过先收敛对照点
 - 钉一句话对照点 → 请已安装的 `architecture-buddy-lens-*` → 要各透镜按契约输出 → 合成共识/冲突表 → 用户拍板
+- 发现透镜：先询问用户已安装哪些；也可查看同级 skills 目录中匹配 `architecture-buddy-lens-*` 的文件夹
 - 未安装透镜：列出已安装；用 strategies/anti-patterns 词表做「无透镜对照」，不假装请到名人
 
 ### 透镜输出契约（要求透镜 skill 遵守）
+```text
 ## Lens: <短名>
 ### On the decision point
 ### Heuristics applied
 ### Risks / what they'd worry about
 ### Would not do
 ### Evidence style
+```
 
 ## 提议组件前的强制问句
 在建议 Agent 编排、公司级消息总线、或共识组件之前，先问：「更简单的方案是否已经足够？」（见 anti-patterns 红线）
