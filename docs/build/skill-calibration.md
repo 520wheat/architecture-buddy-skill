@@ -52,7 +52,7 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 | `minecraft` | 共享模拟世界 / 客户端预测与权威服 | [`corpus/golden/minecraft/`](../../corpus/golden/minecraft/) | [`corpus/runs/2026-08-05-cal-minecraft.md`](../../corpus/runs/2026-08-05-cal-minecraft.md)（PASS） |
 
 - **半自动 RUBRIC 报告**：[`scripts/rubric-report.sh`](../../scripts/rubric-report.sh) · 用法 [`docs/build/rubric-report.md`](rubric-report.md)
-- **版本矩阵**：[`corpus/COMPAT.md`](../../corpus/COMPAT.md)（skill `0.3.0` ↔ 已知 PASS，含 hdfs / spark / minecraft 复现 cal）
+- **版本矩阵**：[`corpus/COMPAT.md`](../../corpus/COMPAT.md)（skill `0.3.6` 纳入可识别交付标题、Phase 1B 语义质量与圆桌过程证据；历史版本的领域 PASS 不代表语义优秀）
 - 计划：[`docs/superpowers/plans/2026-08-05-architecture-buddy-phase3-tooling.md`](../superpowers/plans/2026-08-05-architecture-buddy-phase3-tooling.md)
 
 ## 复现校准
@@ -65,7 +65,7 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 
 ### PASS 标准（复现）
 
-- 候选满足层 A（A1–A8）与层 B（B1–B5），且过 S6 结构完整性
+- 候选满足层 A（A1–A8）与层 B（B1–B6），且过 S6 结构完整性与 B6 最低证据检查
 - RUBRIC 必中点命中；无 RUBRIC 黑名单幻觉
 - 机制/策略与 GOLDEN 同问题类对齐（允许表述差异，不允许乱套类比）
 
@@ -98,5 +98,5 @@ Phase 1 三种子 GOLDEN + RUBRIC 已齐，且各有一次维护者复现校准 
 | 1（完成） | 三种子 GOLDEN+RUBRIC；各至少一次维护者 PASS（见上表链接） |
 | 2（完成） | 扩库 hdfs/spark/agent-runtime；mig-sre-buddy PASS；透镜 agent-loop；验收 V9 |
 | 3（完成） | rubric-report；COMPAT；盲区金标 etcd + minecraft；hdfs/spark 复现 cal；GFS-MR 0.2.0；V10 |
-| 公开内测就绪（进行中） | host 0.3.1；Use when descriptions；Cursor+Codex README；pressure-test.sh；agent-runtime 专用 cal PASS；见 `release-readiness.md` / V11 |
+| 公开内测就绪（进行中） | host 0.3.6；Use when descriptions；Cursor+Codex README；结构与语义质量压力测试；Git 圆桌现场校准 PASS；见 `release-readiness.md` / V12 |
 | 之后 | 真模型多轮回归、可选拆分发布物（按需） |

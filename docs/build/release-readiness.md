@@ -14,7 +14,8 @@
 | 2 | README 含 Cursor **与** Codex（及通用 skills 路径）安装说明 | 见根 README |
 | 3 | 可执行压力测试：门禁文案 + 结构负例/正例；agent-runtime 必中主题 | `scripts/pressure-test.sh` |
 | 4 | `agent-runtime` 专用复现校准 PASS | `corpus/runs/*-cal-agent-runtime.md` + COMPAT |
-| 5 | 高影响互斥分叉必须触发圆桌预检；同意后可加载透镜并综合 | `architecture-buddy` 0.3.2 + `corpus/runs/2026-08-05-live-test-git-roundtable.md` |
+| 5 | 高影响互斥分叉必须触发圆桌预检；同意后可加载透镜并综合 | `architecture-buddy` 0.3.6 + `corpus/runs/2026-08-05-live-test-git-roundtable.md` |
+| 6 | B6 具体证据与圆桌过程证据进入交付门禁；语义分与领域分独立 | `docs/design/architecture-quality-rubric.md` + `scripts/architecture-quality-report.sh` |
 
 本轮补充校准已通过：主持人先提议圆桌、测试用户同意、加载 `log-stream` 与 `raft-cp` 两个透镜，并输出综合结论。
 
@@ -22,6 +23,12 @@
 
 - 范飞龙《别再让 AI 一直加功能》：加法陷阱 → 乘法式构架；停找分抽证；业务五问；N+1 + 反例进完成门禁与模板 B6。  
 - 摘记：`docs/survey/architecture/D9-fan-multiplicative-architecture.md`。
+
+## Phase 1B（0.3.6）
+
+- B6 必须给出变化轴、N+1、反例、可组合能力和复杂度的具体证据。
+- 圆桌触发后必须保存提议、用户选择、席位/透镜契约和主持人综合结论；正文仍保持架构设计，不变成会议记录。
+- 语义质量、领域正确性、圆桌过程质量分开评分；报告工具不以关键词自动判定优秀。
 
 ## 仍属「稳定版之后」
 

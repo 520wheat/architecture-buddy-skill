@@ -15,7 +15,7 @@ bash scripts/rubric-report.sh <golden_id> <candidate.md> [out.md]
 | 参数 | 说明 |
 |------|------|
 | `golden_id` | `corpus/golden/<id>/` 目录名（如 `kafka`） |
-| `candidate.md` | 候选交付正文（含 `### A1`…`### A8`、`### B1`…`### B5`） |
+| `candidate.md` | 候选交付正文（含 `### A1`…`### A8`、`### B1`…`### B6`） |
 | `out.md` | 可选；省略则打印到 stdout |
 
 ```bash
@@ -25,12 +25,12 @@ bash scripts/rubric-report.sh --help
 ## 行为
 
 1. 校验 `corpus/golden/<id>/{GOLDEN,RUBRIC}.md` 与候选文件存在
-2. 结构门禁：候选必须含层 A（A1–A8）与层 B（B1–B5）标题；缺则 **FAIL**（非 0）
+2. 结构门禁：候选必须含层 A（A1–A8）与层 B（B1–B6）标题，并通过 B6 最低证据检查；缺则 **FAIL**（非 0）
 3. 从 RUBRIC 中标题含「必中」的章节提取 `- ` 列表项 → 报告 `- [ ] …`
 4. 从「幻觉黑名单」章节提取列表项 → 报告 `- [ ] 未出现：…`
 5. 报告头部声明：**本报告不自动判定 PASS；维护者勾选后写入 corpus/runs**
 
-「叙事完整性」等非「必中」标题章节不进入勾选表（仍由维护者人工阅读）。
+「叙事完整性」等非「必中」标题章节不进入勾选表（仍由维护者人工阅读）。语义质量请使用 `docs/design/architecture-quality-rubric.md` 与 `scripts/architecture-quality-report.sh`，本脚本不以关键词自动判定优秀。
 
 ## 冒烟
 

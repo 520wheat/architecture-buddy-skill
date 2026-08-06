@@ -1,0 +1,88 @@
+{
+  "format": "skillopt_sleep.tasks.v1",
+  "project": "/Users/apple/Desktop/skill-create",
+  "transcript_source": "curated-architecture-regression-v2",
+  "n_sessions": 0,
+  "target_skill_path": "/Users/apple/Desktop/skill-create/skill/architecture-buddy/SKILL.md",
+  "reviewed": true,
+  "tasks": [
+    {
+      "id": "roundtable-decline",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "架构设计中发现高影响互斥分叉，主持人先提出圆桌并说明席位，但用户明确拒绝圆桌。请记录用户选择跳过圆桌，然后继续用轻量策略/反模式对照推进，不要伪造透镜讨论。",
+      "context_excerpt": "用户希望继续完成设计，但不希望展开多视角讨论。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {"kind": "rule", "checks": [
+        {"op": "contains", "arg": "已提议圆桌"},
+        {"op": "contains", "arg": "用户选择跳过圆桌"},
+        {"op": "contains", "arg": "继续"},
+        {"op": "regex", "arg": "(?s)^(?!.*(?:Lens:|用户同意)).*$"}
+      ]},
+      "tags": ["architecture", "roundtable", "rule:decline-record"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "roundtable-no-lens-degrade",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "用户同意架构圆桌，但当前没有与决策点匹配的已安装透镜。请明确说明没有匹配透镜，降级使用策略/反模式词表，并强调透镜是做法立场而不是名人扮演。",
+      "context_excerpt": "这是一个不属于现有透镜目录的领域问题。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {"kind": "rule", "checks": [
+        {"op": "contains", "arg": "没有匹配透镜"},
+        {"op": "contains", "arg": "策略/反模式词表"},
+        {"op": "contains", "arg": "名人扮演"},
+        {"op": "contains", "arg": "圆桌"}
+      ]},
+      "tags": ["architecture", "roundtable", "rule:no-lens-degrade"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "first-principles-reasoning",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "开始一份 deliverable 架构设计时，请先从假设草案拆到不可再简化的基本事实，标出待验证事实，再从事实重推机制与策略。不要只填写结果、约束和优化变量表。",
+      "context_excerpt": "用户给出了一个熟悉的技术选型，但没有说明真正要保证的事实。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {"kind": "rule", "checks": [
+        {"op": "contains", "arg": "假设"},
+        {"op": "contains", "arg": "基本事实"},
+        {"op": "contains", "arg": "待验证"},
+        {"op": "contains", "arg": "机制"},
+        {"op": "contains", "arg": "策略"}
+      ]},
+      "tags": ["architecture", "first-principles", "rule:facts-before-strategy"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "composition-boundary-review",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "架构设计需要处理第三个相似变体时，请停止复制实现，抽出少数稳定概念和明确变化轴，用 A × B × C → 结果表达组合意图，并用 N+1 与反例检查边界。最后说明是在增加可组合能力还是只增加复杂度。",
+      "context_excerpt": "已有两个相似实现，第三个需求正在推动再次复制流程。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {"kind": "rule", "checks": [
+        {"op": "contains", "arg": "变化轴"},
+        {"op": "contains", "arg": "N+1"},
+        {"op": "contains", "arg": "反例"},
+        {"op": "contains", "arg": "可组合能力"},
+        {"op": "contains", "arg": "复杂度"}
+      ]},
+      "tags": ["architecture", "composition", "rule:n-plus-one-boundary"],
+      "source_sessions": [],
+      "split": "test",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    }
+  ]
+}

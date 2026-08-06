@@ -1,0 +1,250 @@
+[
+  {
+    "id": "git-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 Git 写正式双层架构设计。先定位目标层和推导链，再说明工作树、index、内容寻址对象、blob/tree/commit、refs/HEAD、多父 DAG、pack/delta、plumbing/porcelain、离线提交和 push/fetch 边界；覆盖失败恢复、安全、演进和验收。不要把 Git 核心写成 Kafka 或全局 Raft。",
+    "context_excerpt": "设计对象是 Git 本身，不是代码托管产品。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "工作树"}, {"op": "contains", "arg": "index"},
+      {"op": "contains", "arg": "对象库"}, {"op": "contains", "arg": "DAG"},
+      {"op": "contains", "arg": "pack"}, {"op": "contains", "arg": "refs"},
+      {"op": "contains", "arg": "plumbing"}, {"op": "contains", "arg": "失败"},
+      {"op": "contains", "arg": "验收"}, {"op": "min_chars", "arg": 2600},
+      {"op": "regex", "arg": "(?s)^(?!.*Kafka.{0,80}核心).*$"}
+    ]},
+    "tags": ["architecture", "git", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "git-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 Git 的对象模型、历史合并、refs 发布和跨仓库同步取舍主持圆桌。先识别内容寻址 DAG 与中央协调/追加日志的高影响分叉，提议圆桌并假设用户同意；使用 Log Stream 和 Raft-CP 透镜，分别给出契约，最后综合为什么 Git 核心不采用它们作为本地提交真相。",
+    "context_excerpt": "需要验证圆桌是否保留 Git 的离线和多父历史边界。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "高影响互斥分叉"}, {"op": "contains", "arg": "提议圆桌"},
+      {"op": "contains", "arg": "用户同意"}, {"op": "contains", "arg": "综合结论"},
+      {"op": "regex", "arg": "(?m)^## Lens:"}, {"op": "contains", "arg": "Log Stream"},
+      {"op": "contains", "arg": "Raft-CP"}, {"op": "contains", "arg": "### On the decision point"},
+      {"op": "contains", "arg": "### Heuristics applied"}, {"op": "contains", "arg": "### Risks / what they'd worry about"},
+      {"op": "contains", "arg": "### Would not do"}, {"op": "contains", "arg": "### Evidence style"},
+      {"op": "min_chars", "arg": 1200}
+    ]},
+    "tags": ["architecture", "git", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "kubernetes-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 Kubernetes 写正式架构设计。解释声明式期望状态、API 对象、控制器调和、控制面与节点执行面的边界、调度、服务发现、扩展和故障恢复；说明质量属性、演进和验收，不把 YAML 或组件部署清单当作架构。",
+    "context_excerpt": "目标是 Kubernetes 集群架构，而不是写一个 Helm chart。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "期望状态"}, {"op": "contains", "arg": "调和"},
+      {"op": "contains", "arg": "控制面"}, {"op": "contains", "arg": "节点"},
+      {"op": "contains", "arg": "失败"}, {"op": "contains", "arg": "演进"},
+      {"op": "contains", "arg": "验收"}, {"op": "min_chars", "arg": 2400}
+    ]},
+    "tags": ["architecture", "kubernetes", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "kubernetes-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "主持 Kubernetes 架构圆桌：在声明式调和、强一致控制面、节点自治、扩展性和运维复杂度之间识别高影响分叉，提议并获得用户同意后邀请 Raft-CP、Agent Loop 和 Zero Trust Resource 透镜，输出契约并综合冲突、边界和代价。",
+    "context_excerpt": "圆桌必须回写控制面一致性、调和循环和身份边界的设计结论。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "提议圆桌"}, {"op": "contains", "arg": "用户同意"},
+      {"op": "contains", "arg": "综合结论"}, {"op": "regex", "arg": "(?m)^## Lens:"},
+      {"op": "contains", "arg": "Raft-CP"}, {"op": "contains", "arg": "Agent Loop"},
+      {"op": "contains", "arg": "Zero Trust"}, {"op": "contains", "arg": "调和"},
+      {"op": "contains", "arg": "边界"}, {"op": "contains", "arg": "### Would not do"},
+      {"op": "min_chars", "arg": 1200}
+    ]},
+    "tags": ["architecture", "kubernetes", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "minecraft-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为多人 Minecraft 类共享模拟世界写正式架构设计。说明服务端权威状态、客户端预测与和解、tick 循环、实体/区块兴趣区域同步、持久化、插件扩展和网络断连恢复；明确不是 Java 插件模块清单，并写出质量属性、演进和验收。",
+    "context_excerpt": "设计对象是共享模拟世界的问题类，不假设 Mojang 私有实现细节。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "服务端权威"}, {"op": "contains", "arg": "预测"},
+      {"op": "contains", "arg": "tick"}, {"op": "contains", "arg": "区块"},
+      {"op": "contains", "arg": "断连"}, {"op": "contains", "arg": "反例"},
+      {"op": "contains", "arg": "验收"}, {"op": "min_chars", "arg": 2300}
+    ]},
+    "tags": ["architecture", "minecraft", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "minecraft-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "主持多人共享模拟世界的圆桌，先提议并取得用户同意，讨论服务端权威 vs 客户端预测、同步日志 vs 状态快照、插件扩展 vs 核心稳定性三组高影响分叉，使用 Agent Loop、Log Stream 和 Scaffold 透镜，给出契约和综合结论。",
+    "context_excerpt": "圆桌结论必须保留 tick、和解、兴趣区域和扩展边界。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "提议圆桌"}, {"op": "contains", "arg": "用户同意"},
+      {"op": "contains", "arg": "综合结论"}, {"op": "regex", "arg": "(?m)^## Lens:"},
+      {"op": "contains", "arg": "Agent Loop"}, {"op": "contains", "arg": "Log Stream"},
+      {"op": "contains", "arg": "Scaffold"}, {"op": "contains", "arg": "和解"},
+      {"op": "contains", "arg": "兴趣区域"}, {"op": "contains", "arg": "### Evidence style"},
+      {"op": "min_chars", "arg": 1100}
+    ]},
+    "tags": ["architecture", "minecraft", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "hdfs-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 HDFS/大规模批处理存储写正式架构设计。说明商品节点故障模型、NameNode 元数据、DataNode 数据块、副本与心跳、顺序吞吐、计算靠近数据、恢复和扩展边界；区分逻辑文件语义与物理块布局，覆盖质量属性、演进、反例和验收。",
+    "context_excerpt": "目标是大规模顺序数据存储架构，不是部署 Hadoop 服务的操作手册。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "NameNode"}, {"op": "contains", "arg": "DataNode"},
+      {"op": "contains", "arg": "副本"}, {"op": "contains", "arg": "心跳"},
+      {"op": "contains", "arg": "故障"}, {"op": "contains", "arg": "顺序吞吐"},
+      {"op": "contains", "arg": "验收"}, {"op": "min_chars", "arg": 2300}
+    ]},
+    "tags": ["architecture", "hdfs", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "hdfs-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "主持 HDFS 架构圆桌，先识别并提议副本一致性、中心元数据协调、顺序吞吐和跨机房可用性的高影响分叉，取得用户同意后使用 GFS-MR、Raft-CP 和 Scaffold 透镜，最后综合冲突、边界、代价与证据。",
+    "context_excerpt": "圆桌要避免把 HDFS 误写成低延迟 OLTP 或全球强一致数据库。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "高影响互斥分叉"}, {"op": "contains", "arg": "提议圆桌"},
+      {"op": "contains", "arg": "用户同意"}, {"op": "contains", "arg": "综合结论"},
+      {"op": "regex", "arg": "(?m)^## Lens:"}, {"op": "contains", "arg": "GFS-MR"},
+      {"op": "contains", "arg": "Raft-CP"}, {"op": "contains", "arg": "Scaffold"},
+      {"op": "contains", "arg": "顺序吞吐"}, {"op": "contains", "arg": "### Risks / what they'd worry about"},
+      {"op": "min_chars", "arg": 1100}
+    ]},
+    "tags": ["architecture", "hdfs", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "kafka-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 Kafka 类追加日志写正式架构设计。说明分区、顺序、offset、消费者组、复制、积压、重放、生产者与消费者失败语义，并从事件事实和质量属性推导边界；不要把 Kafka 当作数据库事务或共识服务。",
+    "context_excerpt": "设计对象是高吞吐可回放事件日志，而不是一个简单消息队列 API。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "分区"}, {"op": "contains", "arg": "offset"},
+      {"op": "contains", "arg": "消费者组"}, {"op": "contains", "arg": "重放"},
+      {"op": "contains", "arg": "积压"}, {"op": "contains", "arg": "重复"},
+      {"op": "contains", "arg": "质量属性"}, {"op": "min_chars", "arg": 2200}
+    ]},
+    "tags": ["architecture", "kafka", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "kafka-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "主持 Kafka 架构圆桌，识别追加日志 vs 请求响应、分区顺序 vs 全局顺序、复制可用性 vs 一致性和回放成本分叉，提议并取得用户同意后使用 Log Stream、Dynamo-AP 和 Raft-CP 透镜，形成综合结论。",
+    "context_excerpt": "综合结论必须说明哪些事实需要日志，哪些事实不需要 Kafka。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "提议圆桌"}, {"op": "contains", "arg": "用户同意"},
+      {"op": "contains", "arg": "综合结论"}, {"op": "regex", "arg": "(?m)^## Lens:"},
+      {"op": "contains", "arg": "Log Stream"}, {"op": "contains", "arg": "Dynamo-AP"},
+      {"op": "contains", "arg": "Raft-CP"}, {"op": "contains", "arg": "分区"},
+      {"op": "contains", "arg": "### Evidence style"}, {"op": "contains", "arg": "代价"},
+      {"op": "min_chars", "arg": 1100}
+    ]},
+    "tags": ["architecture", "kafka", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "etcd-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 etcd 类强一致元数据与协调系统写正式架构设计。说明 Raft 多数派、leader、线性一致读写、watch、租约、revision、快照恢复、分区失败和配置/服务发现边界；从协调事实推导机制和质量属性，不把它当普通缓存。",
+    "context_excerpt": "设计对象是防止脑裂的协调面，而不是高吞吐业务数据面。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "Raft"}, {"op": "contains", "arg": "多数派"},
+      {"op": "contains", "arg": "线性一致"}, {"op": "contains", "arg": "watch"},
+      {"op": "contains", "arg": "租约"}, {"op": "contains", "arg": "脑裂"},
+      {"op": "contains", "arg": "恢复"}, {"op": "min_chars", "arg": 2200}
+    ]},
+    "tags": ["architecture", "etcd", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "etcd-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "主持 etcd 架构圆桌，识别强一致协调 vs 高可用数据面、watch vs 轮询、租约语义和多数派可用性分叉，提议并取得用户同意后使用 Raft-CP、Dynamo-AP 和 Zero Trust Resource 透镜，输出契约并综合结论。",
+    "context_excerpt": "必须保留分区期间的不可用代价和身份/权限边界。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "提议圆桌"}, {"op": "contains", "arg": "用户同意"},
+      {"op": "contains", "arg": "综合结论"}, {"op": "regex", "arg": "(?m)^## Lens:"},
+      {"op": "contains", "arg": "Raft-CP"}, {"op": "contains", "arg": "Dynamo-AP"},
+      {"op": "contains", "arg": "Zero Trust"}, {"op": "contains", "arg": "多数派"},
+      {"op": "contains", "arg": "不可用"}, {"op": "contains", "arg": "### Would not do"},
+      {"op": "min_chars", "arg": 1100}
+    ]},
+    "tags": ["architecture", "etcd", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "agent-runtime-formal-architecture-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "为 Agent Runtime 写正式架构设计。说明 plan/act/observe 循环、工具契约、权限、人审、会话边界、失败重试、轨迹审计、提示注入防护和可观测性；从任务目标和副作用边界推导应用与技术机制，不把模型调用清单当作架构。",
+    "context_excerpt": "设计对象是具备工具副作用的 agent runtime，不是某个 SDK 的 API 文档。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "section_present", "arg": "A1"}, {"op": "section_present", "arg": "A8"},
+      {"op": "section_present", "arg": "B1"}, {"op": "section_present", "arg": "B6"},
+      {"op": "contains", "arg": "目标层"}, {"op": "contains", "arg": "架构推导链"},
+      {"op": "contains", "arg": "plan/act/observe"}, {"op": "contains", "arg": "权限"},
+      {"op": "contains", "arg": "人审"}, {"op": "contains", "arg": "会话"},
+      {"op": "contains", "arg": "轨迹"}, {"op": "contains", "arg": "提示注入"},
+      {"op": "contains", "arg": "失败"}, {"op": "min_chars", "arg": 2200}
+    ]},
+    "tags": ["architecture", "agent-runtime", "formal", "domain"], "source_sessions": [], "split": "test", "origin": "real", "skill_hint": "architecture-buddy"
+  },
+  {
+    "id": "agent-runtime-roundtable-v6",
+    "project": "/Users/apple/Desktop/skill-create",
+    "intent": "主持 Agent Runtime 圆桌，识别 workflow vs autonomous agent、自动执行 vs 人审、短会话 vs 可恢复长会话、集中策略 vs 工具自治分叉，提议并取得用户同意后使用 Agent Loop、Zero Trust Resource 和 Scaffold 透镜，形成带边界和代价的综合结论。",
+    "context_excerpt": "圆桌结论必须写回权限、会话、HITL 和轨迹边界。",
+    "outcome": "unknown",
+    "reference_kind": "rule",
+    "judge": {"kind": "rule", "checks": [
+      {"op": "contains", "arg": "提议圆桌"}, {"op": "contains", "arg": "用户同意"},
+      {"op": "contains", "arg": "综合结论"}, {"op": "regex", "arg": "(?m)^## Lens:"},
+      {"op": "contains", "arg": "Agent Loop"}, {"op": "contains", "arg": "Zero Trust"},
+      {"op": "contains", "arg": "Scaffold"}, {"op": "contains", "arg": "人审"},
+      {"op": "contains", "arg": "权限"}, {"op": "contains", "arg": "### Risks / what they'd worry about"},
+      {"op": "contains", "arg": "代价"}, {"op": "min_chars", "arg": 1100}
+    ]},
+    "tags": ["architecture", "agent-runtime", "roundtable", "domain"], "source_sessions": [], "split": "val", "origin": "real", "skill_hint": "architecture-buddy"
+  }
+]

@@ -9,7 +9,7 @@ usage() {
 Usage: bash scripts/rubric-report.sh <golden_id> <candidate.md> [out.md]
 
 Generate a maintainer RUBRIC checklist report from corpus/golden/<id>/RUBRIC.md
-against a candidate deliverable. Structure A1–A8 / B1–B5 must be present.
+against a candidate deliverable. Structure A1–A8 / B1–B6 must be present.
 
 Does NOT auto-judge PASS — maintainer checks boxes, then writes corpus/runs.
 
@@ -45,16 +45,35 @@ RUBRIC_MD="$GOLDEN_DIR/RUBRIC.md"
 [[ -f "$GOLDEN_MD" ]] || fail "missing $GOLDEN_MD"
 [[ -f "$RUBRIC_MD" ]] || fail "missing $RUBRIC_MD"
 
-# Structure gate: ### A1…### A8, ### B1…### B5
+# Structure gate: ### A1…### A8, ### B1…### B6
 missing=()
 for i in 1 2 3 4 5 6 7 8; do
   grep -qE "^### A${i}([[:space:]]|$)" "$CANDIDATE" || missing+=("### A${i}")
 done
-for i in 1 2 3 4 5; do
+for i in 1 2 3 4 5 6; do
   grep -qE "^### B${i}([[:space:]]|$)" "$CANDIDATE" || missing+=("### B${i}")
 done
 if [[ ${#missing[@]} -gt 0 ]]; then
   fail "candidate missing sections: ${missing[*]}"
+fi
+
+# B6 is the explicit composition-boundary gate. These markers are minimum
+# omission evidence; they do not auto-judge whether the architecture is good.
+extract_b6() {
+  awk '
+    /^### B6([[:space:]]|$)/ { in_b6=1; next }
+    in_b6 && (/^### / || /^## /) { exit }
+    in_b6 { print }
+  ' "$CANDIDATE"
+}
+
+b6_body="$(extract_b6)"
+b6_missing=()
+for marker in '变化轴' 'N+1' '反例' '可组合能力' '复杂度'; do
+  [[ "$b6_body" == *"$marker"* ]] || b6_missing+=("$marker")
+done
+if [[ ${#b6_missing[@]} -gt 0 ]]; then
+  fail "candidate B6 missing minimum evidence: ${b6_missing[*]}"
 fi
 
 # Extract "- " list items under ## headings matching needle until next ##
@@ -102,7 +121,7 @@ emit() {
 | golden_id | \`${GOLDEN_ID}\` |
 | golden | \`corpus/golden/${GOLDEN_ID}/\` |
 | candidate | \`${rel_candidate}\` |
-| structure | OK（A1–A8、B1–B5） |
+| structure | OK（A1–A8、B1–B6） |
 
 ## 必中
 

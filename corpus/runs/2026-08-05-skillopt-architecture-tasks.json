@@ -1,0 +1,110 @@
+{
+  "format": "skillopt_sleep.tasks.v1",
+  "project": "/Users/apple/Desktop/skill-create",
+  "transcript_source": "curated-architecture-regression",
+  "n_sessions": 0,
+  "target_skill_path": "/Users/apple/Desktop/skill-create/skill/architecture-buddy/SKILL.md",
+  "reviewed": true,
+  "tasks": [
+    {
+      "id": "formal-git-architecture",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "请为 Git 写一份正式架构设计文档。正文只保留架构决策、边界、组件契约、主路径、失败恢复、安全、演进和验收，不要把圆桌过程写进正式文档。",
+      "context_excerpt": "对象库、refs、index、pack、push/fetch 和离线提交是已知主题。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "section_present", "arg": "摘要"},
+          {"op": "section_present", "arg": "上下文与边界"},
+          {"op": "section_present", "arg": "主路径"},
+          {"op": "section_present", "arg": "组件与契约"},
+          {"op": "section_present", "arg": "失败"},
+          {"op": "section_present", "arg": "安全"},
+          {"op": "section_present", "arg": "验收"},
+          {"op": "contains", "arg": "明确不做"},
+          {"op": "regex", "arg": "(?s)^(?!.*(?:圆桌提议|用户同意|Lens:|会议记录)).*$"}
+        ]
+      },
+      "tags": ["architecture", "formal-deliverable", "rule:separate-meeting-record"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "architecture-roundtable",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "针对一个存在一致性边界和中央协调取舍的系统，请先主持架构圆桌：说明高影响分叉，提出席位并等待用户同意；同意后让每个透镜给出决策点、启发式、风险、不会做和证据方式，最后形成综合结论。",
+      "context_excerpt": "系统同时涉及可变元数据、分布式数据和故障恢复。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "圆桌"},
+          {"op": "contains", "arg": "用户同意"},
+          {"op": "contains", "arg": "综合结论"},
+          {"op": "section_present", "arg": "Lens:"},
+          {"op": "section_present", "arg": "On the decision point"},
+          {"op": "section_present", "arg": "Heuristics applied"},
+          {"op": "section_present", "arg": "Risks / what they'd worry about"}
+        ]
+      },
+      "tags": ["architecture", "roundtable", "rule:preflight-consent"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "separate-roundtable-from-deliverable",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "请把一次架构圆桌的讨论结果整理成正式架构设计。圆桌过程应留在会议记录，正式设计只表达最终决策和必要的取舍。",
+      "context_excerpt": "已有多个视角的讨论、冲突和主持人综合意见。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "section_present", "arg": "摘要"},
+          {"op": "section_present", "arg": "组件与契约"},
+          {"op": "section_present", "arg": "取舍"},
+          {"op": "section_present", "arg": "演进"},
+          {"op": "regex", "arg": "(?s)^(?!.*(?:用户同意|测试用户|Lens:|会议记录|圆桌提议)).*$"}
+        ]
+      },
+      "tags": ["architecture", "formal-deliverable", "rule:separate-meeting-record"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "architecture-quality-review",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "评价一份架构设计是否优秀，必须分别检查问题边界、机制与策略、失败语义、可测验收句、演进切片、N+1 变化轴和反例；不要只根据篇幅或组件数量评价。",
+      "context_excerpt": "候选文档包含对象模型、状态流转、组件表和若干替代方案。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "边界"},
+          {"op": "contains", "arg": "机制"},
+          {"op": "contains", "arg": "策略"},
+          {"op": "contains", "arg": "失败"},
+          {"op": "contains", "arg": "验收"},
+          {"op": "contains", "arg": "N+1"},
+          {"op": "contains", "arg": "反例"}
+        ]
+      },
+      "tags": ["architecture", "quality-review", "rule:architecture-rubric"],
+      "source_sessions": [],
+      "split": "test",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    }
+  ]
+}

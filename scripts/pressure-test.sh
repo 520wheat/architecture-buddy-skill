@@ -6,8 +6,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL="$ROOT/skill/architecture-buddy"
 FIX="$ROOT/scripts/fixtures/pressure"
+QUALITY_FIX="$ROOT/scripts/fixtures/quality"
 fail() { echo "FAIL: $*" >&2; exit 1; }
 pass() { echo "OK: $*"; }
+
+mkdir -p "$QUALITY_FIX"
 
 mkdir -p "$FIX"
 
@@ -25,6 +28,84 @@ cat >"$FIX/incomplete-deliverable.md" <<'EOF'
 ## 层 B — 机制与策略
 ### B1 基本事实
 一条事实。
+EOF
+
+cat >"$FIX/missing-b6.md" <<'EOF'
+# 架构设计：缺少组合边界
+
+> 模式：deliverable
+
+## 层 A — 叙事
+### A1 摘要
+解决受控执行问题；不解决无监督变更。
+### A2 上下文与边界
+系统边界和信任边界已说明。
+### A3 主路径
+请求 → 鉴权 → 执行 → 审计。
+### A4 组件与契约
+组件职责和调用契约已说明。
+### A5 状态、失败与恢复
+失败状态和恢复路径已说明。
+### A6 安全与身份
+身份边界已说明。
+### A7 演进切片
+现在、下一刀和明确不做已说明。
+### A8 如何验收
+1. 输入请求后得到可观察结果。
+2. 未授权请求被拒绝。
+3. 失败后可以恢复。
+
+## 层 B — 机制与策略
+### B1 基本事实
+工具副作用不可自动回滚。
+### B2 机制
+统一执行闸门。
+### B3 策略选项
+内存或持久化状态。
+### B4 取舍
+简单性换取恢复能力限制。
+### B5 与对照的关系
+未对照。
+EOF
+
+cat >"$FIX/missing-b6-evidence.md" <<'EOF'
+# 架构设计：B6 证据不足
+
+> 模式：deliverable
+
+## 层 A — 叙事
+### A1 摘要
+解决受控执行问题；不解决无监督变更。
+### A2 上下文与边界
+系统边界和信任边界已说明。
+### A3 主路径
+请求 → 鉴权 → 执行 → 审计。
+### A4 组件与契约
+组件职责和调用契约已说明。
+### A5 状态、失败与恢复
+失败状态和恢复路径已说明。
+### A6 安全与身份
+身份边界已说明。
+### A7 演进切片
+现在、下一刀和明确不做已说明。
+### A8 如何验收
+1. 输入请求后得到可观察结果。
+2. 未授权请求被拒绝。
+3. 失败后可以恢复。
+
+## 层 B — 机制与策略
+### B1 基本事实
+工具副作用不可自动回滚。
+### B2 机制
+统一执行闸门。
+### B3 策略选项
+内存或持久化状态。
+### B4 取舍
+简单性换取恢复能力限制。
+### B5 与对照的关系
+未对照。
+### B6 组合增长与边界检验
+这里描述组合，但没有完成边界证据。
 EOF
 
 cat >"$FIX/complete-minimal-deliverable.md" <<'EOF'
@@ -68,7 +149,7 @@ cat >"$FIX/complete-minimal-deliverable.md" <<'EOF'
 未对照。
 
 ### B6 组合增长与边界检验
-消息 × 渠道 × 通用规则 → 可追踪投递。变化轴=渠道。N+1 只加渠道适配。反例=双向实时会话。能力增长而非缠绕。
+消息 × 渠道 × 通用规则 → 可追踪投递。变化轴=渠道。N+1 只加渠道适配。反例=双向实时会话。增加可组合能力而不是增加复杂度。
 
 ## 完成门禁自检
 - [x] 结构齐全
@@ -135,12 +216,59 @@ grep -q '必须先提议圆桌' "$SKILL/SKILL.md" || fail "missing: mandatory ro
 grep -q '用户选择跳过圆桌' "$SKILL/SKILL.md" || fail "missing: explicit user-decline record"
 pass "host SKILL requires roundtable preflight and consent record"
 
+# --- 2c) Deliverable quality contracts must be explicit ---
+grep -q 'B6 必须写出具体的变化轴、N+1、反例、可组合能力和复杂度证据' "$SKILL/SKILL.md" \
+  || fail "missing explicit B6 evidence contract"
+grep -q '圆桌过程证据必须' "$SKILL/SKILL.md" \
+  || fail "missing roundtable process-evidence contract"
+grep -q '综合结论必须' "$SKILL/SKILL.md" \
+  || fail "missing roundtable synthesis contract"
+grep -q '正文仍是架构设计，不写成会议记录' "$SKILL/SKILL.md" \
+  || fail "missing architecture-vs-minutes boundary"
+grep -q '正式 `deliverable` 必须直接使用以下' "$SKILL/SKILL.md" \
+  || fail "missing machine-readable deliverable heading contract"
+grep -q '用户同意圆桌' "$SKILL/SKILL.md" \
+  || fail "missing explicit consent evidence wording"
+grep -q '每席完整契约' "$SKILL/SKILL.md" \
+  || fail "missing ordered roundtable execution contract"
+grep -q '高影响互斥分叉：' "$SKILL/SKILL.md" \
+  || fail "missing explicit roundtable evidence labels"
+grep -q '主持人综合结论：' "$SKILL/SKILL.md" \
+  || fail "missing explicit synthesis evidence label"
+grep -q '圆桌过程证据' "$SKILL/templates/architecture-deliverable.md" \
+  || fail "deliverable template missing roundtable evidence slot"
+pass "deliverable quality contracts are explicit"
+
+# --- 2d) Architecture-vs-system-design boundary ---
+[[ -f "$FIX/system-design-only.md" ]] || fail "missing architecture-vs-system-design counterexample"
+grep -q '架构设计.*系统设计\|系统设计.*架构设计' "$SKILL/SKILL.md" \
+  || fail "missing explicit architecture-vs-system-design boundary"
+grep -q '问题.*业务.*应用.*集成.*技术' "$SKILL/SKILL.md" \
+  || fail "missing problem/business/application/integration/technology derivation chain"
+grep -q '服务.*API.*数据库.*系统设计\|模块.*API.*数据库.*系统设计' "$SKILL/SKILL.md" \
+  || fail "missing system-design-only counterexample rule"
+grep -q '目标层\|设计对象属于' "$SKILL/SKILL.md" \
+  || fail "missing adaptive architecture-layer positioning rule"
+grep -q '不适用\|明确不属于\|明确不做' "$SKILL/SKILL.md" \
+  || fail "missing deliberate omission rule for non-applicable layers"
+pass "architecture-vs-system-design boundary is explicit"
+
 # --- 3) Structure gate: incomplete fails, complete passes ---
 if bash "$ROOT/scripts/rubric-report.sh" kafka "$FIX/incomplete-deliverable.md" "$FIX/out-incomplete.md" 2>"$FIX/err-incomplete.txt"; then
   fail "incomplete deliverable should fail rubric-report structure check"
 fi
 grep -qiE 'missing|FAIL|A[0-9]|B[0-9]' "$FIX/err-incomplete.txt" "$FIX/out-incomplete.md" 2>/dev/null || true
 pass "incomplete deliverable rejected by structure check"
+
+if bash "$ROOT/scripts/rubric-report.sh" kafka "$FIX/missing-b6.md" "$FIX/out-missing-b6.md" 2>"$FIX/err-missing-b6.txt"; then
+  fail "missing B6 deliverable must fail structure check"
+fi
+pass "missing B6 deliverable rejected by structure check"
+
+if bash "$ROOT/scripts/rubric-report.sh" kafka "$FIX/missing-b6-evidence.md" "$FIX/out-missing-b6-evidence.md" 2>"$FIX/err-missing-b6-evidence.txt"; then
+  fail "B6 without minimum evidence must fail structure check"
+fi
+pass "B6 minimum evidence is required"
 
 bash "$ROOT/scripts/rubric-report.sh" kafka "$FIX/complete-minimal-deliverable.md" "$FIX/out-complete.md" \
   || fail "minimal complete deliverable should pass structure check"
@@ -189,6 +317,41 @@ if [[ -n "${CAL_AR}" ]]; then
 else
   fail "missing dedicated agent-runtime calibration run (corpus/runs/*-cal-agent-runtime.md)"
 fi
+
+# --- 6) Phase 1B semantic-quality counterexamples ---
+QUALITY_REPORT="$ROOT/scripts/architecture-quality-report.sh"
+[[ -x "$QUALITY_REPORT" ]] || fail "missing architecture quality report tool"
+
+run_quality_case() {
+  local name="$1"
+  local expected="$2"
+  local output="$FIX/out-quality-${name}.md"
+  bash "$QUALITY_REPORT" "$QUALITY_FIX/${name}.md" "$output" \
+    || fail "quality report failed for ${name}"
+    grep -Fq "$expected" "$output" \
+    || fail "quality report for ${name} missing expected signal: ${expected}"
+}
+
+run_quality_case module-list-only 'flag: module-list-only'
+run_quality_case system-design-only 'flag: architecture-boundary-debt'
+run_quality_case meeting-record-only 'flag: meeting-record-only'
+run_quality_case b6-title-empty 'flag: b6-evidence-insufficient'
+run_quality_case roundtable-without-synthesis 'roundtable_signal: synthesis-missing'
+run_quality_case roundtable-with-synthesis 'roundtable_signal: none-detected'
+run_quality_case conclusion-without-evidence 'flag: evidence-and-cost-debt'
+run_quality_case heading-level-variant 'hard_gate | **PASS**'
+run_quality_case empty-b6 'flag: b6-evidence-insufficient'
+grep -q 'semantic_quality_score | _MANUAL / 100_' "$FIX/out-quality-heading-level-variant.md" \
+  || fail "quality report must keep semantic score manual"
+grep -q 'domain_score | _MANUAL / 100_' "$FIX/out-quality-heading-level-variant.md" \
+  || fail "quality report must keep domain score manual"
+grep -q 'roundtable_score | _MANUAL / 20 or not-needed_' "$FIX/out-quality-heading-level-variant.md" \
+  || fail "quality report must keep roundtable score manual"
+grep -q 'human_review | _PENDING_' "$FIX/out-quality-heading-level-variant.md" \
+  || fail "quality report must keep human review pending"
+grep -q '结论：_PENDING_' "$FIX/out-quality-heading-level-variant.md" \
+  || fail "quality report must not emit an automatic semantic conclusion"
+pass "semantic-quality counterexamples are classified"
 
 # --- 5) README must document Codex install ---
 grep -q 'Codex' "$ROOT/README.md" || fail "README must mention Codex"

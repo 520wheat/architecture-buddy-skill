@@ -1,0 +1,172 @@
+{
+  "format": "skillopt_sleep.tasks.v1",
+  "project": "/Users/apple/Desktop/skill-create",
+  "transcript_source": "curated-architecture-regression-v3",
+  "n_sessions": 0,
+  "target_skill_path": "/Users/apple/Desktop/skill-create/skill/architecture-buddy/SKILL.md",
+  "reviewed": true,
+  "tasks": [
+    {
+      "id": "deliverable-complete-structure",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "用户要求把一个分布式文件历史系统写成可交付架构设计。请输出双层架构设计正文，而不是会议记录或问题清单：层 A 必须覆盖摘要、上下文与边界、主路径、组件与契约、状态失败与恢复、安全与身份、演进切片、可测验收；层 B 必须覆盖基本事实、机制、策略选项、取舍、对照关系、组合增长与边界检验。不要在没有完成检查前宣称完成。",
+      "context_excerpt": "系统需要离线记录、跨节点同步、分支合并和可验证恢复；用户没有指定技术方案。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "section_present", "arg": "A1"},
+          {"op": "section_present", "arg": "A8"},
+          {"op": "section_present", "arg": "B1"},
+          {"op": "section_present", "arg": "B6"},
+          {"op": "contains", "arg": "上下文与边界"},
+          {"op": "contains", "arg": "状态、失败与恢复"},
+          {"op": "contains", "arg": "安全与身份"},
+          {"op": "min_chars", "arg": 1800}
+        ]
+      },
+      "tags": ["architecture", "deliverable", "structure"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "roundtable-evidence-chain",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "在选择架构主策略前，识别一致性边界、历史模型和中央协调之间的高影响互斥分叉。主持人必须先提议圆桌，说明为什么需要额外立场并列出不超过三席；假设用户同意，输出至少两份透镜契约、每席的担忧和不会做什么，最后给出主持人的综合结论。透镜是做法立场，不扮演名人。",
+      "context_excerpt": "系统既要离线写入又要跨节点发布，中央强一致和本地可用之间存在真实分叉。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "高影响互斥分叉"},
+          {"op": "contains", "arg": "提议圆桌"},
+          {"op": "contains", "arg": "用户同意"},
+          {"op": "regex", "arg": "(?m)^## Lens:"},
+          {"op": "contains", "arg": "### On the decision point"},
+          {"op": "contains", "arg": "### Risks / what they'd worry about"},
+          {"op": "contains", "arg": "### Would not do"},
+          {"op": "contains", "arg": "综合结论"}
+        ]
+      },
+      "tags": ["architecture", "roundtable", "evidence"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "lens-decline-and-no-match",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "先发现高影响分叉并提议圆桌。第一种情形用户拒绝圆桌：记录已提议圆桌、用户选择跳过圆桌，然后继续用策略/反模式轻量对照，不得伪造透镜。第二种情形用户同意但没有匹配透镜：明确没有匹配透镜，使用策略/反模式词表降级，并说明透镜不是名人扮演。",
+      "context_excerpt": "领域不匹配已安装的架构透镜，且用户只愿意接受轻量讨论。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "已提议圆桌"},
+          {"op": "contains", "arg": "用户选择跳过圆桌"},
+          {"op": "contains", "arg": "继续"},
+          {"op": "contains", "arg": "没有匹配透镜"},
+          {"op": "contains", "arg": "策略/反模式词表"},
+          {"op": "contains", "arg": "名人扮演"},
+          {"op": "regex", "arg": "(?s)^(?!.*^## Lens:)"}
+        ]
+      },
+      "tags": ["architecture", "roundtable", "decline", "degrade"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "first-principles-and-tradeoffs",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "用户直接说要采用 Kafka 或共识服务来解决一个事件协作问题。请先列出当前方案中的假设，再剥掉方案名拆出不可再简化的基本事实，并标记待验证事实；然后从事实重推机制和不超过两个策略方向，说明每个方向依赖的事实与取舍，不要把结果/硬约束/优化变量三列表当作第一性原理。",
+      "context_excerpt": "用户只给出了熟悉的技术选型，没有说明能否丢失、重复、乱序、离线和失败恢复的真正要求。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "假设"},
+          {"op": "contains", "arg": "基本事实"},
+          {"op": "contains", "arg": "待验证"},
+          {"op": "contains", "arg": "机制"},
+          {"op": "contains", "arg": "策略"},
+          {"op": "contains", "arg": "取舍"},
+          {"op": "regex", "arg": "(?i)(Kafka|共识|消息总线)"}
+        ]
+      },
+      "tags": ["architecture", "first-principles", "tradeoff"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "composition-boundary-and-gate",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "已有两个相似接入实现，第三个相似变体要求再次复制流程。请先停止复制，抽出稳定概念和变化轴，用 A × B × C → 结果表达组合意图，写明 N+1 应改什么和不应改什么，给出必须拒绝的反例，并判断是在增加可组合能力还是只增加复杂度。最后用至少三条刺激→可观察响应的验收句过完成检查。",
+      "context_excerpt": "第三个渠道将要接入，旧实现各自复制鉴权、重试、审计和错误处理。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "停止复制"},
+          {"op": "contains", "arg": "变化轴"},
+          {"op": "contains", "arg": "N+1"},
+          {"op": "contains", "arg": "反例"},
+          {"op": "contains", "arg": "可组合能力"},
+          {"op": "contains", "arg": "复杂度"},
+          {"op": "regex", "arg": "(?s)(×|x|组合).{0,120}(结果|能力)"},
+          {"op": "regex", "arg": "(?m)^\\s*\\d+\\.\\s+.+"}
+        ]
+      },
+      "tags": ["architecture", "composition", "n-plus-one", "gate"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "git-architecture-accuracy",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "为 https://github.com/git/git 写一份正式架构设计。设计必须说明工作树、index、内容寻址对象库、blob/tree/commit、refs/HEAD、父指针 DAG、pack/delta 物理优化、plumbing/porcelain 分层、离线 commit 与 push/fetch 的边界；不能把 Git 写成 Kafka 式事件日志或所有仓库共享的 Raft 中央共识系统。要求双层交付并保留失败恢复、信任边界、演进和验收。",
+      "context_excerpt": "目标是理解 Git 本身的架构，不是设计代码托管平台，也不是输出圆桌会议逐字记录。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "工作树"},
+          {"op": "contains", "arg": "index"},
+          {"op": "contains", "arg": "对象库"},
+          {"op": "contains", "arg": "refs"},
+          {"op": "contains", "arg": "DAG"},
+          {"op": "contains", "arg": "pack"},
+          {"op": "contains", "arg": "plumbing"},
+          {"op": "contains", "arg": "porcelain"},
+          {"op": "contains", "arg": "离线"},
+          {"op": "contains", "arg": "push"},
+          {"op": "contains", "arg": "fetch"},
+          {"op": "contains", "arg": "失败"},
+          {"op": "contains", "arg": "验收"},
+          {"op": "regex", "arg": "(?s)^(?!.*Kafka.{0,80}核心).*$"},
+          {"op": "regex", "arg": "(?s)^(?!.*所有仓库.{0,80}Raft).*$"},
+          {"op": "min_chars", "arg": 2400}
+        ]
+      },
+      "tags": ["architecture", "git", "accuracy", "test"],
+      "source_sessions": [],
+      "split": "test",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    }
+  ]
+}

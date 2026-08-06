@@ -1,0 +1,44 @@
+{
+  "format": "skillopt_sleep.tasks.v1",
+  "project": "/Users/apple/Desktop/skill-create",
+  "transcript_source": "curated-git-architecture-test",
+  "n_sessions": 0,
+  "target_skill_path": "/Users/apple/Desktop/skill-create/skill/architecture-buddy/SKILL.md",
+  "reviewed": true,
+  "tasks": [
+    {
+      "id": "git-architecture-accuracy",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "为 https://github.com/git/git 写一份正式架构设计。设计必须说明工作树、index、内容寻址对象库、blob/tree/commit、refs/HEAD、父指针 DAG、pack/delta 物理优化、plumbing/porcelain 分层、离线 commit 与 push/fetch 的边界；不能把 Git 写成 Kafka 式事件日志或所有仓库共享的 Raft 中央共识系统。要求双层交付并保留失败恢复、信任边界、演进和验收。",
+      "context_excerpt": "目标是理解 Git 本身的架构，不是设计代码托管平台，也不是输出圆桌会议逐字记录。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "工作树"},
+          {"op": "contains", "arg": "index"},
+          {"op": "contains", "arg": "对象库"},
+          {"op": "contains", "arg": "refs"},
+          {"op": "contains", "arg": "DAG"},
+          {"op": "contains", "arg": "pack"},
+          {"op": "contains", "arg": "plumbing"},
+          {"op": "contains", "arg": "porcelain"},
+          {"op": "contains", "arg": "离线"},
+          {"op": "contains", "arg": "push"},
+          {"op": "contains", "arg": "fetch"},
+          {"op": "contains", "arg": "失败"},
+          {"op": "contains", "arg": "验收"},
+          {"op": "regex", "arg": "(?s)^(?!.*Kafka.{0,80}核心).*$"},
+          {"op": "regex", "arg": "(?s)^(?!.*所有仓库.{0,80}Raft).*$"},
+          {"op": "min_chars", "arg": 2400}
+        ]
+      },
+      "tags": ["architecture", "git", "accuracy", "test"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    }
+  ]
+}

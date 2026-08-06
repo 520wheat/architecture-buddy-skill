@@ -1,0 +1,240 @@
+{
+  "format": "skillopt_sleep.tasks.v1",
+  "project": "/Users/apple/Desktop/skill-create",
+  "transcript_source": "calibrated-phase1b-architecture-regression-v4",
+  "n_sessions": 0,
+  "target_skill_path": "/Users/apple/Desktop/skill-create/skill/architecture-buddy/SKILL.md",
+  "reviewed": true,
+  "tasks": [
+    {
+      "id": "formal-deliverable-b6-evidence",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "把一个存在离线写入、跨节点同步、分支合并和可验证恢复的系统写成正式双层架构设计。正文必须使用 A1-A8、B1-B6 标题，覆盖边界、主路径、契约、失败恢复、安全、演进和验收；B6 必须具体写变化轴、N+1、反例、可组合能力和复杂度证据。正文不是会议记录，完成前不能宣称完成。",
+      "context_excerpt": "用户没有指定技术方案，需要从基本事实推导机制和策略。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "section_present", "arg": "A1"},
+          {"op": "section_present", "arg": "A8"},
+          {"op": "section_present", "arg": "B1"},
+          {"op": "section_present", "arg": "B6"},
+          {"op": "contains", "arg": "上下文与边界"},
+          {"op": "contains", "arg": "状态、失败与恢复"},
+          {"op": "contains", "arg": "安全与身份"},
+          {"op": "contains", "arg": "变化轴"},
+          {"op": "contains", "arg": "N+1"},
+          {"op": "contains", "arg": "反例"},
+          {"op": "contains", "arg": "可组合能力"},
+          {"op": "contains", "arg": "复杂度"},
+          {"op": "min_chars", "arg": 2200},
+          {"op": "regex", "arg": "(?s)^(?!.*(?:会议记录|逐字稿|架构设计已完成)).*$"}
+        ]
+      },
+      "tags": ["architecture", "deliverable", "b6", "structure"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "roundtable-consent-and-synthesis",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "在存在一致性边界、历史模型和中央协调取舍的系统上，先识别高影响互斥分叉并提议圆桌，列出不超过三席，假设用户同意后输出至少两份完整透镜契约，最后由主持人综合冲突、边界和代价。透镜是做法立场，不扮演名人。",
+      "context_excerpt": "系统既要离线可用又要跨节点发布，不能把所有写入都交给中央共识。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "高影响互斥分叉"},
+          {"op": "contains", "arg": "提议圆桌"},
+          {"op": "contains", "arg": "用户同意"},
+          {"op": "regex", "arg": "(?m)^## Lens:"},
+          {"op": "contains", "arg": "### On the decision point"},
+          {"op": "contains", "arg": "### Heuristics applied"},
+          {"op": "contains", "arg": "### Risks / what they'd worry about"},
+          {"op": "contains", "arg": "### Would not do"},
+          {"op": "contains", "arg": "### Evidence style"},
+          {"op": "contains", "arg": "综合结论"},
+          {"op": "regex", "arg": "(?s)^(?!.*名人扮演.{0,20}我就是).*$"}
+        ]
+      },
+      "tags": ["architecture", "roundtable", "consent", "synthesis"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "roundtable-decline-and-no-match",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "先识别高影响分叉并提议圆桌。用户拒绝时必须记录已提议圆桌和用户选择跳过圆桌，然后继续用策略/反模式词表轻量对照；用户同意但没有匹配透镜时必须明确没有匹配透镜并降级，不伪造透镜。",
+      "context_excerpt": "当前领域没有匹配的已安装透镜，用户只接受轻量对照。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "已提议圆桌"},
+          {"op": "contains", "arg": "用户选择跳过圆桌"},
+          {"op": "contains", "arg": "继续"},
+          {"op": "contains", "arg": "没有匹配透镜"},
+          {"op": "contains", "arg": "策略/反模式词表"},
+          {"op": "contains", "arg": "透镜不是名人扮演"},
+          {"op": "regex", "arg": "(?s)^(?!.*^## Lens:)"}
+        ]
+      },
+      "tags": ["architecture", "roundtable", "decline", "degrade"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "first-principles-and-tradeoffs",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "用户直接要求采用 Kafka 或共识服务解决事件协作问题。先列出现有方案的隐含假设，剥掉方案名拆出不可再简化的基本事实，并标记待验证事实；再从事实重推机制和不超过两个策略方向，说明依赖事实、取舍和被放弃的代价。不要把三列表单冒充第一性原理。",
+      "context_excerpt": "用户没有说明是否允许丢失、重复、乱序、离线和失败恢复。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "假设"},
+          {"op": "contains", "arg": "基本事实"},
+          {"op": "contains", "arg": "待验证"},
+          {"op": "contains", "arg": "机制"},
+          {"op": "contains", "arg": "策略"},
+          {"op": "contains", "arg": "取舍"},
+          {"op": "regex", "arg": "(?i)(Kafka|共识|消息总线)"}
+        ]
+      },
+      "tags": ["architecture", "first-principles", "tradeoff"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "composition-boundary-and-gate",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "已有两个相似接入实现，第三个变体要求复制流程。先停止复制，抽出稳定概念和变化轴，用 A × B × C → 结果表达组合意图，写明 N+1 应改什么和不应改什么、必须拒绝的反例，并判断增加的是可组合能力还是复杂度。最后提供至少三条刺激到可观察响应的验收句。",
+      "context_excerpt": "旧实现分别复制鉴权、重试、审计和错误处理。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "停止复制"},
+          {"op": "contains", "arg": "变化轴"},
+          {"op": "contains", "arg": "N+1"},
+          {"op": "contains", "arg": "反例"},
+          {"op": "contains", "arg": "可组合能力"},
+          {"op": "contains", "arg": "复杂度"},
+          {"op": "regex", "arg": "(?s)(×|x|组合).{0,160}(结果|能力)"},
+          {"op": "regex", "arg": "(?m)^\\s*\\d+\\.\\s+.+"}
+        ]
+      },
+      "tags": ["architecture", "composition", "n-plus-one", "gate"],
+      "source_sessions": [],
+      "split": "val",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "git-architecture-accuracy",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "为 https://github.com/git/git 写一份正式双层架构设计。必须说明工作树、index、内容寻址对象库、blob/tree/commit、refs/HEAD、父指针 DAG、pack/delta 物理优化、plumbing/porcelain、离线 commit 和 push/fetch 边界，并保留失败恢复、信任边界、演进和验收。不能把 Git 写成 Kafka 核心或所有仓库共享的 Raft 系统。",
+      "context_excerpt": "目标是理解 Git 本身，不是代码托管平台，也不是圆桌逐字记录。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "section_present", "arg": "A1"},
+          {"op": "section_present", "arg": "A8"},
+          {"op": "section_present", "arg": "B1"},
+          {"op": "section_present", "arg": "B6"},
+          {"op": "contains", "arg": "工作树"},
+          {"op": "contains", "arg": "index"},
+          {"op": "contains", "arg": "对象库"},
+          {"op": "contains", "arg": "refs"},
+          {"op": "contains", "arg": "DAG"},
+          {"op": "contains", "arg": "pack"},
+          {"op": "contains", "arg": "plumbing"},
+          {"op": "contains", "arg": "porcelain"},
+          {"op": "contains", "arg": "离线"},
+          {"op": "contains", "arg": "push"},
+          {"op": "contains", "arg": "fetch"},
+          {"op": "contains", "arg": "失败"},
+          {"op": "contains", "arg": "验收"},
+          {"op": "regex", "arg": "(?s)^(?!.*Kafka.{0,80}核心).*$"},
+          {"op": "regex", "arg": "(?s)^(?!.*所有仓库.{0,80}Raft).*$"},
+          {"op": "min_chars", "arg": 2600}
+        ]
+      },
+      "tags": ["architecture", "git", "accuracy", "held-out"],
+      "source_sessions": [],
+      "split": "test",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "formal-design-not-meeting-minutes",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "把一次架构讨论结果整理为正式架构设计。输出必须是陌生读者可使用的稳定决策、边界、机制、策略、失败恢复、演进和验收，不要输出模块清单、会议逐字稿或只有席位发言没有综合结论的记录。",
+      "context_excerpt": "讨论中出现过多个架构师观点和用户选择，但正式文档只保留必要决策证据。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "section_present", "arg": "摘要"},
+          {"op": "section_present", "arg": "上下文与边界"},
+          {"op": "section_present", "arg": "组件与契约"},
+          {"op": "section_present", "arg": "取舍"},
+          {"op": "section_present", "arg": "演进"},
+          {"op": "section_present", "arg": "验收"},
+          {"op": "contains", "arg": "明确不做"},
+          {"op": "regex", "arg": "(?s)^(?!.*(?:主持人：|架构师[^：]*：|用户：|会议记录|模块清单)).*$"},
+          {"op": "min_chars", "arg": 1800}
+        ]
+      },
+      "tags": ["architecture", "formal-deliverable", "anti-minutes"],
+      "source_sessions": [],
+      "split": "test",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    },
+    {
+      "id": "quality-review-not-keyword-score",
+      "project": "/Users/apple/Desktop/skill-create",
+      "intent": "评价候选架构设计是否优秀。必须分别检查问题类与边界、机制与策略分离、失败安全恢复、演进 N+1 与反例、证据决策理由与质量属性；指出正文证据、反例和残余风险，明确不能只按篇幅、组件数量或关键词命中判定优秀。",
+      "context_excerpt": "候选文档可能包含完整标题但存在空泛 B6、结论无证据或会议记录伪装。",
+      "outcome": "unknown",
+      "reference_kind": "rule",
+      "judge": {
+        "kind": "rule",
+        "checks": [
+          {"op": "contains", "arg": "问题类与边界"},
+          {"op": "contains", "arg": "机制与策略"},
+          {"op": "contains", "arg": "失败"},
+          {"op": "contains", "arg": "演进"},
+          {"op": "contains", "arg": "N+1"},
+          {"op": "contains", "arg": "反例"},
+          {"op": "contains", "arg": "证据"},
+          {"op": "contains", "arg": "残余风险"},
+          {"op": "contains", "arg": "不能只"},
+          {"op": "min_chars", "arg": 1200}
+        ]
+      },
+      "tags": ["architecture", "quality-review", "anti-keyword-gaming"],
+      "source_sessions": [],
+      "split": "train",
+      "origin": "real",
+      "skill_hint": "architecture-buddy"
+    }
+  ]
+}

@@ -85,6 +85,13 @@ RUBRIC_REPORT="$ROOT/scripts/rubric-report.sh"
 bash "$RUBRIC_REPORT" --help >/dev/null || fail "rubric-report.sh --help failed"
 echo "OK: rubric-report.sh --help"
 
+QUALITY_REPORT="$ROOT/scripts/architecture-quality-report.sh"
+[[ -f "$QUALITY_REPORT" ]] || fail "missing scripts/architecture-quality-report.sh"
+[[ -x "$QUALITY_REPORT" ]] || fail "scripts/architecture-quality-report.sh not executable"
+bash "$QUALITY_REPORT" --help >/dev/null || fail "architecture-quality-report.sh --help failed"
+[[ -f "$ROOT/docs/design/architecture-quality-rubric.md" ]] || fail "missing architecture quality rubric"
+echo "OK: architecture-quality-report.sh --help"
+
 PRESSURE="$ROOT/scripts/pressure-test.sh"
 [[ -f "$PRESSURE" ]] || fail "missing scripts/pressure-test.sh"
 bash "$PRESSURE" || fail "pressure-test.sh failed"
