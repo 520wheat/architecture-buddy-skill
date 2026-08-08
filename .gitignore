@@ -4,5 +4,9 @@
 tools/nuwa-skill/
 .skillopt-sleep/
 .video-analysis/
+/corpus/
+/docs/
+/scripts/
+/tools/
 scripts/fixtures/pressure/out-*.md
 scripts/fixtures/pressure/err-*.txt

@@ -35,12 +35,8 @@ done
 
 安装 Codex 或其他兼容 Agent Skills 的运行时，只需将 `DST` 换成对应的用户级 skills 目录。
 
-## 不属于发行包的内容
+## 包内资源
 
-- `corpus/`：训练集、held-out 集、候选和评估结果。
-- `docs/`：ADR、设计规范、训练计划和发布证据。
-- `scripts/`：维护者校验、生成、盲评和比较工具。
-- `tools/`：构建期工具说明。
-- `architecture-buddy/references/` 与 `architecture-buddy/templates/`：主 Skill 包内部资源，必须随主包安装，不能单独安装。
+`architecture-buddy/references/` 与 `architecture-buddy/templates/` 是主 Skill 的运行时资源，必须随主包安装，不能单独拆出。
 
 完整机器可读清单见 [`release-manifest.tsv`](release-manifest.tsv)。
