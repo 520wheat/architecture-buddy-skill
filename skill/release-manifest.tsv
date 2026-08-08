@@ -1,0 +1,10 @@
+package	kind	required	version	status
+architecture-buddy	host	yes	0.3.6	release
+architecture-buddy-lens-scaffold	lens	no	0.1.0	release
+architecture-buddy-lens-agent-loop	lens	no	0.1.0	release
+architecture-buddy-lens-dynamo-ap	lens	no	0.1.0	release
+architecture-buddy-lens-gfs-mr	lens	no	0.2.0	release
+architecture-buddy-lens-log-stream	lens	no	0.1.0	release
+architecture-buddy-lens-raft-cp	lens	no	0.1.0	release
+architecture-buddy-lens-spanner-sql	lens	no	0.1.0	release
+architecture-buddy-lens-zta-resource	lens	no	0.1.0	release

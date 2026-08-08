@@ -1,5 +1,5 @@
 # Mechanisms (runtime cheat sheet)
-Source: docs/survey/living/mechanisms.md — compressed for skill runtime.
+Runtime mechanism vocabulary distilled from the maintainer research corpus.
 User-visible authority is templates/architecture-deliverable.md (dual layer A/B).
 M1–M9 below are internal mapping only; see references/note-mapping.md.
 Do not invent new M numbers; do not put M numbers in user-facing deliverable body.

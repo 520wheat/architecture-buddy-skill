@@ -153,10 +153,10 @@ Anchor claims in NIST SP 800-207 terms first, then use ASVS V1 for verifiable ar
 
 ## Appendix: Research Sources
 
-- `/Users/apple/Desktop/skill-create/docs/survey/architecture/D7-nist-800-207.md`
+- NIST SP 800-207, Zero Trust Architecture:
   - Source: https://csrc.nist.gov/pubs/sp/800/207/final
   - PDF: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf
-- `/Users/apple/Desktop/skill-create/docs/survey/architecture/D7-owasp-samm-sa.md`
+- OWASP SAMM Secure Architecture:
   - Source: https://owaspsamm.org/model/design/secure-architecture/
-- `/Users/apple/Desktop/skill-create/docs/survey/architecture/D7-owasp-asvs-v1.md`
+- OWASP ASVS V1 Architecture:
   - Source: https://asvs.dev/v4.0.3/V1-Architecture/

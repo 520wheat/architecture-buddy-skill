@@ -1,5 +1,5 @@
 # Strategies & Patterns (runtime cheat sheet)
-Source: docs/survey/living/strategies-and-patterns.md — compressed for skill runtime.
+Runtime strategy vocabulary distilled from the maintainer research corpus.
 
 ## 按问题域（策略分叉速查）
 
@@ -16,14 +16,14 @@ Source: docs/survey/living/strategies-and-patterns.md — compressed for skill r
 
 ## 模式 corpus 入口
 
-| ID | repo-only 证据（`docs/survey/patterns/`，未随包安装） | Buddy 默认层级 |
+| ID | 证据类别 | Buddy 默认层级 |
 |----|------------------------------------------------------|----------------|
-| P1 GoF | `docs/survey/patterns/P1-gof-index.md` | 细粒度 |
-| P2 POSA1 | `docs/survey/patterns/P2-posa-vol1-index.md` + deep-three | 架构 |
-| P3 PoEAA | `docs/survey/patterns/P3-poeaa-families.md` | 企业 |
-| P4 EIP | `docs/survey/patterns/P4-eip-core.md` | 集成 |
-| P5 并发分布式 | `docs/survey/patterns/P5-concurrency-distributed.md` | 架构/中间件 |
-| P9 Agent | `docs/survey/patterns/P9-agent-patterns-seed.md` | 领域模式（Agent） |
+| P1 GoF | 公开模式与对象设计实践 | 细粒度 |
+| P2 POSA1 | 公开架构模式实践 | 架构 |
+| P3 PoEAA | 公开企业应用模式实践 | 企业 |
+| P4 EIP | 公开企业集成模式实践 | 集成 |
+| P5 并发分布式 | 公开并发与分布式系统实践 | 架构/中间件 |
+| P9 Agent | 公开 Agent 架构实践 | 领域模式（Agent） |
 
 ## M5 策略表列约定
 `策略或模式 | 层级(架构/企业/集成/并发分布式/Agent/细粒度) | 适用条件 | 代价 | 状态`

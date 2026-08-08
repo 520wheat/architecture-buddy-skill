@@ -152,12 +152,7 @@ When called by Architecture Buddy, answer only the decision point using this for
 
 ## Appendix: Research Sources
 
-Local survey corpus:
-- `docs/survey/architecture/D4-kafka.md`
-- `docs/survey/architecture/D4-pulsar.md`
-- `docs/survey/architecture/D4-kafka-vs-pulsar.md`
-- `docs/survey/patterns/P4-eip-core.md`
-- `docs/survey/patterns/P4-eip-routing-deep.md`
+The maintainer survey corpus used to distill this lens is not required at runtime.
 
 Source URLs captured by the corpus:
 - https://kafka.apache.org/documentation/#design

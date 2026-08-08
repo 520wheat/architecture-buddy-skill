@@ -183,14 +183,7 @@ When Architecture Buddy asks this lens to contribute, answer only the decision p
 
 ## Appendix: Research Sources
 
-Local corpus and build instructions:
-- `/Users/apple/Desktop/skill-create/tools/nuwa-skill/SKILL.md` - theme Skill variant requirements.
-- `/Users/apple/Desktop/skill-create/tools/nuwa-skill/references/extraction-framework.md` - triple verification method and theme-skill distinction.
-- `/Users/apple/Desktop/skill-create/docs/build/nuwa-lens-distill-prompt.md` - Architecture Buddy lens output contract.
-- `/Users/apple/Desktop/skill-create/docs/survey/living/strategies-and-patterns.md` - local Architecture Buddy strategy vocabulary and P5 entry point.
-- `/Users/apple/Desktop/skill-create/docs/survey/patterns/P5-concurrency-distributed.md` - local CP contrast vocabulary for Raft/quorum coordination.
-- `/Users/apple/Desktop/skill-create/docs/design/lens-catalog.md` - `dynamo-ap` catalog placement, best-for, not-for, and evidence anchors.
-- `/Users/apple/Desktop/skill-create/docs/adr/0016-lens-distills-proven-practice-not-voice.md` - non-roleplay, proven-practice lens decision.
+The maintainer corpus and build instructions used to distill this lens are not required at runtime.
 
 Public sources:
 - Giuseppe DeCandia et al., "Dynamo: Amazon's Highly Available Key-value Store" / Amazon Science abstract: https://www.amazon.science/publications/dynamo-amazons-highly-available-key-value-store

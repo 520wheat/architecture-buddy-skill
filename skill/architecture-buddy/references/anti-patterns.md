@@ -1,5 +1,5 @@
 # Anti-patterns & Writing Rules (runtime cheat sheet)
-Source: docs/survey/living/anti-patterns-and-writing-rules.md — compressed for skill runtime.
+Runtime anti-pattern vocabulary distilled from the maintainer research corpus.
 
 ## 内容反模式
 | 反模式 | 证据 |
@@ -42,4 +42,3 @@ Source: docs/survey/living/anti-patterns-and-writing-rules.md — compressed for
 - Top N / 深调研先问再做  
 - 提出 agent / 消息总线 / 共识组件前先问「更简单方案是否足够」  
 - 第三个相似需求时禁止默许再复制一套实现  
-

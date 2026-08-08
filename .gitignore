@@ -2,5 +2,7 @@
 .superpowers/sdd/
 .obsidian/
 tools/nuwa-skill/
+.skillopt-sleep/
+.video-analysis/
 scripts/fixtures/pressure/out-*.md
 scripts/fixtures/pressure/err-*.txt

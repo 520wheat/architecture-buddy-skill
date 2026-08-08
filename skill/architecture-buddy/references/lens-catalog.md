@@ -1,6 +1,6 @@
 # Lens Catalog (runtime)
 
-Source: `docs/design/lens-catalog.md` — compressed for Architecture Buddy host.
+Runtime catalog for Architecture Buddy host. The full research catalog is maintained outside the installable package.
 Dynamic seating: pick ≤3 installed lenses by best-for / not-for (ADR-0017). Distills practices, not voice (ADR-0016).
 
 | shortname | package dir | best-for (summary) | not-for (summary) | tensions with |

@@ -180,12 +180,7 @@ Use Raft majority/log safety, etcd API guarantees and limits, and Kubernetes con
 
 ## Sources
 
-- `/Users/apple/Desktop/skill-create/tools/nuwa-skill/SKILL.md` - theme Skill variant requirements.
-- `/Users/apple/Desktop/skill-create/tools/nuwa-skill/references/extraction-framework.md` - triple verification method and theme-skill distinction.
-- `/Users/apple/Desktop/skill-create/docs/build/nuwa-lens-distill-prompt.md` - Architecture Buddy lens output contract.
-- `/Users/apple/Desktop/skill-create/docs/survey/patterns/P5-concurrency-distributed.md` - local notes on Raft, replicated state machines, majority quorum, joint consensus, and POSA concurrency context.
-- `/Users/apple/Desktop/skill-create/docs/survey/architecture/D2-etcd.md` - local notes on etcd's CP metadata store, Raft, revision, MVCC, watch, lease, lock, and API guarantees.
-- `/Users/apple/Desktop/skill-create/docs/survey/architecture/D2-kubernetes.md` - local notes on Kubernetes control-plane/data-plane split, declarative API, controller reconciliation, and etcd as source of truth.
+The maintainer corpus and build instructions used to distill this lens are not required at runtime.
 - Diego Ongaro and John Ousterhout, "In Search of an Understandable Consensus Algorithm (Raft)": https://raft.github.io/raft.pdf
 - Raft project site and visualization resources: https://raft.github.io/
 - etcd Learning documentation: https://etcd.io/docs/latest/learning/

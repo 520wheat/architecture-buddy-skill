@@ -12,7 +12,7 @@ metadata:
   stance: "Optimize the system around large sequential dataflow: shard durable storage into large replicated blocks, expose locality, and schedule simple parallel compute near the data—then pay honestly for shuffle and metadata limits."
   best-for: "batch analytics, data lakes, web-scale indexing, ETL, large-file scans, commodity clusters, HDFS/GFS/MapReduce/Hadoop/Spark trade-offs"
   not-for: "low-latency OLTP, small-file-heavy workloads, mutable random writes, POSIX fidelity, fine-grained interactive queries without another serving layer"
-  evidence-anchors: "Google File System paper; MapReduce paper; AOSA HDFS survey; corpus/golden/hdfs; Apache Spark Cluster/RDD docs; corpus/golden/spark; docs/survey/architecture/D3-hdfs.md; docs/survey/architecture/D4-spark.md"
+  evidence-anchors: "Google File System paper; MapReduce paper; AOSA HDFS survey; Apache Spark Cluster/RDD documentation"
 ---
 
 # Architecture Buddy Lens - GFS-MR
@@ -24,7 +24,7 @@ This is a **heuristic architecture lens**, not a person and not roleplay. It eva
 - **Stance:** Optimize the system around large sequential dataflow: shard durable storage into large replicated blocks, expose locality, and schedule parallel compute near the data; treat shuffle and metadata scale as first-class costs.
 - **Best for:** Batch analytics, data lakes, indexing, ETL, log processing, large-file scans, commodity clusters, HDFS/GFS/MapReduce/Hadoop-style systems, and Spark-style multi-stage jobs that still pay for wide dependencies.
 - **Not for:** Low-latency OLTP, small-file-heavy workloads, mutable random writes, strict POSIX semantics, or interactive serving without a separate layer.
-- **Evidence anchors:** Google File System paper; MapReduce paper; AOSA HDFS survey / `corpus/golden/hdfs`; Spark Cluster Overview + RDD Programming Guide / `corpus/golden/spark`; local surveys `docs/survey/architecture/D3-hdfs.md` and `D4-spark.md`.
+- **Evidence anchors:** Google File System paper; MapReduce paper; AOSA HDFS survey; Spark Cluster Overview and RDD Programming Guide.
 
 ## Framework Overview
 
@@ -195,8 +195,7 @@ When Architecture Buddy asks this lens to contribute, answer only the decision p
 
 ## Appendix: Research Sources
 
-- Local corpus: `docs/survey/architecture/D3-hdfs.md`, `docs/survey/architecture/D4-spark.md`.
-- Golden anchors (build-time): `corpus/golden/hdfs/`, `corpus/golden/spark/`.
+- The maintainer corpus and golden anchors used during distillation are not required at runtime.
 - Google Research: "The Google File System" overview, `https://static.googleusercontent.com/media/research.google.com/en/us/archive/gfs.html`.
 - Google Research: "MapReduce: Simplified Data Processing on Large Clusters" overview, `https://research.google.com/archive/mapreduce.html`.
 - USENIX OSDI 2004 page: `https://www.usenix.org/conference/osdi-04/mapreduce-simplified-data-processing-large-clusters`.

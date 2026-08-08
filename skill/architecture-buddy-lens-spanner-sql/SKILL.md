@@ -179,10 +179,7 @@ Use the Spanner OSDI paper, Cloud Spanner replication/read-write architecture do
 
 ## Appendix: Research Sources
 
-Local survey corpus:
-- `docs/survey/architecture/D2-spanner.md`
-- `tools/nuwa-skill/references/extraction-framework.md`
-- `docs/build/nuwa-lens-distill-prompt.md`
+The maintainer corpus and build instructions used to distill this lens are not required at runtime.
 
 Public sources:
 - Google Research, "Spanner: Google's Globally-Distributed Database": https://research.google/pubs/spanner-googles-globally-distributed-database-2/

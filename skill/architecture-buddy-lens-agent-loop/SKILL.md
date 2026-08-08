@@ -166,13 +166,7 @@ When called by Architecture Buddy, answer only the decision point using this for
 
 ## Appendix: Research Sources
 
-Local survey / golden corpus:
-- `corpus/golden/agent-runtime/GOLDEN.md`
-- `corpus/golden/agent-runtime/RUBRIC.md`
-- `corpus/golden/agent-runtime/SOURCES.md`
-- `docs/survey/architecture/D8-openai-agents-sdk.md`
-- `docs/survey/architecture/D8-anthropic-effective-agents.md`
-- `docs/survey/architecture/D8-langgraph.md`
+The maintainer corpus used to distill this lens is not required at runtime.
 
 Source URLs captured by the corpus:
 - https://openai.github.io/openai-agents-python/
