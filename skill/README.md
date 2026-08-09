@@ -6,7 +6,7 @@
 
 | 包 | 类型 | 是否必装 | 当前版本 | 用途 |
 |---|---|---:|---:|---|
-| `architecture-buddy` | 主持 Skill | 是 | `0.3.6` | 主持架构共思、正式架构设计、ADR 和圆桌流程 |
+| `architecture-buddy` | 主持 Skill | 是 | `0.4.0` | 主持架构共思、正式架构设计、ADR、圆桌和授权后的调查证据包 |
 | `architecture-buddy-lens-scaffold` | 通用透镜 | 否 | `0.1.0` | 没有领域透镜时提供通用取舍视角 |
 | `architecture-buddy-lens-agent-loop` | 领域透镜 | 否 | `0.1.0` | Agent loop、工具编排、HITL 和轨迹 |
 | `architecture-buddy-lens-dynamo-ap` | 领域透镜 | 否 | `0.1.0` | AP、副本、分区和冲突修复 |

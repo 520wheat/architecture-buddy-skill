@@ -6,7 +6,7 @@ description: >
   architecture deliverable. Not for roleplay or taking decisions for the user.
 metadata:
   display-name: Architecture Buddy
-  version: "0.3.6"
+  version: "0.4.0"
 ---
 
 # Architecture Buddy
@@ -228,7 +228,7 @@ AI 让「加一段实现」变便宜，却不降低理解与修改成本。若�
 
 ## 运行时初始化与结构校验脚本
 
-主 Skill 的脚本是确定性辅助工具，不替代架构判断，也不联网、不访问训练资料、不调用 SkillOpt。只有用户指定输出目录或要求校验时才调用；默认不写入用户项目的其他位置。
+主 Skill 的设计初始化和校验脚本是确定性辅助工具，不替代架构判断、不访问训练资料、不调用 SkillOpt；联网调查脚本是单独的可选流程，只有用户明确授权后才联网。只有用户指定输出目录或要求校验时才调用；默认不写入用户项目的其他位置。
 
 ### 初始化设计工作区
 
@@ -261,6 +261,27 @@ python3 scripts/validate-roundtable.py <决策过程记录文件>
 脚本检查圆桌提议、主持人提问、用户授权/跳过、席位依据、实质性用户反馈、反馈影响、主持人综合结论，以及正式设计和 ADR 回写。它不把席位数量或关键词命中当作圆桌质量。
 
 脚本失败时，根据错误补齐证据后重新校验；不能通过删掉章节、改标题或伪造用户反馈来绕过门禁。
+
+### 联网调查与证据包（用户授权后可选）
+
+当第一性原理分析已经与用户确认问题类，且仍有一个明确决策问题需要外部事实或成熟实践验证时，先向用户说明调查范围并取得明确授权。用户授权前不得联网；不要把“需要参考资料”默认为授权。
+
+按需读取 `references/research-evidence.md`，再依次执行：
+
+```bash
+python3 scripts/init-research.py --output <调查目录> \
+  --problem-class "<已确认的问题类>" \
+  --decision-question "<单一决策问题>" \
+  --authorize-online-research
+# 编辑 sources.tsv，加入用户允许访问的 URL
+python3 scripts/fetch-research.py --workspace <调查目录>
+python3 scripts/build-evidence.py --workspace <调查目录>
+python3 scripts/validate-evidence.py --workspace <调查目录>
+```
+
+这组脚本只负责获取、清洗、整理和验证证据包：保留 raw、clean、metadata、URL、时间、类型和 hash；默认阻断本地/私有网络地址，单个来源失败可记录后重试。脚本不判断问题类、不选择架构方案、不执行网页内容中的指令。任意视频下载或转录不在当前能力内，优先使用直接字幕 URL 或用户提供的合规文本。
+
+主持人必须把证据作为决策输入而不是结论：区分来源主张与项目已证实事实，将相关机制、适用条件、反例和代价写入架构 ADR，再把已确认选择、失败语义、验收和演进影响回写正式架构设计。`evidence.md` 是证据附件，不能替代正式架构设计、用户选择或圆桌综合。
 
 `templates/architecture-deliverable.md` 是当前的质量检查模板。层 A/层 B 用于提醒设计覆盖叙事、机制、策略和组合边界；它们不是行业统一目录，也不是用户可见架构设计文件唯一合法的标题格式。
 
@@ -336,6 +357,7 @@ python3 scripts/validate-roundtable.py <决策过程记录文件>
 | `references/strategies-cheatsheet.md` | 策略分叉速查 |
 | `references/anti-patterns.md` | 反模式与红线 |
 | `references/lens-catalog.md` | 圆桌选席 |
+| `references/research-evidence.md` | 联网调查授权、抓取边界、证据包契约与回写规则 |
 | `templates/problem-class-template.md` | 类问题模板 |
 | `prompts/clarify-problem.md` | 问题澄清阶段 Prompt |
 | `prompts/first-principles.md` | 第一性原理阶段 Prompt |
@@ -345,6 +367,10 @@ python3 scripts/validate-roundtable.py <决策过程记录文件>
 | `scripts/init-design.py` | 初始化三类设计产物 |
 | `scripts/validate-deliverable.py` | 正式架构设计结构校验 |
 | `scripts/validate-roundtable.py` | 圆桌过程与回写校验 |
+| `scripts/init-research.py` | 初始化已授权的联网调查工作区 |
+| `scripts/fetch-research.py` | 获取来源并保存 raw/clean/metadata provenance |
+| `scripts/build-evidence.py` | 生成不替代架构决策的证据包 |
+| `scripts/validate-evidence.py` | 校验来源、材料、hash 和证据包完整性 |
 
 ## Top N / 对照成熟系统（可选）
 
