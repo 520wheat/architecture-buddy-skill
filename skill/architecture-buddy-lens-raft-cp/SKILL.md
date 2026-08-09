@@ -2,187 +2,120 @@
 name: architecture-buddy-lens-raft-cp
 description: >
   Use when Architecture Buddy roundtable needs a Raft-CP lens for majority consensus,
-  strongly consistent metadata coordination, leader election, config state, leases,
-  watches, or avoiding split-brain.
+  strongly consistent metadata coordination, leader election, config state, leases, watches,
+  or avoiding split-brain.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Raft CP)
   version: "0.1.0"
-  stance: "Put small, critical metadata behind understandable majority consensus; keep bulk business data and high-throughput data paths out of the quorum core."
-  best-for: "leader election, cluster metadata, configuration, membership, fencing, strongly consistent control-plane state"
-  not-for: "large business datasets, low-latency AP paths, Byzantine trust failures, global active-active writes without quorum trade-offs"
+  stance: "把小而关键的 metadata 放在可理解的 majority consensus 后面；把大业务数据和高吞吐数据路径留在 quorum 核心之外。"
+  best-for: "leader election、cluster metadata、configuration、membership、fencing、strongly consistent control-plane state"
+  not-for: "大业务数据、低延迟 AP 路径、Byzantine failure、没有 quorum 取舍的全球 active-active 写入"
   evidence-anchors: "Raft paper; etcd architecture/API guarantees; Kubernetes control-plane architecture"
 ---
 
 # Architecture Buddy Lens - Raft CP
 
-This is a heuristic lens for Architecture Buddy roundtables, not a persona. It evaluates whether a proposal needs understandable majority consensus and strongly consistent metadata coordination, then makes the quorum, scope, and operational consequences explicit.
+## 中文运行说明
 
-## Lens Metadata
+这是 Raft/CP 的启发式做法透镜，不是角色扮演。它判断方案是否真正需要 majority consensus 和强一致 metadata，并明确 quorum、范围和运维后果。
 
-- **Stance:** Put small, critical metadata behind understandable majority consensus; keep bulk business data and high-throughput data paths out of the quorum core.
-- **Best for:** Leader election, cluster metadata, configuration, membership, fencing, strongly consistent control-plane state.
-- **Not for:** Large business datasets, low-latency AP paths, Byzantine trust failures, global active-active writes without quorum trade-offs.
-- **Evidence anchors:** Raft paper; etcd architecture/API guarantees; Kubernetes control-plane architecture.
+## 透镜元数据
 
-## Framework Overview
+- **立场：** 把小而关键的 metadata 放在可理解的 majority consensus 后面；把大业务数据和高吞吐数据路径留在 quorum 核心之外。
+- **适合：** leader election、cluster metadata、configuration、membership、fencing、strongly consistent control-plane state。
+- **不适合：** 大业务数据、低延迟 AP 路径、Byzantine failure，或没有 quorum 取舍的全球 active-active 写入。
+- **证据锚点：** Raft paper、etcd architecture/API guarantees、Kubernetes control-plane architecture。
 
-### 1. Replicated Log Before Distributed State
+## 框架概览
 
-**One sentence:** A CP coordination system is safest when every node reaches the same state by applying the same ordered log, not by reconciling ad hoc peer state.
+### 1. 先有 replicated log，再有 distributed state
 
-**Evidence anchors:**
-- Raft decomposes consensus around a replicated log feeding deterministic state machines: leader election, log replication, safety, and membership change.
-- etcd exposes a globally ordered revision over a single Raft-backed KV store, giving clients a concrete ordering handle for metadata.
-- Kubernetes treats etcd as the source of truth behind the API server, with controllers observing ordered state changes and reconciling from that durable record.
+最安全的 CP 协调系统让所有节点按同一条有序 log 应用确定性 state machine，而不是相互猜测和事后合并。设计必须说明哪些 command 进入 log、产生哪些状态转移、哪些读必须看到最新 committed state。
 
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in algorithm design (Raft), production coordination storage (etcd), and orchestration control planes (Kubernetes).
-- **Generative power:** For a new coordination proposal, this model asks, "What is the authoritative ordered log, and which state machine consumes it?"
-- **Exclusivity:** This is not generic reliability advice; it specifically rejects loose peer convergence for decisions that must never split-brain.
+Raft 将选主、日志复制、安全性和成员变更分解为可理解的机制；etcd 暴露有序 revision；Kubernetes 以 etcd 作为控制面事实来源，controller 观察并调和状态。
 
-**Application:** Require designs to name the commands that enter the log, the deterministic state transitions they produce, and which reads need the log's latest committed state.
+### 2. Majority 是安全边界
 
-**Limit:** A single ordered log is intentionally narrow. It can become the bottleneck or wrong abstraction when the workload is large, partition-tolerant, or naturally sharded.
+已提交的决策必须与未来决策共享 majority，才能避免两个分区都成为 authoritative writer。分区时应明确哪一侧能选主、哪一侧能 commit、客户端看到什么，以及失去 quorum 时哪些操作必须拒绝。
 
-### 2. Majority Is the Safety Boundary
+majority 保护 safety，不保证 availability。跨 zone 的 quorum latency、leader 迁移和容量余量都应写入决策。
 
-**One sentence:** The system stays correct because any committed decision intersects with future decisions through a majority quorum.
+### 3. Strong leader 简化心智模型
 
-**Evidence anchors:**
-- Raft serves safely with a majority and uses majority agreement for leader election and log commitment.
-- Raft membership changes use joint consensus so old and new configurations overlap by majority.
-- etcd chooses CP behavior: it would rather lose availability under partition than allow split-brain metadata writes.
+强 leader 让写入所有权、日志顺序、重试和 leader failure 行为更容易解释，但 leader 也会成为延迟、负载和运维关注点。读路径要单独说明 linearizable、serializable 或 cached 的选择。
 
-**Triple verification:**
-- **Cross-domain recurrence:** Shows up in election, replication, membership changes, and production CP storage behavior.
-- **Generative power:** It predicts that a design with two independent writable partitions is outside the lens unless another fencing authority exists.
-- **Exclusivity:** AP stores, caches, and eventually consistent systems deliberately choose a different boundary.
+### 4. Metadata scope discipline
 
-**Application:** Ask every proposed failure mode in quorum terms: which side can elect, which side can commit, and what clients observe when no majority is reachable.
+CP coordination 适合 identity、membership、config、lease、版本和 desired state，不适合 metrics、logs、blobs、bulk business records 或 hot counters。控制面协调“应该在哪里做什么”，不承载高流量数据面。
 
-**Limit:** Majority protects safety, not user happiness. It can turn common network or capacity problems into visible write unavailability.
+### 5. Watch、lease、lock 不是魔法
 
-### 3. Strong Leader Simplifies the Mental Model
+watch 消费者必须能从 revision 恢复并在 compaction 后 relist；lease/lock 保护外部资源时仍需要 resource-side CAS、generation 或 fencing token。超时、leader election 和 watch lag 都可能形成未知态。
 
-**One sentence:** Raft makes consensus understandable by routing log entries through a strong leader rather than treating all peers symmetrically.
+## 决策启发式
 
-**Evidence anchors:**
-- Raft's paper explicitly favors understandability through decomposition and a strong leader, with log entries flowing leader to follower.
-- P5 contrasts this with Paxos's harder-to-teach single-decree model assembled into a log.
-- etcd's client-visible behavior includes uncertainty around timeouts and leader elections, making leader transitions part of the API reality.
+1. 当业务失败是“两方都以为自己是 primary”时才选 Raft-style CP，而不是仅仅因为读到 stale data。
+2. 保持 consensus group 小、其中的数据更小；存 references、desired state、lease 和 version，不存大 payload。
+3. 为 timeout 后的客户端行为设计 read-back、revision compare 或幂等 retry。
+4. 按读路径声明 linearizable、serializable 或 cached consistency。
+5. 成员变更必须是一等操作，写清 overlap、顺序、回滚和失去 quorum 的行为。
+6. 每个 lock/lease 都要配 fencing、CAS 或资源侧 generation check。
+7. watch consumer 要能从已知 revision 恢复，并在 compaction 后重新列举 authoritative state。
+8. 尽早分离 control plane 和 data plane；CP store 只协调，不承载高量工作流数据。
+9. 明确 quorum latency、quorum loss、跨 zone 放置和 leader failure 的容量预算。
+10. 选择团队能在故障时理解、调试和恢复的 consensus 实现，而不是只看理论优雅。
 
-**Triple verification:**
-- **Cross-domain recurrence:** Applies to algorithm pedagogy, implementation strategy, and client error handling.
-- **Generative power:** For a new system, it asks who serializes writes, how leadership changes, and what clients must retry or verify.
-- **Exclusivity:** Symmetric peer protocols and CRDT-style convergence intentionally avoid this leader-centered shape.
+## 设计分歧与张力
 
-**Application:** Prefer designs where write ownership, retry semantics, and leader failure behavior are explicit enough for operators and client authors to reason about.
+- **linearizable read vs 低延迟 read：** 前者保证最新状态，后者降低延迟但允许 stale。
+- **单一协调组 vs 分片协调：** 前者有简单的全局顺序，后者提高容量却让跨 shard 不变量变复杂。
+- **embedded consensus vs managed service：** 嵌入减少外部依赖，托管服务集中运维能力和失败语义。
+- **lease 便利性 vs fencing 正确性：** TTL 有助于清理，但 client pause 和 partition 会让没有 fencing 的 lock 失效。
+- **CP safety vs 用户可用性：** 失去 quorum 时拒绝写入避免脑裂，但用户可能只能读、等待或接受降级。
 
-**Limit:** A leader is also a focus of latency, load, operational attention, and tail behavior. Read scaling needs careful consistency choices.
+## 不会这样做 / 反模式
 
-### 4. Metadata Scope Discipline
+- 不会把高基数业务记录、metrics、logs、blobs 或 hot counters 放进 quorum metadata store。
+- 不会只说“有 lock”就声称外部资源已互斥，除非资源验证 revision、generation 或 fencing token。
+- 不会允许 partition 两侧同时接受 authoritative metadata writes。
+- 不会用 watch 作为唯一事实来源；消费者必须能够 relist 和 resume。
+- 不会把 wall-clock TTL 当作面对 pause、partition 或慢 client 时的正确性证明。
+- 不会把 Raft 共识加到真正需要的是 cache invalidation、queueing、幂等或最终收敛的 workload 上。
 
-**One sentence:** CP coordination is for small, high-value metadata and coordination primitives, not for turning consensus into a general data plane.
+## 诚实边界
 
-**Evidence anchors:**
-- etcd frames itself as strongly consistent, durable metadata storage with reliable scale in the gigabyte range, not a bulk business database.
-- Kubernetes centralizes desired cluster state in etcd while leaving container runtime, networking, and workload data paths outside the consensus store.
-- P5 explicitly warns against treating a consensus library as a massive business database.
-
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in etcd capacity guidance, Kubernetes control-plane/data-plane split, and distributed pattern taxonomy.
-- **Generative power:** It predicts which proposed fields belong in the CP store: identity, membership, config, leases, and desired state, not telemetry streams or large payloads.
-- **Exclusivity:** Many reliable systems deliberately keep heavy data in sharded stores while using CP only to coordinate ownership and metadata.
-
-**Application:** Force a boundary review: what must be linearizable, what can be cached, what can be eventually consistent, and what should live in another storage system.
-
-**Limit:** The boundary is easy to erode. Once users discover a convenient strongly consistent KV, they may push logs, metrics, blobs, or hot counters into it.
-
-### 5. Watches And Leases Are Coordination Aids, Not Magic
-
-**One sentence:** Watch streams, leases, locks, and elections help clients coordinate, but external correctness still needs version checks, fencing, and recovery logic.
-
-**Evidence anchors:**
-- etcd provides Watch, Lease, Lock, and Election primitives alongside MVCC and compaction, but watch latency can be unbounded under unhealthy conditions.
-- etcd lock APIs do not by themselves guarantee mutual exclusion over external resources; resource-side version validation or fencing is required.
-- Kubernetes controllers use watch-diff-act reconciliation, assuming controllers can recover by re-reading the authoritative API state.
-
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in etcd coordination APIs, lock/fencing warnings, and Kubernetes controller architecture.
-- **Generative power:** It asks whether every external side effect carries a revision, generation, fencing token, or compare-and-swap condition.
-- **Exclusivity:** Simpler lock stories often stop at "I acquired the lock"; this lens treats that as incomplete for external resources.
-
-**Application:** For every lease or watch-driven design, specify stale-holder behavior, missed-event recovery, compaction handling, and the validation performed by the protected resource.
-
-**Limit:** Fencing shifts some burden to downstream systems. If the external resource cannot validate versions, the coordination layer cannot fully protect it.
-
-## Decision Heuristics
-
-- Use Raft-style CP when the business failure is "two authorities both believed they were primary," not merely "some clients saw stale data."
-- Keep the consensus group small and the data inside it smaller; store references, desired state, leases, and versions rather than large payloads.
-- Design client APIs around completion uncertainty: after timeout, the client may need to read, compare revision, or retry idempotently.
-- State the consistency level per read path: linearizable when correctness depends on the latest committed value, serializable or cached only when staleness is acceptable.
-- Treat membership changes as first-class operations with overlap, sequencing, and rollback plans; never swap cluster membership as an out-of-band shortcut.
-- Pair every distributed lock or lease with fencing, CAS, or resource-side generation checks.
-- Make watch consumers resumable from a known revision and able to recover from compaction by relisting authoritative state.
-- Separate control plane and data plane early; the CP store coordinates where work should happen, not the high-volume work itself.
-- Budget quorum latency and quorum loss explicitly in the architecture decision record, including cross-zone placement and failure domains.
-- Prefer an understandable consensus implementation and operational model over a theoretically elegant one the team cannot debug at 3 a.m.
-
-## Design Disagreements
-
-- **Linearizable reads vs lower-latency reads:** Linearizable reads preserve the strongest mental model, while serializable or cached reads reduce latency at the cost of possible staleness.
-- **Single coordination group vs sharded coordination:** A single group gives simple global ordering; sharding improves capacity but makes cross-shard invariants harder.
-- **Embedded consensus vs managed coordination service:** Embedding can reduce dependencies and fit product shape; using etcd/ZooKeeper/Consul-like systems concentrates operational knowledge and failure semantics.
-- **Lease convenience vs correctness discipline:** Leases simplify liveness and cleanup, but TTL and client pauses can mislead holders unless downstream fencing exists.
-- **CP purity vs user-facing availability:** Refusing writes without quorum prevents split-brain, but product owners may prefer degraded, stale, or read-only behavior during partitions.
-
-## Would Not Do / Antipatterns
-
-- Would not put high-cardinality business records, metrics streams, logs, blobs, or hot counters in the quorum-backed metadata store.
-- Would not claim "we have a lock" as proof of external mutual exclusion unless the protected resource checks a revision, generation, or fencing token.
-- Would not allow both sides of a partition to accept authoritative metadata writes.
-- Would not hide leader election and timeout uncertainty behind an API that pretends writes are simply success-or-failure.
-- Would not use watches as the only source of truth; consumers must be able to relist and resume.
-- Would not treat wall-clock TTL as a correctness proof in the presence of pauses, partitions, or slow clients.
-- Would not add CP consensus to a workload whose real requirement is cache invalidation, queueing, idempotency, or eventual convergence.
-
-## Honest Limits
-
-- This lens assumes non-Byzantine failures. It does not cover malicious peers, arbitrary corruption, or adversarial consensus.
-- It is strongest for metadata coordination and control-plane state, not for OLTP, analytics, document storage, or event streaming architecture.
-- It does not choose a specific product for the team; etcd, ZooKeeper, Consul, database transactions, or a managed control plane may each be reasonable depending on operational context.
-- It cannot eliminate CAP trade-offs. It makes the decision to reject unsafe writes during quorum loss visible.
-- Local corpus coverage is centered on Raft, etcd, and Kubernetes; broader Paxos-family and multi-region consensus variants are only secondary context here.
+- 本透镜假设 non-Byzantine failure，不覆盖恶意节点、任意损坏或对抗性共识。
+- 它最适合 metadata coordination 和 control-plane state，不适合 OLTP、analytics、文档存储或 event streaming 主路径。
+- 它不替团队选择 etcd、ZooKeeper、Consul、数据库事务或 managed control plane；产品选择取决于约束和运维能力。
+- 它不能消除 CAP 取舍，只能让 quorum loss 时拒绝不安全写入的选择显式化。
 
 ## Roundtable Output Contract
 
-When Architecture Buddy asks this lens to contribute, answer only in this shape:
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织：
 
 ```text
 ## Lens: Raft CP
 ### On the decision point
-State whether the decision is truly CP metadata coordination, what must be strongly consistent, and what can remain outside the quorum path.
+说明该决策是否真正属于 CP metadata coordination；哪些必须 strongly consistent，哪些可以留在 quorum path 之外。
 
 ### Heuristics applied
-Name the specific quorum/log/metadata/watch/lease heuristics used. Tie each to the proposal, not to generic distributed-systems advice.
+列出实际使用的 quorum/log/metadata/watch/lease 规则，并绑定到当前方案。
 
 ### Risks / what this lens would worry about
-Call out quorum loss, leader transition uncertainty, data-scope creep, stale lock holders, watch recovery gaps, compaction, and operational capacity risks where relevant.
+按需指出 quorum loss、leader transition uncertainty、data-scope creep、stale lock holder、watch recovery、compaction 和容量风险。
 
 ### Would not do
-List concrete design moves this lens would reject for this decision.
+列出本透镜会拒绝的具体设计动作。
 
 ### Evidence style
-Use Raft majority/log safety, etcd API guarantees and limits, and Kubernetes control-plane separation as anchors. Mark assumptions that need validation.
+以 Raft majority/log safety、etcd API guarantees and limits、Kubernetes control-plane separation 为证据锚点，并标记待验证假设。
 ```
 
-## Sources
+## 附录：研究来源
 
-The maintainer corpus and build instructions used to distill this lens are not required at runtime.
-- Diego Ongaro and John Ousterhout, "In Search of an Understandable Consensus Algorithm (Raft)": https://raft.github.io/raft.pdf
-- Raft project site and visualization resources: https://raft.github.io/
-- etcd Learning documentation: https://etcd.io/docs/latest/learning/
-- etcd "Why etcd?" documentation: https://etcd.io/docs/v3.5/learning/why/
-- Kubernetes Cluster Architecture documentation: https://kubernetes.io/docs/concepts/architecture/
+- https://raft.github.io/raft.pdf
+- https://raft.github.io/
+- https://etcd.io/docs/latest/learning/
+- https://etcd.io/docs/v3.5/learning/why/
+- https://kubernetes.io/docs/concepts/architecture/

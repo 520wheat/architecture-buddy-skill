@@ -1,8 +1,8 @@
-# Mechanisms (runtime cheat sheet)
-Runtime mechanism vocabulary distilled from the maintainer research corpus.
-User-visible authority is templates/architecture-deliverable.md (dual layer A/B).
-M1–M9 below are internal mapping only; see references/note-mapping.md.
-Do not invent new M numbers; do not put M numbers in user-facing deliverable body.
+# 机制（运行时速查）
+
+以下是运行时使用的机制词汇，来自维护者整理的研究资料。用户可见的权威骨架是
+`templates/architecture-deliverable.md`（双层 A/B）。下方 M1–M9 仅用于内部映射，详见
+`references/note-mapping.md`；不要新增 M 编号，也不要把 M 编号写进用户可见正文。
 
 ## 映射到笔记锚点（M）
 
@@ -15,21 +15,21 @@ Do not invent new M numbers; do not put M numbers in user-facing deliverable bod
 | M5 | 机制与策略 | K4, K5, K7, K10, K13–K19 | 共性机制 vs 可选项；优先公共模式名；常出现控制面/数据面或元数据/数据分离 |
 | M6 | 决策与理由 | K6 | Context / Options / Decision / Consequences |
 | M7 | 权衡、风险、未决 | K6, K16 | 含负面后果、敏感点、推迟项 |
-| M8 | 证据与学习痕迹 | K8, K9 | Top N、圆桌、canon、Design Lessons、When not |
+| M8 | 证据与学习痕迹 | K8, K9 | Top N、圆桌、canon、设计教训、何时不使用 |
 | M9 | 模式词汇层级 | K5, K19 + P1–P5/P9 | 架构/企业/集成/并发分布式优先；GoF 默认细粒度 |
 
 ## 机制明细（去重后）
 
 | ID | 机制 | 关键证据 |
 |----|------|----------|
-| K1 | 问题类与非目标先行 | etcd 对照；HDFS；Anthropic when not |
+| K1 | 问题类与非目标先行 | etcd 对照；HDFS；Anthropic 何时不使用 |
 | K2 | 信任/威胁/一致性假设显性化 | ZTA；etcd CP；Envoy threat model |
 | K3 | 质量与规模场景化 | HDFS 40PB；Agent 成本/延迟 |
 | K4 | 机制 vs 策略分离 | K8s variations；Agent 模式族 |
 | K5 | 公共模式命名 | POSA/PoEAA/EIP/Raft |
 | K6 | 决策含负面后果 | etcd lock；DT ADR；BDB 演进 |
 | K7 | 控制面·数据面 / 元数据·数据分离 | K8s；HDFS；Envoy；Pulsar |
-| K8 | When not / Design Lessons | Anthropic；BDB；LLVM |
+| K8 | 何时不使用 / 设计教训 | Anthropic；BDB；LLVM |
 | K9 | 组织参考架构与可验证清单 | SAMM；ASVS |
 | K10 | 配置不可变/原子替换 | Caddy |
 | K13 | 日志型消息（追加+保留+位点） | Kafka |
@@ -40,7 +40,7 @@ Do not invent new M numbers; do not put M numbers in user-facing deliverable bod
 | K20 | 可理解的共识分解（选主/复制/安全） | Raft |
 | K21 | 事件驱动并发模型族（Reactor 等） | POSA2；Envoy |
 | K22 | 逻辑组件 vs 部署模型分离（安全） | NIST ZTA PE/PA/PEP vs Agent/Enclave/Portal |
-| K23 | 框架哲学清单承载机制、子系统表承载策略 | Django design philosophies |
+| K23 | 框架哲学清单承载机制、子系统表承载策略 | Django 设计哲学 |
 | K24 | 嵌入式存储：编译→VM→页缓存→VFS | SQLite |
 
 ## 已否决的膨胀

@@ -1,162 +1,124 @@
 ---
 name: architecture-buddy-lens-zta-resource
 description: >
-  Use when Architecture Buddy roundtable needs a Zero Trust resource lens for trust
-  assumptions, access paths, policy enforcement, identity or device posture,
-  micro-segmentation, or continuous authorization without network-location trust.
+  Use when Architecture Buddy roundtable needs a Zero Trust resource lens for trust assumptions,
+  access paths, policy enforcement, identity or device posture, micro-segmentation, or continuous
+  authorization without network-location trust.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (ZTA Resource)
   version: "0.1.0"
-  stance: "Do not trust a subject, device, or workload because of where it is on the network; authorize access to each resource explicitly and continuously."
-  best-for: "Zero Trust Architecture, resource access, PEP placement, trust boundaries, continuous authorization, least privilege"
-  not-for: "Generic security checklisting, persona roleplay, or replacing threat modeling and ASVS control verification"
+  stance: "不因主体、设备或 workload 所在网络位置而信任它；对每个 resource 显式授权并持续评估。"
+  best-for: "Zero Trust Architecture、resource access、PEP placement、trust boundary、continuous authorization、least privilege"
+  not-for: "泛化安全清单、角色扮演、替代 threat modeling 和 ASVS 控制验证"
   evidence-anchors: "NIST SP 800-207; OWASP ASVS V1; OWASP SAMM Secure Architecture"
 ---
 
 # Architecture Buddy Lens — ZTA Resource
 
-This is a **heuristic lens**, not a person or roleplay character. It applies the zero trust resource stance from NIST SP 800-207 to Architecture Buddy roundtables: every protected resource needs an explicit decision path, enforcement point, and revocation story.
+## 中文运行说明
 
-## Seat Metadata
+这是 Zero Trust resource 的启发式做法透镜，不是角色扮演。它把资源、主体、策略决策点、执行点、撤销路径和残余信任区域放到同一条访问路径上检查。
 
-- **Best for:** Zero Trust Architecture, resource-centric access, PEP placement, identity/device posture, least privilege, segmentation, continuous authorization.
-- **Not for:** Broad security review without an access decision point, compliance-only checkboxing, or replacing ASVS/SAMM verification.
-- **Evidence anchors:** NIST SP 800-207 for ZTA principles and PE/PA/PEP logic; OWASP ASVS V1 for verifiable architecture controls; OWASP SAMM Secure Architecture for organizational maturity and reusable patterns.
+## 席位元数据
 
-## Framework Overview
+- **适合：** Zero Trust Architecture、resource-centric access、PEP placement、identity/device posture、least privilege、segmentation 和 continuous authorization。
+- **不适合：** 没有具体访问决策点的泛化安全审查、只勾合规复选框，或替代 ASVS/SAMM 验证。
+- **证据锚点：** NIST SP 800-207 的 ZTA 原则和 PE/PA/PEP；OWASP ASVS V1 的可验证架构控制；OWASP SAMM Secure Architecture 的组织成熟度。
 
-### 1. Network Location Is Not Trust
+## 框架概览
 
-**One-line model:** Local network, VPN, subnet, or asset ownership is context, not authorization.
+### 1. 网络位置不是信任
 
-**Evidence:**
-- NIST SP 800-207 states that no asset is inherently trusted and that enterprise networks may already be compromised.
-- NIST requires authentication and authorization before sessions and calls for minimizing implicit trust zones.
-- ASVS V1 requires documented trust boundaries and security controls enforced in trusted layers, not in untrusted clients.
+local network、VPN、subnet 或资产所有权只是上下文，不是授权。设计要回答：如果“内网”已经被攻破，哪些请求仍然会被允许？
 
-**Application:** Ask what would still be allowed if the "internal" network were hostile. Replace "inside the VPC" or "behind VPN" as a trust argument with identity, device posture, workload identity, resource sensitivity, and request context.
+应显式命名 subject、device、workload、resource、resource sensitivity、request context 和剩余 implicit trust zone，并逐步缩小后者。
 
-**Limit:** This does not mean every legacy implicit trust zone can disappear immediately. It means the design must name remaining implicit zones and shrink them over time.
+### 2. 以 resource 为中心授权
 
-### 2. Resource-Centric Authorization
+受保护对象是 resource，而不是包围它的网络段。对于每个 resource 或 resource group，说明谁能访问、通过哪个 PEP、在什么条件下访问，以及如何撤销。
 
-**One-line model:** The protected object is the resource, not the network segment around it.
+resource inventory 和 data classification 是前提；没有准确的资产和身份信息，策略会变得过宽、过期且不可维护。
 
-**Evidence:**
-- NIST frames access decisions around enterprise resources and communication paths from subject to resource.
-- NIST deployment models vary by resource/workflow: device agent/gateway, enclave gateway, and resource portal can coexist in one enterprise.
-- ASVS maps data classification and protection requirements into architecture, reinforcing that resource sensitivity should drive controls.
+### 3. PE、PA、PEP 分离
 
-**Application:** Start with a resource inventory and sensitivity map. For each resource or resource group, define who can access it, through which PEP, under what conditions, and how access is revoked.
+Policy Engine 决策，Policy Administrator 建立或撤销访问路径，Policy Enforcement Point 阻止、监控或终止流量。逻辑分离不要求三个产品，但不能把责任隐藏在“gateway 负责一切”中。
 
-**Limit:** Resource-centric design can increase policy and inventory complexity. Without good asset, identity, and data classification hygiene, policies become inaccurate or unmaintainable.
+应同时区分 control-plane communication 和 application data-plane traffic，说明每条路径的身份、策略输入、执行点和日志。
 
-### 3. PE / PA / PEP Separation
+### 4. 持续且有上下文的授权
 
-**One-line model:** Separate policy decision, policy administration, and enforcement so the design has a clear control plane and data plane.
+访问不是一次 login 的永久结果。device posture、identity risk、token age、unusual request、threat intelligence、resource sensitivity 或 policy update 都可能触发重新评估。
 
-**Evidence:**
-- NIST defines Policy Engine (PE), Policy Administrator (PA), and Policy Enforcement Point (PEP) as core logical components.
-- NIST separates control-plane communication (PE/PA to PEP) from application data-plane traffic.
-- ASVS favors centralized, simple, reusable, and reviewed security controls over duplicated enforcement logic.
+设计必须有 revocation 和 session termination 路径。持续检查会增加延迟、可用性和运维成本，过度频繁或信号质量差都会造成误拒绝。
 
-**Application:** In the roundtable, locate the PE, PA, and PEP. Identify which component decides, which component establishes or tears down the path, and which component blocks, monitors, or terminates traffic.
+### 5. 组织成熟度把模式变成默认值
 
-**Limit:** Logical separation does not require three products. It does require that the architecture not hide these responsibilities inside vague "gateway" or "platform handles it" claims.
+ZTA 不只是单个系统图。组织需要可复用的 reference architecture、标准 PEP、identity source、device posture source、日志要求和 review checkpoint，并通过 ASVS/SAMM 风格的控制持续验证。
 
-### 4. Continuous, Contextual Authorization
+## 决策启发式
 
-**One-line model:** Access is not a one-time login result; risk can change during the session.
+1. 把“trusted network”翻译成明确的 subject、device、workload、resource 和 policy。
+2. 在 workflow 和 legacy 约束允许时，将 PEP 放在靠近 protected resource 的位置。
+3. 将 implicit trust zone 缩小到可命名、可监控、可逐步收缩的范围。
+4. 把 identity、device posture、workload identity、threat intelligence 和 resource sensitivity 作为一次显式授权决策的输入。
+5. 保持 PE、PA、PEP 的逻辑责任清晰，不在 client 和服务中复制不可审计的授权逻辑。
+6. 先设计 revocation，再设计 approval：风险变化后系统如何移除权限。
+7. 对不同 workflow 允许不同 deployment model，不强行让一个 portal/gateway/agent 覆盖所有资源。
+8. 将 ZTA 设计绑定到 ASVS 可验证控制和 SAMM 组织采用情况。
+9. 如果 legacy 约束迫使使用 enclave trust，标出 enclave 边界、数据流和 lateral movement 残余风险。
+10. 对每条访问路径验证身份、授权、执行、监控和撤销，而不是只检查主入口。
 
-**Evidence:**
-- NIST allows continuous session evaluation using identity, device posture, request context, threat intelligence, CDM signals, and resource sensitivity.
-- NIST trust algorithms may use static rules or dynamic risk scoring; both are policy choices under the same mechanism.
-- ASVS requires consistent authentication/authorization strength across paths and component-to-component communication authentication.
+## 设计分歧与张力
 
-**Application:** Ask what events cause re-evaluation: device posture change, user risk change, token age, unusual request, threat intel, resource sensitivity change, or policy update. Require a revocation and session termination path.
+- **identity-first vs resource/gateway-first：** 前者适合开放网络和 SaaS，后者常适合 legacy resource；成熟方案可以组合。
+- **静态策略 vs adaptive risk：** 静态更容易审计，动态风险更能响应上下文但增加解释和运维负担。
+- **per-resource PEP vs enclave gateway：** 前者缩小信任区但改造难，后者便于迁移但保留 enclave 内横向风险。
+- **portal 简洁性 vs concentration risk：** portal 简化访问，却可能成为高价值的可用性和执行依赖。
+- **安全强度 vs 可运维性：** 持续评估加强控制，但错误调优会导致 outage、false deny 和支持成本。
 
-**Limit:** Continuous authorization has operational cost. Overly chatty checks can break reliability or user experience; overly static checks keep stale trust alive.
+## 不会这样做 / 反模式
 
-### 5. Maturity Turns Patterns Into Defaults
+- 不会接受“在 VPN/VPC 内”作为主要授权理由。
+- 不会只在不可信 client 或前端执行授权。
+- 不会把 Zero Trust 简化成 MFA、SSO 或 micro-segmentation。
+- 不会允许同一 resource 存在一条认证授权更弱的备用路径。
+- 不会用一个巨大 enclave gateway 就声称 lateral movement 风险已解决。
+- 不会跳过 resource classification 后对模糊资源组写宽泛策略。
+- 不会接受没有 enforcement、monitoring 和 revocation path 的 policy decision。
 
-**One-line model:** ZTA is not only a per-system diagram; organizations need reusable secure patterns and governed technology choices.
+## 诚实边界
 
-**Evidence:**
-- OWASP SAMM Secure Architecture moves from training, to secure design patterns, to reference architectures and continuous assessment.
-- SAMM Technology Management moves from identifying risk, to standardizing frameworks, to enforcing approved technologies.
-- ASVS describes architecture as a way to reason about multiple valid implementations rather than a single correct implementation.
-
-**Application:** Check whether the proposed ZTA approach is a one-off exception or an adopted pattern: reference architecture, standard PEP options, identity source rules, device posture sources, logging requirements, and review checkpoints.
-
-**Limit:** Maturity models do not choose the correct PEP placement for a specific workflow. They ensure the organization can repeat and verify the choice.
-
-## Decision Heuristics
-
-1. If the argument says "trusted network," translate it into named subjects, devices, workloads, resources, and policies.
-2. Put the PEP as close to the protected resource as the workflow and legacy constraints allow.
-3. Keep the implicit trust zone behind a PEP small enough to name, monitor, and eventually shrink.
-4. Treat identity, device posture, workload identity, threat intelligence, and resource sensitivity as inputs to one explicit decision, not separate checkboxes.
-5. Separate logical responsibilities: PE decides, PA establishes or tears down the path, PEP enforces and monitors.
-6. Prefer centralized, reviewed authorization controls over duplicated authorization logic in many services or clients.
-7. Model revocation before approval: ask how the system removes access when risk changes.
-8. Use different deployment models per workflow when needed; do not force a single portal, gateway, or agent pattern across unlike resources.
-9. Pair ZTA design with ASVS-style verifiable controls and SAMM-style organizational adoption.
-10. When legacy constraints force enclave trust, label the enclave boundary, data flows, and residual lateral-movement risk.
-
-## Schools / Design Tensions
-
-- **Identity-first vs resource/gateway-first:** Enhanced identity governance works well for SaaS, BYOD, and open networks; gateway or micro-segmentation patterns often fit legacy resources and finer network control. Strong designs usually combine them.
-- **Static policy vs adaptive risk:** Static policies are easier to reason about and audit; adaptive risk scoring can respond to live context but adds explainability and operations burden.
-- **Per-resource PEP vs enclave gateway:** Per-resource enforcement shrinks implicit trust but can be hard to retrofit; enclave gateways ease migration but preserve trust inside the enclave.
-- **Portal simplicity vs concentration risk:** A resource portal simplifies user flow and browser access, but it becomes a high-value enforcement and availability dependency.
-- **Security rigor vs operability:** Continuous evaluation and posture checks improve control, but poor tuning creates outages, false denies, and support load.
-
-## Would Not Do / Anti-Patterns
-
-- Would not approve "inside the VPN/VPC" as the main authorization claim.
-- Would not place authorization enforcement only in an untrusted client or front-end.
-- Would not describe "Zero Trust" only as MFA, SSO, or micro-segmentation.
-- Would not allow multiple paths to the same resource with weaker authentication or authorization on one path.
-- Would not use one large enclave gateway while pretending lateral movement risk is solved.
-- Would not skip resource classification and then write broad policies against vague resource groups.
-- Would not accept a policy decision without an enforcement, monitoring, and revocation path.
-- Would not turn ZTA into product selection before naming trust assumptions and protected resources.
-
-## Honest Boundaries
-
-- This lens does not replace threat modeling; it provides questions that should feed threat modeling.
-- This lens does not guarantee compliance with NIST, ASVS, or SAMM; it helps align architecture discussion with their concepts.
-- ZTA adoption is incremental. Some implicit trust may remain in legacy zones, but it must be explicit and governed.
-- Continuous authorization depends on signal quality. Bad identity, device, asset, or telemetry data can make the policy engine confidently wrong.
-- The lens is strongest for access-path and resource-protection decisions; it is weaker for unrelated security topics such as secure coding details, cryptographic primitive choice, or incident response process.
+- 本透镜不替代 threat modeling，只提供应进入 threat model 的架构问题。
+- 它不保证自动符合 NIST、ASVS 或 SAMM；具体控制仍要验证和审计。
+- ZTA 通常需要渐进采用，legacy implicit trust 可以暂时存在，但必须显式治理并设定收缩路径。
+- continuous authorization 依赖身份、设备、资产和 telemetry 信号质量；错误信号可能让 policy engine 自信地做出错误决定。
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织：
 
 ```text
 ## Lens: ZTA Resource
 ### On the decision point
-State whether the proposal relies on network location, broad enclave trust, client-side enforcement, or one-time authentication.
+说明方案是否依赖 network location、broad enclave trust、client-side enforcement 或 one-time authentication。
 
 ### Heuristics applied
-Name the relevant ZTA checks: resource scope, PE/PA/PEP responsibilities, PEP placement, continuous authorization signals, trust boundary size, and revocation path.
+列出 resource scope、PE/PA/PEP responsibilities、PEP placement、continuous authorization、trust boundary 和 revocation 检查。
 
 ### Risks / what this lens worries about
-List concrete failure modes such as lateral movement, bypass paths, stale sessions, weak alternate routes, over-broad resource groups, or ungoverned policy sprawl.
+列出 lateral movement、bypass path、stale session、weak alternate route、过宽 resource group 或 policy sprawl 风险。
 
 ### Would not do
-Call out the specific anti-pattern this proposal should avoid.
+指出该方案应避免的具体反模式。
 
 ### Evidence style
-Anchor claims in NIST SP 800-207 terms first, then use ASVS V1 for verifiable architecture requirements and SAMM for maturity or reference-architecture questions.
+优先以 NIST SP 800-207 为锚点，用 ASVS V1 说明可验证的架构要求，用 SAMM 处理成熟度和复用问题。
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
-- NIST SP 800-207, Zero Trust Architecture:
-  - Source: https://csrc.nist.gov/pubs/sp/800/207/final
-  - PDF: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf
-- OWASP SAMM Secure Architecture:
-  - Source: https://owaspsamm.org/model/design/secure-architecture/
-- OWASP ASVS V1 Architecture:
-  - Source: https://asvs.dev/v4.0.3/V1-Architecture/
+- https://csrc.nist.gov/pubs/sp/800/207/final
+- https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf
+- https://owaspsamm.org/model/design/secure-architecture/
+- https://asvs.dev/v4.0.3/V1-Architecture/

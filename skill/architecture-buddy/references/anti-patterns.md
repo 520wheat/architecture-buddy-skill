@@ -1,8 +1,9 @@
-# Anti-patterns & Writing Rules (runtime cheat sheet)
-Runtime anti-pattern vocabulary distilled from the maintainer research corpus.
+# 反模式与写作规则（运行时速查）
+
+以下词汇用于帮助主持人识别常见架构反模式。它们是推理提示，不是必须逐字写入正式设计的标题。
 
 ## 内容反模式
-| 反模式 | 证据 |
+| 反模式 | 参考依据 |
 |--------|------|
 | 为 Agent 而 Agent | Anthropic |
 | 协调库当业务主键库 | etcd |
@@ -24,7 +25,7 @@ Runtime anti-pattern vocabulary distilled from the maintainer research corpus.
 | ---------- | ----------------- |
 | 模块图第一章     | 问题类→假设→质量→机制/策略   |
 | 单一最佳实践     | 并列策略+条件+代价        |
-| 不写负面后果     | Consequences 必含负向 |
+| 不写负面后果     | Consequences 必须包含负面后果 |
 | 私有黑话       | 公共模式名优先           |
 | 隐藏信任/一致性假设 | 写入 M3             |
 | 容量数字当主叙事   | 仅作 M4 场景          |

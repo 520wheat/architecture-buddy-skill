@@ -16,7 +16,7 @@
 | `architecture-buddy-lens-spanner-sql` | 领域透镜 | 否 | `0.1.0` | 全球 SQL、外部一致性和多区域事务 |
 | `architecture-buddy-lens-zta-resource` | 安全透镜 | 否 | `0.1.0` | 零信任、资源访问、策略执行和信任边界 |
 
-推荐安装主包和全部可选透镜；透镜默认不主动触发，只由主持 Skill 在圆桌中按问题选择。
+推荐安装主包和全部可选透镜。透镜默认不主动触发，只由主持 Skill 在圆桌中依据决策点选择；它们提供做法视角，不扮演真人。
 
 ## 安装
 
@@ -37,6 +37,6 @@ done
 
 ## 包内资源
 
-`architecture-buddy/prompts/`、`references/`、`templates/` 和 `scripts/` 是主 Skill 的运行时资源目录，必须随主包安装，不能单独拆出。当前新增的 Prompt、脚本和 Agent UI 文件为空占位，尚未改变 `0.3.6` 的运行行为。
+`architecture-buddy/prompts/`、`references/`、`templates/` 和 `scripts/` 是主 Skill 的运行时资源目录，必须随主包安装，不能单独拆出。它们分别承载分阶段提示词、架构知识、正式产物模板和确定性校验工具。
 
 完整机器可读清单见 [`release-manifest.tsv`](release-manifest.tsv)。

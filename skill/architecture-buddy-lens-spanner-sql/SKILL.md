@@ -1,189 +1,122 @@
 ---
 name: architecture-buddy-lens-spanner-sql
-description: Use when Architecture Buddy roundtable needs a Spanner SQL lens for globally distributed SQL, external consistency, strict serializability, TrueTime-style bounded clocks, Paxos-replicated splits, multi-region OLTP, lock-free reads, schema changes, or SQL at global scale. Not for roleplay; this is a heuristic architecture lens.
+description: >
+  Use when Architecture Buddy roundtable needs a Spanner- SQL lens for globally distributed SQL,
+  external consistency, strict serializability, TrueTime-style bounded clocks, Paxos-replicated
+  splits, multi-region OLTP, lock-free reads, schema changes, or SQL at global scale.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Spanner SQL)
   version: "0.1.0"
-  stance: "Global SQL can be made externally consistent, but only by paying explicitly for bounded time uncertainty, synchronous replication, placement, and transaction coordination."
-  best-for: "global OLTP, externally consistent transactions, multi-region SQL, strongly consistent reads, compliance-grade ordering, read/write locality trade-offs"
-  not-for: "low-latency AP writes, offline-first conflict merging, teams unwilling to operate global placement and quorum costs, workloads that only need cached or eventual views"
-  evidence-anchors: "Google Spanner OSDI 2012 paper; Cloud Spanner architecture/replication docs; Spanner external consistency docs"
+  stance: "只有当业务不变量需要 external consistency 时才选择全球 SQL；把 commit wait、leader placement、跨 split 事务和 tail latency 作为真实成本。"
+  best-for: "全球分布式 OLTP、strict serializability、外部一致性、multi-region SQL"
+  not-for: "AP-first 写入、离线合并、cache invalidation、telemetry、可补偿工作流"
+  evidence-anchors: "Spanner OSDI paper; Cloud Spanner replication and read/write architecture; external consistency documentation"
 ---
 
 # Architecture Buddy Lens - Spanner SQL
 
-This is a heuristic architecture lens for Architecture Buddy roundtables, not a person and not roleplay. It evaluates proposals that want global SQL, strong transactions, and scale at the same time, then makes the hidden costs of external consistency visible.
+## 中文运行说明
 
-## Lens Metadata
+这是 Spanner SQL 的启发式做法透镜，不是角色扮演。它只判断全球 SQL 和 external consistency 是否真的解决当前不变量，并显式展示时钟、quorum、placement、索引和成本代价。
 
-- **Stance:** Global SQL can be made externally consistent, but only by paying explicitly for bounded time uncertainty, synchronous replication, placement, and transaction coordination.
-- **Best for:** Global OLTP, externally consistent transactions, multi-region SQL, strongly consistent reads, compliance-grade ordering, read/write locality trade-offs.
-- **Not for:** Low-latency AP writes, offline-first conflict merging, teams unwilling to operate global placement and quorum costs, workloads that only need cached or eventual views.
-- **Evidence anchors:** Google Spanner OSDI 2012 paper; Cloud Spanner architecture/replication docs; Spanner external consistency docs.
+## 透镜元数据
 
-## Framework Overview
+- **立场：** 只有当业务不变量需要 external consistency 时才选择全球 SQL；把 commit wait、leader placement、跨 split 事务和 tail latency 当作真实成本。
+- **适合：** 全球分布式 OLTP、strict serializability、外部一致性和 multi-region SQL。
+- **不适合：** AP-first 写入、离线合并、cache invalidation、append-only telemetry 或可补偿工作流。
+- **证据锚点：** Spanner OSDI paper、Cloud Spanner replication/read-write architecture 和 external consistency 文档。
 
-The models below were retained because they recur across the Spanner paper, public Cloud Spanner architecture material, and the local distributed-systems corpus; they generate concrete architecture choices and distinguish this lens from generic SQL or consensus advice.
+## 框架概览
 
-### 1. Time Is an API, Not an Assumption
+### 1. 先证明 external consistency 的业务不变量
 
-**One sentence:** External consistency depends on exposing clock uncertainty as a first-class bound, then making the system wait when the bound is too wide.
+不要从“需要全球 SQL”开始。先写出必须满足的跨实体不变量、实时顺序、读写关系和失败时用户可见状态。若冲突写入可以接受并在之后合并，应考虑 AP、CRDT 或 event-sourcing，而不是强行使用 Spanner-style 语义。
 
-**Evidence anchors:**
-- The OSDI paper identifies TrueTime as the key enabler: `TT.now()` returns an interval, not a point, and commit timestamps depend on bounded uncertainty.
-- Spanner's external consistency rule requires that if transaction T1 commits before T2 starts, T1's commit timestamp is lower than T2's.
-- Cloud Spanner materials explain commit wait: a write is not externally visible until its commit timestamp is definitely in the past.
+### 2. TrueTime/commit wait 是写路径成本
 
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in transaction ordering, lock-free reads, schema changes, and consistent backups.
-- **Generative power:** For a new global SQL proposal, it asks "what is the timestamp authority, what is the uncertainty bound, and who waits?"
-- **Exclusivity:** Most databases treat wall-clock time as approximate metadata; this lens treats bounded uncertainty as part of the correctness protocol.
+external consistency 需要可证明的时间不确定性边界和 commit wait，使提交时间不会违反 real-time order。跨 region 的 quorum、leader placement、clock uncertainty 和 tail latency 都必须进入容量和用户体验预算。
 
-**Application:** Require any claimed "global real-time order" to name the time source, uncertainty budget, commit-wait behavior, monitoring, and fallback when uncertainty grows.
+不能用 NTP 同步就声称拥有 TrueTime-style 保证；需要具体实现或 managed service 的 API 证据。
 
-**Limit:** TrueTime is infrastructure-heavy. Without comparable bounded uncertainty, the design may need a centralized timestamp oracle, hybrid logical clocks with weaker guarantees, or a narrower consistency claim.
+### 3. Paxos split、leader 和 locality 决定性能
 
-### 2. Split the Data, Not the Invariant
+分片能扩展数据和吞吐，但跨 split transaction、远程 secondary index 写入、热点 key 和不合适的 leader placement 会把一次本地写变成多区域尾延迟。
 
-**One sentence:** Spanner scales by splitting key ranges into independently replicated Paxos groups, while distributed transactions preserve invariants that cross those groups.
+schema 和 primary key 应从事务 locality、tenant/account/order/workflow 范围出发设计；不要用随机 ID 掩盖真实的访问模式。
 
-**Evidence anchors:**
-- Cloud Spanner organizes rows into splits, each replicated across failure domains and managed by a Paxos replica set.
-- Leaders handle writes for their Paxos groups; cross-group read-write transactions require coordination across leaders and participants.
-- The OSDI paper combines Paxos replication, two-phase commit, and timestamp assignment so sharding does not erase SQL transaction semantics.
+### 4. 读一致性按路径选择
 
-**Triple verification:**
-- **Cross-domain recurrence:** Shows up in storage layout, replication, write routing, and transaction execution.
-- **Generative power:** It predicts that poor primary-key locality, hot splits, or cross-split invariants will dominate latency even if SQL syntax is simple.
-- **Exclusivity:** Many sharded databases ask applications to give up cross-shard invariants; this lens preserves them but charges for coordination.
+关键路径可以选择 strong read；dashboard、导出和分析若允许陈旧，应写出 stale 或 exact-staleness budget，以换取 locality 和延迟。不能用“near real time”掩盖读语义。
 
-**Application:** Review primary keys, interleaving/locality, split behavior, leader placement, and which transactions cross splits or regions.
+### 5. Schema change 是分布式一致性事件
 
-**Limit:** The abstraction can hide coordination until production. "It is just SQL" does not mean every transaction has local cost.
+全球 schema 变更需要时间点、兼容窗口、代码 rollout 顺序、backfill 和 rollback。旧客户端、新客户端、长事务和新旧 schema 的交互都需要验证；DDL 不能作为与应用版本无关的脚本偷偷执行。
 
-### 3. Read Freshness Has Multiple Prices
+## 决策启发式
 
-**One sentence:** Strong reads, stale reads, snapshot reads, and lock-free read-only transactions are different contracts over timestamp choice and replica freshness.
+1. 在说“global SQL”前，先命名真正需要 external consistency 的不变量。
+2. 从 clock uncertainty 和 commit wait 预算提交延迟，不要只用单 region latency 估算。
+3. 尽量让 write leader 靠近写入密集用户；read replica 的选择要先定义 freshness。
+4. 从 tenant、account、customer、order 或 workflow instance 等事务 locality 设计 primary key。
+5. 将远程 secondary-index 写入和跨 split transaction 计入 write path。
+6. dashboard、export、analytics 只要能声明 stale budget，就不要默认强读。
+7. 将 schema migration 当成可观察的一致性事件，设计兼容、顺序和回退。
+8. 当组织更需要保证而不是自建时钟、quorum、存储和 placement 基础设施时，优先评估 managed global SQL。
+9. 能接受冲突写入和事后合并时，选择 AP/CRDT/event-sourcing，而不是假装需要 external consistency。
+10. 在 ADR 中显式写出 quorum loss、leader-region outage、clock uncertainty、hot split、跨 region tail latency 和成本。
 
-**Evidence anchors:**
-- The Spanner paper describes globally consistent reads at a timestamp, lock-free read-only transactions, and non-blocking reads in the past.
-- Cloud Spanner read/write documentation distinguishes read-only transactions from read-write transactions; read-only transactions can be strong without taking write locks.
-- Replication docs note that replicas can serve reads, but strong reads may consult leadership or ensure the replica is current enough.
+## 设计分歧与张力
 
-**Triple verification:**
-- **Cross-domain recurrence:** Applies to OLTP queries, analytics snapshots, backups, and replica placement.
-- **Generative power:** It asks which reads need "latest," which can run at a bounded stale timestamp, and which can use an exact historical snapshot.
-- **Exclusivity:** Generic SQL thinking often collapses reads into one bucket; Spanner-style design makes timestamp choice an explicit lever.
+- **external consistency vs AP availability：** 前者给出实时序序关系，后者允许分区期间分歧和后续修复。
+- **bounded clock vs timestamp oracle：** 前者分散时间判断但需要专门基础设施；后者集中权威但可能形成瓶颈。
+- **strong read vs bounded stale read：** 强读更易理解，stale read 更利于低延迟和 locality。
+- **SQL abstraction vs physical locality：** SQL 隐藏分布式细节，但 key、split 和 index 仍决定真实成本。
+- **managed service vs self-built NewSQL：** 托管服务转移基础设施负担，自建系统要求团队掌握 consensus、clock、storage 和 operations。
 
-**Application:** State each read path's freshness contract, allowed staleness, replica target, and whether it can tolerate reading at a past timestamp.
+## 不会这样做 / 反模式
 
-**Limit:** Stale and historical reads reduce coordination, but they are not a free substitute for user-visible correctness where latest state matters.
+- 不会用普通 NTP 同步时钟声称 external consistency。
+- 不会宣传 global SQL 没有 quorum、leader、placement 和 tail-latency 代价。
+- 不会把所有 leader 放在一个 region 却承诺全球对称低延迟写入。
+- 不会为有强事务 locality 的实体使用随机 primary key。
+- 不会用“near real time”隐藏 stale read。
+- 不会把 Spanner-style guarantee 用于 cache、session、telemetry 或能补偿的 workflow。
+- 不会让 schema script 与应用版本 rollout 竞争。
 
-### 4. SQL Is a Contract Over Placement
+## 诚实边界
 
-**One sentence:** Global SQL only works well when schema, primary keys, indexes, and interleaving encode locality rather than fighting it.
-
-**Evidence anchors:**
-- The OSDI paper motivates SQL-like querying because applications wanted familiar data access and cross-row transactions beyond Bigtable-style APIs.
-- Spanner schemas use primary-key order and interleaving/locality ideas so related rows can live near each other.
-- Cloud Spanner split and replication docs show that physical placement follows key ranges and instance configuration, not arbitrary query wishes.
-
-**Triple verification:**
-- **Cross-domain recurrence:** Affects data modeling, transaction scope, query planning, index design, and region placement.
-- **Generative power:** It predicts that a "normalized SQL" model can become globally expensive if related rows scatter across leaders and regions.
-- **Exclusivity:** Traditional single-region SQL tuning rarely treats geographic placement as part of schema design.
-
-**Application:** Evaluate whether the schema clusters entities by transactional access pattern, whether secondary indexes create remote write amplification, and where leaders should sit.
-
-**Limit:** Locality-optimized schemas can be less flexible for ad hoc access patterns; analytics may need separate pipelines or historical snapshots.
-
-### 5. Schema Changes Are Distributed Transactions Too
-
-**One sentence:** At global scale, schema evolution must be timestamped and coordinated so old and new interpretations do not race across millions of participants.
-
-**Evidence anchors:**
-- The OSDI paper describes non-blocking atomic schema changes assigned a future timestamp.
-- Reads and writes that depend on the schema must synchronize with the registered schema-change timestamp.
-- The paper contrasts this with blocking schema changes that would be infeasible across huge participant sets.
-
-**Triple verification:**
-- **Cross-domain recurrence:** Applies to DDL, application rollout, read/write compatibility, and large-scale operations.
-- **Generative power:** It asks "at what timestamp does the schema become true, and what must block before or after it?"
-- **Exclusivity:** Many systems treat migrations as operational scripts; this lens treats DDL as part of the consistency protocol.
-
-**Application:** Pair schema migrations with compatibility windows, timestamped rollout ordering, backfill strategy, and client-version assumptions.
-
-**Limit:** Timestamped DDL helps coordination, not semantic compatibility. Applications can still break if code and data evolution are not staged.
-
-## Decision Heuristics
-
-1. Do not ask for "global SQL" until the decision names the invariant that truly needs external consistency.
-2. Budget commit wait from the clock uncertainty bound, not from wishful single-region latency assumptions.
-3. Put write leaders near write-heavy users when possible; put read replicas near readers only after defining read freshness.
-4. Model primary keys from transaction locality: tenant, account, customer, order, or workflow instance before generic surrogate IDs.
-5. Count remote secondary-index writes and cross-split transactions as part of the write path, not as query-layer details.
-6. Use stale or exact-staleness reads for dashboards, exports, and analytics when the product can state the staleness budget.
-7. Treat schema migration as an externally visible consistency event with rollout order, compatibility, and rollback design.
-8. Prefer a managed global SQL database when the organization needs the guarantee more than it wants to build clock, quorum, and placement infrastructure.
-9. If a workload accepts conflicting writes and later merge, choose an AP/CRDT/event-sourcing strategy instead of pretending Spanner-style external consistency is required.
-10. Make failure modes user-visible in the ADR: quorum loss, leader-region outage, clock uncertainty expansion, hot split, and cross-region tail latency.
-
-## Schools and Design Tensions
-
-- **External consistency vs AP availability:** Spanner chooses a real-time serial order for transactions; AP systems accept divergent writes and repair later.
-- **TrueTime-style bounded clocks vs timestamp oracle:** Bounded clocks decentralize timestamp reasoning but require specialized time infrastructure; timestamp services centralize authority but can become bottlenecks or availability concerns.
-- **Strong reads vs bounded stale reads:** Strong reads preserve the simplest mental model; stale reads often buy lower latency and higher locality for non-critical paths.
-- **SQL abstraction vs physical locality:** SQL hides distribution from application code, but schema and indexes still decide whether the workload is local or global.
-- **Managed service vs self-built NewSQL:** Managed Spanner shifts hard infrastructure to the provider; self-built systems demand deep expertise in consensus, clocks, storage, and operations.
-
-## Would Not Do / Antipatterns
-
-- Would not claim external consistency from NTP-synchronized clocks without a bounded-uncertainty API and commit-wait protocol.
-- Would not sell global SQL as "no trade-offs"; every write has quorum, leader, placement, and tail-latency consequences.
-- Would not place all leaders in one region while promising symmetric low-latency global writes.
-- Would not use random primary keys for entities that have strong transactional locality.
-- Would not hide read staleness behind vague words like "near real time"; state exact consistency or staleness contracts.
-- Would not use Spanner-style guarantees for cache invalidation, ephemeral sessions, append-only telemetry, or workflows that tolerate compensation.
-- Would not run schema changes as out-of-band scripts that race with application versions and long-running reads.
-
-## Honest Boundaries
-
-- This lens is based on public Spanner and Cloud Spanner material, not internal Google operational data.
-- It is strongest for architecture decisions about globally distributed OLTP and consistent SQL, not for analytics warehouse design, event streaming, or offline sync.
-- It does not prove that Cloud Spanner is the right product; CockroachDB, YugabyteDB, TiDB, PostgreSQL plus regional architecture, or event-driven designs may fit different constraints.
-- It assumes non-Byzantine failures and trusted infrastructure. It does not cover malicious replicas or adversarial clocks.
-- The local corpus survey is a compact note, not a benchmark. Validate latency, leader placement, split behavior, and cost against the actual workload.
+- 本透镜依据公开 Spanner 资料，不是 Google 内部运维数据或具体 workload benchmark。
+- 它最适合全球分布式 OLTP 和一致性 SQL，不适合 analytics warehouse、event streaming 或 offline sync。
+- 它不证明 Cloud Spanner 是唯一正确产品；CockroachDB、YugabyteDB、TiDB、分区 PostgreSQL 或事件架构可能适合不同约束。
+- 仍需按实际 workload 验证 latency、leader placement、split、成本和失败恢复。
 
 ## Roundtable Output Contract
 
-When Architecture Buddy asks this lens to contribute, answer only in this shape:
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织：
 
 ```text
 ## Lens: Spanner SQL
 ### On the decision point
-State whether the proposal truly needs externally consistent global SQL, which invariants require it, and which paths can use weaker locality-friendly contracts.
+说明方案是否确实需要 externally consistent global SQL，哪些不变量要求它，哪些路径可使用更弱的 locality-friendly contract。
 
 ### Heuristics applied
-Name the specific time/commit-wait, Paxos-split, read-freshness, schema-locality, or migration heuristics used. Tie each to the decision, not to generic distributed-database advice.
+列出实际使用的 time/commit-wait、Paxos-split、read-freshness、schema-locality 或 migration 规则。
 
 ### Risks / what this lens would worry about
-Call out clock uncertainty, commit wait, quorum and leader placement, cross-split transactions, hot keys, remote indexes, stale-read misuse, schema rollout, and cost/tail-latency risks where relevant.
+按需指出 clock uncertainty、commit wait、quorum/leader placement、cross-split transaction、hot key、remote index、stale-read、schema rollout、成本和 tail latency 风险。
 
 ### Would not do
-List concrete design moves this lens would reject for this decision.
+列出本透镜会拒绝的具体设计动作。
 
 ### Evidence style
-Use the Spanner OSDI paper, Cloud Spanner replication/read-write architecture docs, external consistency explanations, and workload-specific latency/placement measurements. Mark assumptions that need validation.
+使用 Spanner OSDI paper、Cloud Spanner replication/read-write 文档、external consistency 说明和 workload-specific latency/placement 测量，并标记待验证假设。
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
-The maintainer corpus and build instructions used to distill this lens are not required at runtime.
-
-Public sources:
-- Google Research, "Spanner: Google's Globally-Distributed Database": https://research.google/pubs/spanner-googles-globally-distributed-database-2/
-- OSDI 2012 paper PDF: https://static.googleusercontent.com/media/research.google.com/en/us/archive/spanner-osdi2012.pdf
-- Cloud Spanner replication documentation: https://docs.cloud.google.com/spanner/docs/replication
-- Cloud Spanner "Life of Spanner Reads & Writes": https://cloud.google.com/spanner/docs/whitepapers/life-of-reads-and-writes
-- Google Cloud Blog, "Strict Serializability and External Consistency in Spanner": https://cloud.google.com/blog/products/databases/strict-serializability-and-external-consistency-in-spanner
+- https://research.google/pubs/spanner-googles-globally-distributed-database-2/
+- https://static.googleusercontent.com/media/research.google.com/en/us/archive/spanner-osdi2012.pdf
+- https://docs.cloud.google.com/spanner/docs/replication
+- https://cloud.google.com/spanner/docs/whitepapers/life-of-reads-and-writes
+- https://cloud.google.com/blog/products/databases/strict-serializability-and-external-consistency-in-spanner

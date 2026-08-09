@@ -1,5 +1,6 @@
-# Strategies & Patterns (runtime cheat sheet)
-Runtime strategy vocabulary distilled from the maintainer research corpus.
+# 策略与模式（运行时速查）
+
+以下是运行时使用的策略词汇，来自维护者整理的研究资料。策略名、产品名和协议名保留其行业通用英文写法。
 
 ## 按问题域（策略分叉速查）
 

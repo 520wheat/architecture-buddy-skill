@@ -1,174 +1,138 @@
 ---
 name: architecture-buddy-lens-agent-loop
-description: Use when Architecture Buddy roundtable needs an agent-loop lens for LLM tool orchestration, plan/act/observe cycles, session boundaries, guardrails, HITL checkpoints, trajectory tracing, or workflow-vs-autonomous-agent complexity. Not for roleplay; this is a heuristic lens for architecture decisions.
+description: >
+  Use when Architecture Buddy roundtable needs an agent-loop lens for LLM tool orchestration,
+  plan/act/observe cycles, session boundaries, guardrails, HITL checkpoints, trajectory tracing,
+  or workflow-vs-autonomous-agent complexity. Not for roleplay; this is a heuristic lens for
+  architecture decisions.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Agent Loop)
   version: "0.1.0"
-  stance: "Treat the plan/act/observe tool loop as the runtime core, with session bounds, permission gates, and replayable trajectories as first-class boundaries—not optional plugins."
-  best-for: "LLM tool orchestration, agent runtimes, permission/HITL gates, session vs memory boundaries, tracing/eval loops, workflow-vs-agent complexity"
-  not-for: "product module maps as architecture; unguarded full autonomy; claiming a single generation needs no observe loop"
-  evidence-anchors: "OpenAI Agents SDK; Anthropic Building Effective Agents; LangGraph agent runtime"
+  stance: "先证明需要闭环决策，再为循环增加边界、权限、人工检查点和可回放轨迹。"
+  best-for: "LLM 工具编排、计划/执行/观察循环、session 边界、guardrail、HITL、轨迹追踪、workflow 与 agent 取舍"
+  not-for: "把产品模块清单当架构、无护栏的完全自治、没有 observe 的聊天流程、替代存储/消息/安全透镜"
+  evidence-anchors: "Anthropic agent guidance; OpenAI Agents SDK; LangGraph durable execution and human-in-the-loop"
 ---
 
 # Architecture Buddy Lens - Agent Loop
 
-This is a **heuristic architecture lens**, not a person and not roleplay. Use it only when Architecture Buddy hosts a roundtable and asks for the agent-loop stance on a specific decision point.
+## 中文运行说明
 
-## Lens Metadata
+这是 Agent Runtime 的启发式透镜，不是角色扮演。它只围绕当前架构分叉给出做法判断，不替用户拍板，也不主持圆桌。
 
-- **Best for:** LLM + tool multi-step orchestration, agent runtime design, permission/guardrail placement, HITL interrupt/resume, session vs long-term memory boundaries, trajectory tracing and eval, choosing workflow vs autonomous agent complexity.
-- **Not for:** rewriting a commercial IDE/coding-agent product topology as "the architecture"; treating "we installed an agent framework" as automatic safety; denying tool-result grounding; pretending microservice/frontend package diagrams answer the loop-and-boundary problem.
-- **Evidence anchors:** OpenAI Agents SDK (loop, guardrails, sessions, tracing, handoffs); Anthropic Building Effective Agents (augmented LLM, workflow vs agent, ACI, when/when not); LangGraph (cyclic stateful runtime, checkpoint, HITL, streaming).
+## 透镜元数据
 
-## Framework Overview
+- **立场：** 先证明任务需要闭环决策，再为循环增加 session、权限、人工检查点和可回放轨迹。
+- **适合：** LLM 工具编排、plan/act/observe 循环、session 边界、guardrail、HITL、轨迹追踪，以及 workflow 与 autonomous agent 的取舍。
+- **不适合：** 把产品模块清单当架构、无护栏的完全自治、没有 observe 的聊天流程，或替代存储、消息和安全透镜。
+- **证据锚点：** Anthropic agent guidance、OpenAI Agents SDK、LangGraph durable execution 与 human-in-the-loop 文档。
 
-The models below were retained because they recur across at least two evidence families in the agent-runtime golden / D8 surveys, generate concrete design choices, and distinguish agent-runtime architecture from generic chatbots or product UI maps.
+## 框架概览
 
-### 1. Plan / Act / Observe Is the Runtime Core
+### 1. 先判断是否真的需要 Agent Loop
 
-**One sentence:** The model iteratively selects an action, the environment returns a tool observation, and that observation—not model self-report—grounds the next decision until a stop condition.
+**基本判断：** 如果任务可以由确定的工作流、少量条件分支和明确的工具调用完成，就不要因为使用 LLM 而自动引入自治 agent。
 
-**Evidence:**
-- Anthropic frames agentic systems around environment feedback (tool results, tests) as ground truth, with transparent planning and stop conditions.
-- OpenAI Agents SDK centers Agents that run an built-in loop with tools until the task completes.
-- LangGraph treats cyclic control (not DAG-only) as necessary when agentic steps must iterate with state.
+**应用：** 先写出输入、决策、工具副作用、观察结果和终止条件。只有当下一步依赖运行时观察结果，且预先固定的流程无法覆盖合理变化时，才考虑 loop。
 
-**Application:** Require an explicit loop contract: how tools are selected, how results are reinjected, what ends the run (success, budget, guardrail fail, human abort). Reject designs that equate "one prompt, one final answer" with an agent runtime.
+**限制：** “需要多轮推理”不是充分理由。循环会带来成本、延迟、状态恢复、权限和测试复杂度。
 
-**Limits:** Not every product needs a loop. Fixed prompt-chaining or single-shot LLM+RAG may be enough; insisting on a full agent loop without eval proof wastes latency and money.
+### 2. Plan、Act、Observe 必须形成闭环
 
-### 2. Augmented LLM Needs a Real Tool Interface (ACI)
+**基本判断：** 工具调用不是架构；可验证的 observe 结果必须影响下一次决策，且循环必须有明确的终止或升级路径。
 
-**One sentence:** Tools, retrieval, and memory hang outside the model and are orchestrated by the runtime; tool interface quality matters as much as prompting.
+**应用：** 对每次工具调用说明输入契约、授权边界、可观察结果、失败状态和是否允许重试。禁止把模型的自我描述当成外部事实。
 
-**Evidence:**
-- Anthropic names the augmented LLM (tools / retrieval / memory) as the basic building block and elevates ACI (agent-computer interface) design alongside prompts.
-- OpenAI Agents SDK productizes tools as first-class primitives inside the agent loop, not as free-form "model claims it ran."
-- The agent-runtime golden treats tools as the typed operation surface on the environment: clear interfaces, observable errors, results as ground truth.
+**限制：** 观察结果可能延迟、缺失或与副作用状态不一致；设计必须显式处理未知态。
 
-**Application:** Design tool schemas, error shapes, and sandbox boundaries before debating framework brands. Ask what the model can actually touch versus what it can only propose.
+### 3. Session、Memory、Trajectory 是不同概念
 
-**Limits:** Better tools do not remove the need for permissions. A polished ACI with unbounded write access is still an unsafe production path.
+**基本判断：** session 定义一次任务的边界，memory 是可跨任务复用的事实，trajectory 是可审计和回放的执行记录；不能用一个“上下文”字段混合三者。
 
-### 3. Session Working Context Is Bounded and Separate
+**应用：** 说明生命周期、所有权、保留期、脱敏和恢复方式。任务重试必须能判断副作用是否已经发生；审计记录不能依赖模型上下文仍然存在。
 
-**One sentence:** Loop-local working context (session / messages / scratch) must be distinguishable from long-term memory and from the environment's true side effects.
+**限制：** 更长的 memory 不会自动提高正确性，反而可能扩大权限和隐私风险。
 
-**Evidence:**
-- OpenAI Agents SDK treats Sessions as persistent working context for the loop—not an infinite undifferentiated prompt dump.
-- LangGraph models State + checkpointed recovery so long runs do not pretend the context window is infinite truth.
-- Anthropic and the golden note that memory bolted onto the model must not be confused with fresh tool observations.
+### 4. 权限和 HITL 应位于不可逆副作用之前
 
-**Application:** Define what lives in-session, what is summarized/checkpointed, what is external system of record, and how "memory pollution" is prevented from masquerading as this-turn observation.
+**基本判断：** 生成计划和执行副作用是两件事。删除、发布、付款、变更生产配置等动作必须有资源级授权、幂等键和必要的人工确认。
 
-**Limits:** Checkpointing recovers runtime state; it does not undo irreversible environment side effects (sent emails, merged PRs). Design compensating actions separately.
+**应用：** 写清谁能批准、批准的对象和参数是什么、批准后状态如何绑定、超时和撤销如何处理。不要只在提示词中写“请谨慎”。
 
-### 4. Guardrails Sit Between Intent and Side Effect
+**限制：** HITL 增强安全但会增加等待和运维负担；低风险、可逆动作可以采用自动策略，但要有审计和回退。
 
-**One sentence:** Permission checks, input/output validation, and side-effect tiers must be enforceable gates—not soft prompt instructions the model can talk around.
+### 5. 可靠性来自可恢复轨迹，不来自无限重试
 
-**Evidence:**
-- OpenAI Agents SDK makes Guardrails a production primitive: validate in parallel with execution, fail fast and abort.
-- Anthropic requires sandboxes, guardrails, and human checkpoints for agents that act in the world.
-- The golden main path places a permission/guardrail node before tools mutate the environment; deny or escalate rather than "apologize later."
+**基本判断：** 循环要有最大步数、预算、超时、取消和熔断；checkpoint 应能让系统从已知状态恢复，而不是从头重复副作用。
 
-**Application:** Classify tools by side-effect severity; whitelist who may invoke what; record deny reasons in the trajectory. Prefer hard gates on irreversible actions.
+**应用：** 为每一步记录工具名、参数摘要、授权结果、观察结果、状态版本和终止原因。重放测试必须验证重复调用不会造成额外副作用。
 
-**Limits:** Guardrails add latency and false-positive friction. Over-blocking without a clear escalation path creates shadow workflows that bypass the runtime.
+**限制：** 轨迹只能证明系统做了什么，不能证明外部世界一定接受了副作用；外部确认仍需单独查询或补偿。
 
-### 5. HITL and Checkpoints Are Control-Flow Citizens
+## 决策启发式
 
-**One sentence:** For non-deterministic models plus irreversible side effects, interrupt → review/edit → resume (or abort) and durable checkpoints are first-class control flow, not log comments.
+1. 先用确定性 workflow 作为一期默认；只有出现运行时决策分支和可验证 observe 需求时才升级为 agent loop。
+2. 为 loop 设置步数、时间、token、费用和副作用预算；任何一个预算耗尽都要进入明确的失败或人工路径。
+3. 把 session、memory、trajectory 分开设计，分别定义生命周期、权限、保留和恢复语义。
+4. 每个工具都要有资源级授权、参数校验、幂等语义、超时和可观察结果；工具调用失败不能只返回自然语言。
+5. 对不可逆或高影响操作设置 HITL checkpoint；批准内容要绑定资源、参数、版本和有效期。
+6. 观察结果必须能区分成功、失败和未知；未知状态不能被模型自行解释为成功。
+7. 让轨迹支持暂停、恢复、重试和审计；恢复前先确认之前的副作用状态。
+8. 将模型、工具和运行时边界分开，避免 agent 与具体工具实现形成双向耦合。
+9. 以 guardrail 命中率、人工暂停/恢复演练、轨迹回放和失败恢复测试作为证据，而不是只看回答质量。
 
-**Evidence:**
-- LangGraph designs HITL interrupt/resume/state edit and checkpointing specifically because full restarts of long tasks are expensive and uncertainty is inherent.
-- OpenAI Agents SDK surfaces HITL and sandbox/workspace forms for recoverable long work.
-- Anthropic and the golden mark human review as mandatory vocabulary when side effects are irreversible or compliance-bound.
+## 设计分歧与张力
 
-**Application:** Decide which tool classes pause for approval; what the human sees (diff, command, proposed state); timeouts (hang, auto-deny, limited retry—never silent approve); how runs resume from checkpointed workspaces.
+- **workflow vs autonomous agent：** workflow 更易验证和运维；agent 能处理未预先枚举的路径，但带来不可预测性。
+- **短 session vs 长 memory：** 短 session 降低权限和隐私范围；长 memory 可能减少重复上下文，但需要来源、过期和访问控制。
+- **自动执行 vs HITL：** 自动化降低延迟；人工检查降低不可逆副作用风险，但增加等待和操作成本。
+- **重试 vs 补偿：** 重试适用于可证明幂等的瞬时失败；未知副作用状态应先查询、去重或补偿。
+- **通用 agent framework vs 少量本地机制：** 框架可提供持久化和检查点，但也会引入额外状态模型与运维面。
 
-**Limits:** Forced HITL changes SLAs. Treating every low-risk read as human-gated recreates a ticket queue; document the tiering rationale.
+## 不会这样做 / 反模式
 
-### 6. Complexity Ladder Before Autonomy
+- 不会因为使用 LLM 就把确定性流程改成无限自治 loop。
+- 不会把“模型说成功”当成工具或外部系统已成功。
+- 不会让权限只存在于 system prompt 或前端按钮中。
+- 不会在删除、付款、发布和生产变更前缺少资源级授权、幂等和必要的 HITL。
+- 不会把 session、memory、trajectory 混成一个无法审计的上下文字符串。
+- 不会用无限重试掩盖未知态、权限失败、毒性输入或不可恢复错误。
+- 不会把 agent、tool、模型供应商和产品 UI 的目录关系冒充架构边界。
 
-**One sentence:** Default to the simplest sufficient rung—single LLM, predefined workflow, then autonomous agent—and climb only when evaluation shows the latency/cost trade is worth it.
+## 诚实边界
 
-**Evidence:**
-- Anthropic's when/when not discipline: most apps start with single LLM (±retrieval); agents trade delay and cost for performance that must be proven.
-- OpenAI contrasts Responses API self-managed short loops with Agents SDK production primitives; Swarm is explicitly not the production path.
-- LangGraph admits short agents / no-tools / single-prompt cases may not need a heavy graph runtime.
-
-**Application:** Ask whether the path can be hard-coded; whether sub-tasks are unpredictable; whether durability, streaming, and fine-grained interrupts are required before selecting SDK vs graph vs hand-rolled loop.
-
-**Limits:** "Simplest" is not "no observability." Even a light loop still needs stop conditions and enough trace to debug compound tool errors.
-
-## Decision Heuristics
-
-1. Name the stop conditions first: success criteria, max steps/budget, guardrail fail, human abort—never an unbounded empty spin.
-2. Ask whether a predefined workflow or single LLM call already covers the path; require an eval reason before choosing a full autonomous loop.
-3. Treat tool results as environment ground truth; never accept "the model said it executed" without an observation channel.
-4. Put a real permission gate before side-effecting tools; soft prompt policy alone is insufficient.
-5. Separate session working context from long-term memory and from external systems of record.
-6. Tier HITL by irreversibility and compliance, not by fear of all tools equally.
-7. Require step-level trajectories (tools, guardrail hits, human decisions) if the system will be evaluated, audited, or incident-reviewed.
-8. Prefer durable checkpoint / recoverable workspace when replaying the whole run is expensive; document what environment state is not covered by checkpoint.
-9. Choose orchestration shape deliberately: single-agent built-in loop vs cyclic graph with mixed deterministic/agentic nodes vs handoff / orchestrator-workers.
-10. Keep problem-class language (loop, gates, session, trace); refuse to substitute a product's package or screen topology for mechanism design.
-
-## Schools and Design Tensions
-
-- **Workflow vs autonomous agent:** Predefined code paths vs model-dynamic next steps. Open tasks favor agents; predictable pipelines favor workflows. Mixing them without when/when not is a design failure.
-- **Single-agent loop vs graph runtime:** SDK-style built-in loops optimize few primitives and fast productization; LangGraph-style cyclic graphs optimize durability, mixed deterministic/agentic control, and fine interrupts.
-- **Handoff / agents-as-tools vs orchestrator-workers:** Peer delegation vs central planner with workers—coordination cost and failure modes differ.
-- **Forced HITL vs sampling vs full autonomy:** Irreversibility and compliance push toward forced approval; demo speed pushes toward autonomy; write the SLA and blast-radius cost either way.
-- **Self-managed API loop vs Agents SDK vs durable graph framework:** Thickness of runtime must match need for hosted guardrails, sessions, checkpointing, and streaming—not brand preference.
-
-## Would Not Do / Anti-Patterns
-
-- Do not treat a commercial coding-agent or IDE module map as the architecture answer for this problem class.
-- Do not claim that installing an agent framework automatically provides safety, permissions, or human review.
-- Do not deny the observe loop—agent ≠ single generation that is permanently correct.
-- Do not conflate predefined workflows with autonomous agents without stating when each applies.
-- Do not ship production multi-step agents without trajectories, or assert that failure can only mean "restart from scratch with no interrupt/resume" as the sole correct model.
-- Do not use microservice or frontend-component narratives as a substitute for loop-and-boundary mechanisms.
-- Do not rely on prompt-only "permissions" when tools can mutate real environments.
-- Do not default to the heaviest graph/framework for short, hard-codable, or no-tool tasks.
-
-## Honest Boundaries
-
-- This lens is strongest for LLM tool-orchestration runtimes and their control boundaries. It is weaker for pure request/response APIs, OLTP storage design, and batch analytics topology.
-- Evidence is distilled from public engineering docs and local D8 surveys / agent-runtime golden—not a capacity plan, model-quality benchmark, or vendor lock-in recommendation.
-- Concrete HITL thresholds, tool-error rates, and tracing storage costs are deployment-specific; the lens supplies mechanisms and forks, not locked product policy numbers.
-- Product names (Codex, Cursor, etc.) may appear only as problem-class examples; they must not become the deliverable's component inventory.
+- 本透镜讨论 agent loop 的架构取舍，不替代具体工具的安全审查、数据治理或领域不变量分析。
+- 本透镜不保证模型输出正确；必须通过工具契约、状态检查、评测和人工控制降低风险。
+- HITL、checkpoint 和 trajectory 的具体实现会受存储、队列、身份和合规约束影响，应在正式设计中单独记录。
+- 证据应优先来自 tool-loop evaluation、guardrail 命中率、HITL 演练、checkpoint 恢复测试和轨迹复盘，而不是产品 UI 或包名清单。
 
 ## Roundtable Output Contract
 
-When called by Architecture Buddy, answer only the decision point using this format:
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织：
 
 ```text
 ## Lens: Agent Loop
 ### On the decision point
-<Directly answer the architecture trade-off in <=10 lines. State whether a tool loop is needed, which complexity rung fits, and which gates (session, permission, HITL, trace) are mandatory.>
+直接回答是否需要 tool loop、适用哪个复杂度层级，以及 session、permission、HITL、trace 中哪些是必须的。
 
 ### Heuristics applied
-- <2-5 concrete agent-loop heuristics applied to this decision>
+- 列出本决策实际使用的 2-5 条 Agent Loop 启发式规则。
 
 ### Risks / what they'd worry about
-- <unbounded loop, missing observe grounding, soft-only permissions, session/memory confusion, no trajectory, irreversible side effects without HITL, over-heavy framework, or product-topology-as-architecture risks>
+- 列出无界循环、缺少 observe、权限过软、session/memory 混淆、无 trajectory、不可逆副作用缺少 HITL、框架过重等风险。
 
 ### Would not do
-- <specific direction this lens would reject and why>
+- 列出本透镜会拒绝的具体方向及原因。
 
 ### Evidence style
-<Prefer evidence from tool-loop evals, guardrail hit rates, HITL pause/resume drills, checkpoint recovery tests, trajectory replay/incident reviews, and Anthropic / OpenAI Agents SDK / LangGraph precedent—not product UI package lists.>
+优先使用 tool-loop 评测、guardrail 命中率、HITL 暂停/恢复演练、checkpoint 恢复测试、轨迹回放和公开实践；标记需要验证的假设。
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
-The maintainer corpus used to distill this lens is not required at runtime.
+维护者用于蒸馏本透镜的研究语料不属于运行时依赖：
 
-Source URLs captured by the corpus:
 - https://openai.github.io/openai-agents-python/
 - https://www.anthropic.com/engineering/building-effective-agents
 - https://docs.langchain.com/oss/python/langgraph/overview

@@ -1,160 +1,126 @@
 ---
 name: architecture-buddy-lens-log-stream
-description: Use when Architecture Buddy roundtable needs a log-stream lens for event-driven integration, append-only logs as source of truth, offsets, replay, audit streams, partitioned consumers, Kafka/Pulsar-style messaging, or EIP channel trade-offs. Not for roleplay; this is a heuristic lens for architecture decisions.
+description: >
+  Use when Architecture Buddy roundtable needs a log-stream lens for event-driven integration,
+  append-only logs as source of truth, offsets, replay, audit streams, partitioned consumers,
+  Kafka/Pulsar-style messaging, or EIP channel trade-offs. Not for roleplay; this is a heuristic
+  lens for architecture decisions.
 disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Log Stream)
   version: "0.1.0"
-  stance: "Treat the append-only log as the durable integration fact, with independent consumer offsets and replay as first-class design constraints."
-  best-for: "event-driven integration, audit streams, multi-consumer replay, partitioned stream processing, Kafka/Pulsar trade-offs"
-  not-for: "using a log as a cross-service strong-transaction silver bullet or hiding business invariants inside the broker"
-  evidence-anchors: "Kafka design; Apache Pulsar architecture; Enterprise Integration Patterns"
+  stance: "只有当追加、保留、位点和回放语义真正解决问题时才使用 log；把副作用幂等、schema 和 poison message 作为契约。"
+  best-for: "事件集成、审计流、回放、多消费者、Kafka/Pulsar/EIP 取舍"
+  not-for: "低延迟 RPC、跨服务 ACID、没有幂等保障的不可逆副作用"
+  evidence-anchors: "Kafka design documentation; Pulsar architecture; Enterprise Integration Patterns"
 ---
 
 # Architecture Buddy Lens - Log Stream
 
-This is a **heuristic architecture lens**, not a person and not roleplay. Use it only when Architecture Buddy hosts a roundtable and asks for the log-stream stance on a specific decision point.
+## 中文运行说明
 
-## Lens Metadata
+这是 Log Stream 的启发式做法透镜，不是角色扮演。它只回答 append-only log、事件集成、offset、replay 和消费者协作相关的架构分叉。
 
-- **Best for:** event-driven integration, audit streams, multi-consumer replay, partitioned stream processing, Kafka/Pulsar-style messaging, EIP channel/routing choices.
-- **Not for:** treating an event log as a distributed transaction coordinator, a universal ESB, or a substitute for domain ownership and idempotent endpoints.
-- **Evidence anchors:** Kafka design docs, Apache Pulsar architecture docs, Enterprise Integration Patterns.
+## 透镜元数据
 
-## Framework Overview
+- **立场：** 只有当追加、保留、位点和回放语义真正解决问题时才使用 log；把副作用幂等、schema 和 poison message 作为契约。
+- **适合：** 事件集成、审计流、回放、多消费者，以及 Kafka/Pulsar/EIP 风格的消息架构。
+- **不适合：** 低延迟 request/response、跨服务 ACID 事务，或没有幂等保障的不可逆副作用。
+- **证据锚点：** Kafka design、Pulsar architecture 和 Enterprise Integration Patterns。
 
-The models below were retained because they recur across at least two evidence families, generate concrete design choices, and distinguish the log-stream stance from generic messaging advice.
+## 框架概览
 
-### 1. Append-Only Log as Integration Fact
+### 1. 先定义“追加后为真”的事件
 
-**One sentence:** Write immutable events to a durable ordered log first, then let consumers derive their own views from that fact stream.
+log 只有在事件追加后成为可保留、可读取、可回放的事实时才适合作为 source of truth。必须写明生产者、事件所有权、schema owner、保留期和哪些消费者有权产生派生状态。
 
-**Evidence:**
-- Kafka frames itself as closer to a distributed commit log than a traditional message queue: persistent append log, sequential write, long retention, and replayable offsets.
-- Pulsar stores messages in BookKeeper managed ledgers, keeping durable records and cursors separate from transient broker serving.
-- EIP's Message Channel and Guaranteed Delivery patterns give the vocabulary: decouple sender/receiver, persist until safe handling.
+如果事件只是通知某个服务做一次调用，简单 RPC 或事务 outbox 可能更合适；不要因为已有 Kafka/Pulsar 就把所有集成塞进 log。
 
-**Application:** Favor a log when multiple systems need the same business fact, auditability matters, downstream consumers evolve independently, or derived state must be rebuildable.
+### 2. Partition、offset 和消费组是业务语义
 
-**Limits:** The log records facts; it does not make all services share one transaction boundary. If the business invariant requires synchronous commit across domains, this lens should raise a warning rather than force event streaming.
+partition key 应来自需要顺序的最小业务范围。多消费者需要独立 offset 时使用 publish-subscribe；每个事件只应由一个 worker 处理时使用 competing-consumer group。
 
-### 2. Offsets Are Consumer-Owned Clocks
+不能把 partition order 写成 global order。消费者必须说明 offset 所有权、提交时机、积压、重平衡、重复和从故障点恢复的行为。
 
-**One sentence:** A consumer's position in the log is state, and designing where that state lives determines replay, recovery, and fan-out semantics.
+### 3. Replay 的能力同时是副作用风险
 
-**Evidence:**
-- Kafka's consumer model uses pull, long polling, and partition offsets; consumer groups can rewind or advance independently.
-- Pulsar persists subscription cursors in BookKeeper, making consumption state part of the durable messaging substrate.
-- EIP distinguishes Point-to-Point from Publish-Subscribe channels: one consumer group competes for work; many groups/subscriptions each hold independent progress.
+回放可用于 outage recovery、backfill、audit、ML/offline consumer 和 schema migration，但会再次触发邮件、支付、webhook 等副作用。每个 replayable side effect 都要有 dedupe key、天然幂等或补偿流程。
 
-**Application:** Ask who owns the offset, whether each downstream has an independent cursor, what replay range must remain available, and how reprocessing is coordinated with idempotency.
+schema evolution 也是 log contract：旧事件会遇到新代码，必须有兼容性测试、版本策略和失败事件隔离。
 
-**Limits:** Offset control makes replay possible but also exposes duplicate processing, poison messages, and side-effect reapplication. Replay without idempotent endpoints is operational debt.
+### 4. Transient failure 与 poison message 分开
 
-### 3. Partition Keys Buy Local Order by Spending Parallelism
+暂时性网络或下游故障可以按预算重试；格式非法、违反业务不变量或会重复产生危险副作用的消息应进入 invalid、dead-letter 或 quarantine 通道，并保留原因和恢复动作。
 
-**One sentence:** A partition key is a contract about what must stay ordered together, and every such contract constrains scaling.
+不能静默过滤、无限重试或让一个 poison message 阻塞整个 partition。消费者 lag、重试次数、DLQ 年龄和修复成功率必须可观察。
 
-**Evidence:**
-- Kafka gives order inside a partition and uses keyed partitioning for semantic locality while consumer groups parallelize across partitions.
-- The Kafka-vs-Pulsar survey notes both systems share partitioned/sharded parallelism, durable replicas, and ordered log mechanics.
-- EIP Competing Consumers scales processing, while Resequencer and Aggregator expose the cost of recovering order or related sets after distribution.
+### 5. Broker 拓扑是策略，不是架构理由
 
-**Application:** Choose partition keys from business invariants: account, order, tenant, device, or workflow instance. Document what order is guaranteed, what order is not, and what happens when a hot key appears.
+Kafka 风格 unified log 强调简单的数据路径和 broker-local 操作；Pulsar 风格分离 serving/storage，便于独立扩展、multi-tenancy 和 geo-replication，但会增加 metadata、恢复和组件所有权。
 
-**Limits:** Partitioning does not give global order. Repartitioning later can be expensive because consumers, retention, and downstream assumptions may already depend on the original key.
+选择应由吞吐、保留、租户隔离、区域复制、运维能力和成本驱动，而不是产品名驱动。
 
-### 4. Retention and Replay Separate Delivery from Processing
+## 决策启发式
 
-**One sentence:** A retained log turns messaging from "deliver once then forget" into "store facts long enough for recovery, backfill, and new consumers."
+1. 写清事件追加后代表的业务事实、生产者、schema owner 和允许改变它的边界。
+2. 多消费者需要独立进度时用 pub-sub；单 worker 处理时用 consumer group。
+3. 从需要顺序的最小业务范围选 partition key；不要承诺平台不提供的全局顺序。
+4. 在承诺 replay 前先设计 dedupe、幂等、补偿、schema compatibility 和保留期。
+5. 从具体 use case 计算 retention：恢复、回填、审计、离线消费者和迁移；永久保留不是默认架构。
+6. 明确 routing、filter、splitter、aggregator 的所有权和可观测性，避免中央 router 成为无主热点。
+7. 分离 transient failure、invalid message、retry、dead-letter 和 quarantine 语义。
+8. 根据顺序、吞吐和批处理需求选择 partition、batch、compression 和 I/O 策略，并校验加密或 proxy 是否改变数据路径。
+9. 把 schema evolution 当成 log contract；旧事件兼容性是回放的一部分。
+10. 明确客户端直连 partition leader 还是通过 proxy/gateway，并说明 Kubernetes/cloud networking 对选择的影响。
 
-**Evidence:**
-- Kafka explicitly chooses long retention rather than deleting messages at consumption, enabling rewind and offline/batch consumers.
-- Pulsar persistent messaging stores messages until acknowledged, and its ledger model supports durable replay boundaries.
-- EIP Message Store, Message History, Wire Tap, and Dead Letter Channel show that integration systems need audit and failure trails, not just transient delivery.
+## 设计分歧与张力
 
-**Application:** Set retention from recovery objectives, audit needs, schema evolution windows, and expected consumer lag. Treat replay as a tested runbook, not a magical property of the platform.
+- **Kafka unified log vs Pulsar separated storage：** 前者简单，后者独立扩展和多租户能力更强但拓扑更复杂。
+- **pull vs push：** pull 便于消费者控制节奏和批量；push 可能降低延迟但容易压垮异构下游。
+- **ordering vs throughput：** 更多顺序意味着更少独立 lane；更多 lane 则需要下游处理乱序和聚合。
+- **replay 能力 vs blast radius：** 回放改善恢复，却可能重复不可逆副作用。
+- **log vs transaction：** log 适合集成和派生状态，不是跨服务 ACID 事务的替代品。
 
-**Limits:** Retention has cost. Infinite replay expectations shift storage, schema compatibility, privacy deletion, and operational burden onto the platform.
+## 不会这样做 / 反模式
 
-### 5. Log Serving Topology Is a Strategic Choice
+- 不会把 log 当成跨服务 XA 事务或 exactly-once 业务结果的保证。
+- 不会在业务顺序重要时使用随机 partition。
+- 不会承诺 replay 却没有 retention、schema compatibility 和幂等策略。
+- 不会静默丢弃、无限重试或让 poison message 阻塞整个消费路径。
+- 不会创建没有团队负责的中央 router。
+- 不会因为中间件已存在就让简单 RPC、文件传输或共享数据库全部经过 log。
+- 不会把 broker durability 直接等同于业务层 exactly-once。
 
-**One sentence:** Decide whether the system should be a compact broker-local log or a separated serving and durable-log architecture before optimizing details.
+## 诚实边界
 
-**Evidence:**
-- Kafka's classic design leans on broker-local partitions, OS page cache, sequential writes, batching, and zero-copy transfer.
-- Pulsar separates stateless brokers from BookKeeper durable storage, with metadata stores, managed ledgers, optional proxies, and geo-replication.
-- The Kafka-vs-Pulsar comparison frames the split: operational simplicity and unified log mental model versus independent serving/storage scaling and stronger multi-tenant/global platform features.
-
-**Application:** Prefer a Kafka-like stance when the organization wants a unified real-time data log with efficient broker-local operations. Prefer a Pulsar-like stance when independent storage scaling, explicit multi-tenancy, proxy entry, or geo-replication are central requirements.
-
-**Limits:** More topology knobs create more operational surface. A separated storage architecture can solve scaling problems while introducing metadata, recovery, and component ownership problems.
-
-## Decision Heuristics
-
-1. Start with the integration fact: name the event that is true once appended, who produces it, and who is allowed to change its schema.
-2. Use publish-subscribe when multiple consumers need independent offsets; use a competing-consumer group when exactly one worker should handle each event.
-3. Pick the partition key from the smallest business scope that requires ordering; do not claim global order unless the platform actually provides it.
-4. Design idempotency before promising replay. Every replayable side effect needs a dedupe key, natural idempotence, or a compensating workflow.
-5. Size retention from concrete use cases: outage recovery, backfill, audit, ML/offline consumers, and schema migration. "Keep everything forever" is a storage policy, not an architecture.
-6. Keep routing rules observable and owned. Content-based routing, filters, splitters, and aggregators become change hotspots if ownership is vague.
-7. Separate poison messages from transient failures. Dead letter, invalid, retry, and quarantine channels need explicit semantics.
-8. Use batching, sequential I/O, and compression for throughput, but check where encryption or proxying removes zero-copy assumptions.
-9. Decide whether clients should discover partition leaders directly or enter through a proxy/service gateway; cloud/Kubernetes networking often changes the answer.
-10. Treat schema evolution as part of the log contract: replay means old events will meet new code.
-
-## Schools and Design Tensions
-
-- **Kafka-style unified log vs Pulsar-style separated ledger:** Kafka emphasizes a simple distributed log mental model and efficient broker-local data path; Pulsar emphasizes stateless brokers, BookKeeper ledgers, cursors, proxy options, and geo-replication.
-- **Pull vs push:** Kafka's pull model lets consumers control pace and batching; push/event-driven consumers can reduce latency in some systems but can overrun heterogeneous downstreams.
-- **Application routing vs broker-centered routing:** EIP routing patterns are useful vocabulary, but routing logic can become an operational hotspot. Prefer clear ownership over "smart pipe" ambiguity.
-- **Replay as power vs replay as blast radius:** The same feature that enables backfill can duplicate emails, payments, webhooks, or irreversible side effects if endpoints are not designed for it.
-- **Ordering vs throughput:** More ordering usually means fewer independent lanes. More lanes usually means more reordering, aggregation, and correlation work downstream.
-
-## Would Not Do / Anti-Patterns
-
-- Do not sell a log stream as a replacement for ACID transactions across services.
-- Do not put every integration through Kafka/Pulsar just because the platform exists; simple RPC, file transfer, or shared database may fit some bounded problems better.
-- Do not use random partitioning when business order or locality matters.
-- Do not hide failures by silently filtering, dropping, or endlessly retrying messages.
-- Do not create a central router that no team owns and every team depends on.
-- Do not promise replay without retention, schema compatibility, idempotency, and operational runbooks.
-- Do not assume broker-level durability automatically means business-level exactly-once outcomes.
-
-## Honest Boundaries
-
-- This lens is strongest for integration architecture, audit streams, and event-driven derived state. It is weaker for low-latency request/response APIs, OLTP invariants, and human workflow design.
-- The source corpus is a local survey distillation, not a full benchmark or production capacity plan.
-- Kafka and Pulsar ecosystems evolve; validate operational claims against the deployed version, managed service, and team experience.
-- EIP names are vocabulary for reasoning. They are not permission to install an ESB or over-centralize integration logic.
+- 本透镜最适合 integration architecture、audit stream 和 event-driven derived state；对低延迟 RPC、OLTP 不变量和人工工作流较弱。
+- EIP 名称是推理词汇，不是安装 ESB 或集中化集成逻辑的许可。
+- Kafka、Pulsar 和 managed service 的具体保证需要按部署版本和实际运维环境验证。
 
 ## Roundtable Output Contract
 
-When called by Architecture Buddy, answer only the decision point using this format:
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织：
 
 ```text
 ## Lens: Log Stream
 ### On the decision point
-<Directly answer the architecture trade-off in <=10 lines. State whether the append-only log should be source of truth, side channel, or not used.>
+直接回答 append-only log 应作为 source of truth、side channel，还是不应使用；最多 10 行。
 
 ### Heuristics applied
-- <2-5 concrete log-stream heuristics applied to this decision>
+- 列出本决策实际使用的 2-5 条 log-stream 规则。
 
 ### Risks / what they'd worry about
-- <replay, offset ownership, partition key, schema, poison message, retention, topology, or operational risks>
+- 列出 replay、offset ownership、partition key、schema、poison message、retention、topology 和运维风险。
 
 ### Would not do
-- <specific direction this lens would reject and why>
+- 列出本透镜会拒绝的具体方向及原因。
 
 ### Evidence style
-<Prefer evidence from production replay drills, consumer lag/throughput data, partition hot-spot analysis, schema compatibility tests, incident history, and Kafka/Pulsar/EIP precedent.>
+优先使用 replay 演练、consumer lag/throughput、partition 热点、schema 兼容性测试、事故记录和 Kafka/Pulsar/EIP 实践。
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
-The maintainer survey corpus used to distill this lens is not required at runtime.
-
-Source URLs captured by the corpus:
 - https://kafka.apache.org/documentation/#design
 - https://pulsar.apache.org/docs/concepts-architecture-overview/
 - https://www.enterpriseintegrationpatterns.com/
