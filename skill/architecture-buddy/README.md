@@ -24,5 +24,17 @@
 - `prompts/`：五个分阶段运行提示词，分别负责问题澄清、第一性原理、圆桌、ADR 综合和正式交付审阅；由 `SKILL.md` 按阶段加载。
 - `references/`：运行时架构知识和完成门禁。
 - `templates/`：正式架构设计、问题类、ADR 和决策过程记录模板。
-- `scripts/`：运行时确定性工具目录；工具不联网、不修改用户项目。
+- `scripts/`：运行时确定性工具目录，提供设计工作区初始化、正式设计结构校验和圆桌过程校验；工具不联网、不调用训练资料、不修改用户项目。
 - `agents/`：Agent UI 元数据目录。
+
+## 脚本
+
+在本目录中执行：
+
+```bash
+python3 scripts/init-design.py --output <输出目录> --name <设计名称>
+python3 scripts/validate-deliverable.py <正式架构设计文件>
+python3 scripts/validate-roundtable.py <决策过程记录文件>
+```
+
+初始化默认不覆盖已有产物；结构校验只检查必要证据是否存在，不判断架构方案是否优秀。
