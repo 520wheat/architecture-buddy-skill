@@ -291,6 +291,8 @@ AI 让「加一段实现」变便宜，却不降低理解与修改成本。若�
 | 文件 | 用途 |
 |------|------|
 | `templates/architecture-deliverable.md` | **权威**双层成品骨架 |
+| `templates/adr-template.md` | 单个架构决策的 ADR 模板 |
+| `templates/decision-record.md` | 圆桌与决策过程记录模板（不替代正式设计） |
 | `references/deliverable-gate.md` | S6 完成门禁 / 完成检查清单 |
 | `references/note-mapping.md` | 旧 M1–M9 ↔ 双层节映射（内部） |
 | `references/note-mapping.md` | 旧 M1–M9 ↔ 当前结构的内部映射 |
