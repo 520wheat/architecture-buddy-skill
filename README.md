@@ -62,7 +62,9 @@ done
 
 ## 包内容
 
-必须安装的包是 `architecture-buddy`；`architecture-buddy-lens-*` 是可选圆桌透镜，建议在需要对应领域时一并安装。包清单见 [`skill/release-manifest.tsv`](skill/release-manifest.tsv)，包级说明见 [`skill/README.md`](skill/README.md)。
+必须安装的包是 `architecture-buddy`；
+`architecture-buddy-lens-*` 是可选圆桌透镜，建议在需要对应领域时一并安装。
+包清单见 [`skill/release-manifest.tsv`](skill/release-manifest.tsv)，包级说明见 [`skill/README.md`](skill/README.md)。
 
 ## 能力边界
 
