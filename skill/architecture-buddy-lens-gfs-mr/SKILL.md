@@ -9,202 +9,125 @@ disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (GFS-MR)
   version: "0.2.0"
-  stance: "Optimize the system around large sequential dataflow: shard durable storage into large replicated blocks, expose locality, and schedule simple parallel compute near the data—then pay honestly for shuffle and metadata limits."
-  best-for: "batch analytics, data lakes, web-scale indexing, ETL, large-file scans, commodity clusters, HDFS/GFS/MapReduce/Hadoop/Spark trade-offs"
-  not-for: "low-latency OLTP, small-file-heavy workloads, mutable random writes, POSIX fidelity, fine-grained interactive queries without another serving layer"
-  evidence-anchors: "Google File System paper; MapReduce paper; AOSA HDFS survey; Apache Spark Cluster/RDD documentation"
+  stance: "围绕大规模顺序数据流设计：大块复制存储、暴露数据局部性、让并行计算靠近数据，并正视 shuffle、spill 和 metadata 限制。"
+  best-for: "批处理、数据湖、索引、ETL、大文件扫描、commodity cluster、HDFS/GFS/MapReduce/Hadoop/Spark 取舍"
+  not-for: "低延迟 OLTP、小文件密集、随机更新、严格 POSIX、没有 serving 层的细粒度交互查询"
+  evidence-anchors: "Google File System paper; MapReduce paper; HDFS survey; Apache Spark cluster and RDD documentation"
 ---
 
 # Architecture Buddy Lens - GFS-MR
 
 ## 中文运行说明
 
-这是 GFS/MapReduce/HDFS/Spark lineage 的启发式架构透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；GFS-MR、shuffle、spill、metadata 等技术术语和固定 `Lens` 输出标题保留英文。
-
-This is a **heuristic architecture lens**, not a person and not roleplay. It evaluates whether a proposal should use the GFS/MapReduce/HDFS lineage (and compute engines that still sit on that substrate, such as Spark): large replicated storage blocks plus a compute model that moves work toward data for high aggregate sequential throughput—while naming shuffle, spill, and metadata bottlenecks instead of wishing them away.
+这是 GFS/MapReduce/HDFS/Spark lineage 的启发式架构透镜，不是角色扮演。它判断方案是否适合大块复制存储和 data locality，并把 shuffle、spill、metadata 和 commodity failure 作为一等约束。
 
 ## 透镜元数据
 
-- **Stance:** Optimize the system around large sequential dataflow: shard durable storage into large replicated blocks, expose locality, and schedule parallel compute near the data; treat shuffle and metadata scale as first-class costs.
-- **Best for:** Batch analytics, data lakes, indexing, ETL, log processing, large-file scans, commodity clusters, HDFS/GFS/MapReduce/Hadoop-style systems, and Spark-style multi-stage jobs that still pay for wide dependencies.
-- **Not for:** Low-latency OLTP, small-file-heavy workloads, mutable random writes, strict POSIX semantics, or interactive serving without a separate layer.
-- **Evidence anchors:** Google File System paper; MapReduce paper; AOSA HDFS survey; Spark Cluster Overview and RDD Programming Guide.
+- **立场：** 围绕大规模顺序数据流设计大块复制存储，暴露数据局部性，让并行计算靠近数据；把 shuffle 和 metadata scale 作为显式成本。
+- **适合：** 批处理、data lake、索引、ETL、日志处理、大文件扫描、commodity cluster，以及 Hadoop/Spark 风格的多阶段作业。
+- **不适合：** 低延迟 OLTP、小文件密集、随机更新、严格 POSIX 语义或没有独立 serving 层的交互查询。
+- **证据锚点：** Google File System、MapReduce、HDFS survey、Spark Cluster Overview 和 RDD Programming Guide。
 
 ## 框架概览
 
-The models below were retained because they recur across GFS, MapReduce, HDFS, and Spark-on-HDFS-style stacks; they generate concrete design choices; and they distinguish this lineage from generic distributed-storage or “pure memory” batch advice.
+### 1. Workload 假设就是架构
 
-### 1. Workload Assumptions Are the Architecture
+GFS-MR 适合大文件、流式读取、追加写入和批量扫描，并且有意牺牲部分 POSIX 灵活性换取聚合吞吐。评审时先写文件大小、scan/append 比例、延迟目标、小文件数量和是否能批处理。
 
-**One sentence:** GFS-MR works by designing for huge files, streaming reads, append-heavy writes, and batch scans, then deliberately refusing to optimize the opposite workload.
+如果 workload 已经变成随机更新、低延迟查询、小文件或交互式 join，应引入 serving/index/query 层，不能继续拉伸 GFS-MR 语义。
 
-**Evidence:**
-- The GFS overview says the file system was driven by Google's application workloads and "radically different design points," with high aggregate performance for large distributed data-intensive applications.
-- The GFS paper describes modest numbers of large files, multi-GB files, large streaming reads, and append-style workloads as central assumptions.
-- The HDFS survey and golden frame the problem as reliable storage of very large datasets with high-bandwidth streaming to MapReduce-class compute, sacrificing some POSIX fidelity for performance.
-- Spark’s problem class still assumes **partition-parallel scans and transforms** over large datasets; it does not reverse HDFS’s “large sequential / commodity failure” assumptions just because it adds DAG and memory reuse.
+### 2. Metadata 与 bulk data 分离
 
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in storage layout, file-system semantics, client access patterns, and batch/DAG compute scheduling.
-- **Generative power:** For a new design, it asks whether the dominant unit is a large sequential scan or append, not a random record lookup.
-- **Exclusivity:** Many well-designed systems choose the opposite point: POSIX compatibility, low-latency random I/O, or transactional mutation.
+namespace、block placement 和协调可以集中在小型 metadata authority；大字节应由 client/worker 直接在 DataNode/chunkserver 之间传输，不能经过 NameNode 或 master。
 
-**Application:** Begin Architecture Buddy review by naming the workload shape: file sizes, scan ratio, append ratio, latency target, small-file count, and whether the system can batch work.
+必须说明 metadata journal、checkpoint、备份/standby、恢复时间和 block report 重建规则。单一 NameNode 简化一致性，但 HA、federation 和 metadata scale 是后续策略分叉，不是免费能力。
 
-**Limit:** If the workload mix drifts toward small files, random updates, low-latency serving, or interactive joins, this lens should recommend a different serving/index/query layer rather than stretch GFS-MR beyond its shape.
+### 3. Replication 把 commodity failure 变成常态
 
-### 2. Metadata Is Centralized; Bulk Data Is Not
+磁盘和机器会持续故障，架构应使用跨 host/rack/zone 的 block replication、heartbeat、checksum、re-replication 和 placement policy。复制既提供 durability，也可能提高读取带宽，但需要支付存储和修复带宽。
 
-**One sentence:** Keep namespace, block placement, and coordination in a small metadata authority, while clients and workers move large bytes directly through the data nodes.
+要写出 under-replicated block 的修复速度、相关故障假设、stale replica、写入 pipeline 和 rack awareness。冷数据可考虑 erasure coding 或 object storage，但延迟、局部性和修复语义会改变。
 
-**Evidence:**
-- GFS uses a single master for metadata and chunkservers for data; clients contact the master for placement/control and then communicate with chunkservers for data transfer.
-- HDFS separates NameNode metadata from DataNode block storage; clients direct data I/O to DataNodes and rely on NameNode metadata for block locations—**bytes must not transit the NameNode**.
-- HDFS persists the namespace with **WAL journal + checkpoint**; block locations are **not** treated as durable checkpoint contents—they are rebuilt from DataNode block reports. Control instructions are commonly **piggybacked on heartbeat replies** rather than pushed as complex NN→DN RPCs.
-- Both GFS and HDFS use large chunks/blocks so metadata remains compact enough for a centralized control plane; a single NameNode (classic design) buys consistency simplicity at the cost of SPOF / metadata scale—HA and federation are later strategy forks, not free gifts.
+### 4. Move compute to data
 
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in namespace design, block placement, failure recovery, client I/O path, and scheduler locality.
-- **Generative power:** It predicts that proposals should keep hot bytes off the metadata node and ask how metadata is checkpointed, recovered, and bounded.
-- **Exclusivity:** Peer-to-peer storage, shared-disk filesystems, and fully disaggregated object stores make different control/data-plane choices.
+当输入大到不适合搬运时，scheduler 应看到 block location，并把计算放到副本附近；同时必须测量 input scan、shuffle 和 output 哪一段真正占用网络。
 
-**Application:** Separate the review into metadata path and data path. Demand clear answers for metadata size, journal/checkpoint discipline, HA/federation needs, heartbeat-carried repair, and whether the data path bypasses the coordinator.
+云上的 object store 和 disaggregated compute 可能选择牺牲 locality 换取弹性和托管运维。此时要把网络预算写出来，不能仍然宣传 data locality。
 
-**Limit:** A simple metadata authority becomes a scaling and availability concern as namespace size, client count, or multi-tenant operation grows.
+### 5. Stage、DAG、shuffle 与 lineage
 
-### 3. Replication Turns Commodity Failure into Throughput
+MapReduce 用 map/shuffle/reduce 和任务重试隐藏分布式调度复杂度；Spark 用 lazy DAG、stage、可选 cache 和 lineage recompute 提供多阶段复用，但 wide dependency 仍会产生序列化、磁盘 spill、网络 shuffle 和 skew。
 
-**One sentence:** Assume disks and machines fail constantly; use replicated blocks/chunks, heartbeats, re-replication, and placement policy to make failure routine while increasing read bandwidth.
-
-**Evidence:**
-- The GFS overview emphasizes fault tolerance on inexpensive commodity hardware and high aggregate performance across many clients.
-- The HDFS survey/golden lists large blocks plus multiple replicas, heartbeat-carried instructions, pipeline writes, rack-aware placement, and replication for durability and read bandwidth as core mechanisms.
-- GFS and HDFS both prefer software-managed replication across machines over relying on local RAID as the main durability story (contrast Lustre/PVFS-style paths).
-
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in storage durability, read parallelism, recovery, placement, and operational monitoring.
-- **Generative power:** It asks how many independent failure domains each block spans, how fast under-replicated blocks are repaired, and what happens during rack loss.
-- **Exclusivity:** Traditional shared storage and RAID-centered systems often try to hide failure below the distributed layer; this lens surfaces it as a first-class operating condition.
-
-**Application:** Review replica factor, rack awareness, repair bandwidth, checksum strategy, stale replica handling, write pipeline behavior, and whether replication cost is acceptable for the data's value and access pattern.
-
-**Limit:** Replication is expensive. At larger scale, erasure coding, tiering, or object storage may beat simple triple replication for cold data, but usually with different latency and repair trade-offs.
-
-### 4. Move Compute to Data
-
-**One sentence:** When data is too large to move cheaply, expose block locality and schedule parallel tasks near the blocks so the cluster spends network on shuffle and results, not raw input scans.
-
-**Evidence:**
-- The HDFS survey/golden identifies the data locality API: block locations are exposed so computation can be placed close to data.
-- MapReduce's implementation partitions input into splits and schedules many map tasks across a large commodity cluster.
-- Spark still schedules tasks against partitions that often sit on HDFS-like storage; locality remains valuable for input scans even when **wide dependencies** force a later shuffle. Claiming “compute near data” while the scheduler cannot see replica hosts is empty branding.
-
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in storage APIs, job scheduling, network planning, and Hadoop/Spark execution models.
-- **Generative power:** It predicts that the design should ask where bytes physically live before deciding where workers run—and which phase dominates the network: input scan, shuffle, or output.
-- **Exclusivity:** Serverless, remote object storage, and disaggregated compute often accept moving data over the network for elasticity and operational simplicity.
-
-**Application:** Ask whether the scheduler can see data location, whether compute slots exist near the replicas, and whether shuffle dwarfs input locality benefits.
-
-**Limit:** Data locality weakens in cloud object-store architectures, container schedulers with abstract placement, and workloads whose shuffle dominates input reads.
-
-### 5. Simple Stages Hide Distributed Mess—Until Shuffle and Lineage Show Up
-
-**One sentence:** MapReduce buys adoption with map/shuffle/reduce stages and runtime retries; Spark keeps the same commodity-failure honesty but replaces “materialize every stage to external storage” with a lazy DAG, optional working-set persistence, and lineage recompute—while shuffle remains expensive.
-
-**Evidence:**
-- The MapReduce overview defines map functions producing intermediate key/value pairs and reduce functions merging values by key; the runtime handles partitioning, scheduling, machine failures, and inter-machine communication.
-- HDFS was built to stream large datasets into MapReduce and similar batch computation, making storage and compute abstractions co-designed.
-- Spark (Cluster Overview + RDD guide / golden) separates **Driver** (context, scheduling) from **Executors** (tasks, optional cached partitions); **transformations are lazy**, **actions** trigger jobs; **wide dependencies** cut **stages** via shuffle (serialization, local disk spill, network)—not “pure memory magic.”
-- Fault tolerance in Spark is primarily **lineage recompute** of lost partitions; `persist`/`cache` speeds reuse but does **not** cancel the lineage story. The engine stays **independent of a specific Cluster Manager** (Standalone / YARN / Kubernetes allocate executors; they are not the compute model).
-
-**Triple verification:**
-- **Cross-domain recurrence:** Appears in programming model, fault tolerance, task scheduling, partitioning, and operational adoption.
-- **Generative power:** It asks whether the computation is one-shot MR stages, a multi-stage DAG with reuse, where stragglers/skew appear, and whether recovery is recompute vs external checkpoint every boundary.
-- **Exclusivity:** Streaming systems, databases, and actor systems choose richer or lower-latency models; pretending Spark erased shuffle/disk puts a design outside this lens’s honesty bar.
-
-**Application:** Prefer MR simplicity when the job is naturally map→group→reduce once. Prefer Spark-style DAG when iteration/interactive reuse matters—but still budget shuffle spill, stage boundaries, and lineage depth. Make retries idempotent.
-
-**Limit:** Multi-stage iterative algorithms, low-latency streaming, graph workloads, and skew-heavy joins often need richer planners or specialized engines; do not stretch map/reduce rhetoric to hide that.
+要明确 Driver/Executor、cluster manager、stage 边界、重算还是 checkpoint、任务幂等性、straggler 和 hot key。Spark 不是无磁盘、无 shuffle 的魔法。
 
 ## 决策启发式
 
-1. Start with the workload: if the hot path is not large sequential reads/appends or batch/DAG scans, do not force this lens.
-2. Use large blocks/chunks to reduce metadata pressure and amortize seek/control overhead, but check the small-file tax explicitly.
-3. Keep the metadata authority out of the byte path; clients and workers should move bulk data directly with DataNodes/chunkservers or their modern equivalent.
-4. Treat metadata durability as first-class: journal, checkpoint, backup/standby, namespace recovery time, and whether block locations are rebuilt from reports rather than naively checkpointed.
-5. Replicate across independent failure domains, not just disks. Name rack, zone, host, and correlated-failure assumptions; prefer software multi-replica over local RAID as the primary durability story.
-6. Expose data locality to the scheduler when raw input scan cost matters. If locality cannot be exploited, document the network budget that replaces it.
-7. Prefer recomputation (MR task retry or Spark lineage) over complex distributed recovery for pure batch stages, but require deterministic, idempotent task behavior; do not claim persist cancels recovery.
-8. Design for stragglers and skew: speculative execution, partition sizing, combiner use, hot-key handling, and shuffle spill capacity.
-9. Separate storage of durable facts from serving/index layers. GFS/HDFS-style storage is a substrate, not a complete user-facing query system.
-10. When choosing MR vs Spark-class engines: name whether you need multi-stage reuse (lazy DAG + optional cache) or can accept external materialization each boundary—and never advertise “no disk / no shuffle.”
-11. Keep compute engines decoupled from a single cluster manager when the platform already has YARN/K8s/etc.; do not conflate resource allocation with the execution model.
-12. Make the accepted semantic sacrifices explicit: append vs overwrite, relaxed POSIX assumptions, consistency guarantees, and failure-visible client behavior.
+1. 如果主路径不是大规模顺序读取/追加或批量/DAG 扫描，不要强行使用本透镜。
+2. 使用大 block 降低 metadata 压力和控制开销，但必须量化 small-file tax。
+3. metadata authority 不得进入字节数据路径；bulk data 直接走 DataNode/chunkserver 或现代等价层。
+4. 把 journal、checkpoint、备份、namespace 恢复时间和 block location 重建作为 metadata durability 的一等设计。
+5. 按独立 failure domain 复制，写明 rack、zone、host 的相关故障假设和 repair bandwidth。
+6. 输入扫描受益时才暴露 locality；无法利用 locality 时写出替代网络预算。
+7. 纯批处理优先使用可重算的任务或 lineage，但任务必须确定性、幂等；不要声称 persist 消除了恢复问题。
+8. 设计 straggler、skew、speculative execution、partition sizing、combiner 和 shuffle spill 容量。
+9. 将 durable facts 与 serving/index 层分开；GFS/HDFS 是 substrate，不是完整的用户查询系统。
+10. 选择 MR 或 Spark 时，明确是一次性 map→group→reduce，还是需要多阶段复用、lazy DAG 和可选 cache。
+11. 将 compute engine 与 YARN/Kubernetes/Standalone 等 cluster manager 解耦，不要混淆资源分配和执行模型。
+12. 诚实写出 append vs overwrite、POSIX 取舍、一致性保证和客户端可见的失败语义。
 
-## Schools and Design Tensions
+## 设计分歧与张力
 
-- **POSIX fidelity vs data-intensive throughput:** GFS/HDFS intentionally relax familiar file-system expectations to make huge sequential workloads efficient.
-- **Single metadata authority vs federation/HA:** A single master/NameNode simplifies consistency and placement decisions; HA and federation reduce risk but add coordination and operational complexity.
-- **Replication vs erasure coding/object storage:** Simple replication improves read bandwidth and repair simplicity; erasure-coded or object-storage designs can reduce cost but change locality, repair, and latency behavior.
-- **Move compute to data vs elastic disaggregated compute:** Hadoop-era clusters benefited from colocated disks and workers; cloud-era systems often trade locality for elastic compute and managed object storage.
-- **MapReduce simplicity vs richer DAG engines:** Map/reduce stages are easy to reason about and retry; Spark trades per-stage external materialization for lazy DAGs, memory working sets, and lineage—but still pays for shuffle/spill and does not erase partition parallelism.
-- **External materialize-every-stage vs persist/lineage:** MR-style durability at every boundary vs Spark-style recompute-plus-optional-cache; both assume commodity failure.
-- **Batch determinism vs real-time freshness:** This lineage favors throughput and recoverability over immediate visibility; serving fresh user-facing state usually needs another architecture.
+- **POSIX fidelity vs throughput：** 大顺序 workload 的吞吐与熟悉的随机/细粒度文件语义之间需要取舍。
+- **单一 metadata authority vs HA/federation：** 前者更容易保持一致性，后者降低单点和规模风险但增加运维复杂度。
+- **Replication vs erasure coding/object storage：** 复制简单且利于读取，编码和对象存储节省成本但改变 locality、修复和延迟。
+- **Move compute to data vs disaggregated compute：** 共置减少输入网络，云式分离增强弹性但需要承担网络成本。
+- **MapReduce vs DAG engine：** MR 简单易重试；Spark 提供复用但仍需为 shuffle、spill、lineage 和 skew 付费。
 
 ## 不会这样做 / 反模式
 
-- Do not use GFS/HDFS-style storage as a low-latency transactional database.
-- Do not hide a small-file-heavy workload behind "data lake" language without a compaction, bundling, or metadata-scaling plan.
-- Do not put bulk bytes through the master/NameNode/control plane.
-- Do not claim data locality when the scheduler cannot observe or influence where replicas and workers run.
-- Do not depend on manual repair as the normal failure path; commodity failure must be automated and observable (heartbeats, re-replication, checksums).
-- Do not treat DataNode-local RAID as the primary durability narrative for this lineage.
-- Do not use MapReduce (or a Spark job) for workloads requiring millisecond responses, fine-grained mutable state, or continuous low-latency event handling.
-- Do not advertise Spark (or “memory computing”) as disk-free or shuffle-free; do not deny lineage recompute after executor loss.
-- Do not ignore skew: one hot key or pathological partition can erase the benefit of thousands of workers.
-- Do not treat "three replicas" as a complete disaster-recovery strategy without zone/rack correlation and recovery-bandwidth analysis.
-- Do not bind the compute story to a single cluster manager as if YARN/K8s/Standalone were mutually exclusive execution models.
+- 不会把 GFS/HDFS 当作低延迟事务数据库。
+- 不会用“data lake”掩盖 small-file、metadata scale 和 compaction 问题。
+- 不会让 bulk bytes 穿过 master/NameNode/control plane。
+- 不会在 scheduler 看不到副本和 worker 位置时宣称利用了 locality。
+- 不会把人工修复当成 commodity failure 的正常路径。
+- 不会宣传 Spark 或“内存计算”无磁盘、无 shuffle，也不会忽略 lineage recompute。
+- 不会忽略 skew、热点 key、跨 rack 复制和灾难恢复带宽。
+- 不会把 YARN、Kubernetes 或 Standalone 当成互斥的 compute execution model。
 
 ## 诚实边界
 
-- This lens is strongest for the GFS/MapReduce/HDFS lineage and batch/DAG analytics systems influenced by it (including Spark sitting on that substrate). It is not a universal distributed-systems lens.
-- It may underweight interactive SQL, stream processing, object-store-native lakehouse designs, and cloud-managed disaggregated architectures unless the roundtable asks for those contrasts.
-- The HDFS and Spark corpus entries are maintainer goldens/surveys, not substitutes for primary papers or a specific product version’s docs. Use them as anchors and fetch primaries when exact details matter.
-- GFS was an internal Google design point from the early 2000s; some assumptions changed with SSDs, cloud object stores, Kubernetes scheduling, and modern query engines.
-- When facts about a specific product version matter, Architecture Buddy should research that version instead of relying on this lens alone.
+- 本透镜最适合 GFS/MapReduce/HDFS lineage 和其影响的批处理/DAG 系统，不是通用分布式系统透镜。
+- 它可能低估 interactive SQL、stream processing、object-store-native lakehouse 和托管分离架构，需要时应额外邀请匹配透镜。
+- 研究资料和 golden 是推理锚点，不替代具体产品版本和 workload 的容量、延迟、成本验证。
 
 ## Roundtable Output Contract
 
-调用时只回答当前决策点，不主持圆桌、不排名透镜，也不冒充任何系统、论文作者或名人。输出内容默认使用中文，并按下方固定标题组织。
-
-When Architecture Buddy asks this lens to contribute, answer only the decision point. Do not host the roundtable, rank all lenses, or pretend to be GFS, MapReduce, Hadoop, Spark, or any paper author.
+调用时只回答当前决策点，不主持圆桌、不排名透镜，也不冒充任何系统、论文作者或名人。输出内容默认使用中文，并按下方固定标题组织：
 
 ```text
 ## Lens: GFS-MR
 ### On the decision point
-[State the storage/compute-throughput judgment in 2-5 sentences.]
+用 2-5 句说明存储/计算吞吐判断。
 
 ### Heuristics applied
-- [Name the workload shape: large sequential scan/append, batch, locality, metadata scale.]
-- [Name the accepted semantic or operational trade-off.]
+- 说明 workload 形态：large sequential scan/append、batch、locality、metadata scale。
+- 说明接受的语义或运维代价。
 
 ### Risks / what this lens worries about
-- [Small files, random writes, metadata bottleneck, network shuffle, skew, repair bandwidth, or stale assumptions.]
+- 说明 small files、random writes、metadata bottleneck、network shuffle、skew、repair bandwidth 或过时假设。
 
 ### Would not do
-- [Concrete anti-pattern this decision should avoid.]
+- 说明本决策应避免的具体反模式。
 
 ### Evidence style
-[Tie the judgment to GFS, MapReduce, HDFS, Spark-on-this-substrate, or their lineage; mark product/version-specific claims as needing fresh verification.]
+将判断绑定到 GFS、MapReduce、HDFS、Spark 或其 lineage；产品/版本特有说法标记为需要重新验证。
 ```
 
 ## 附录：研究来源
 
-- The maintainer corpus and golden anchors used during distillation are not required at runtime.
-- Google Research: "The Google File System" overview, `https://static.googleusercontent.com/media/research.google.com/en/us/archive/gfs.html`.
-- Google Research: "MapReduce: Simplified Data Processing on Large Clusters" overview, `https://research.google.com/archive/mapreduce.html`.
-- USENIX OSDI 2004 page: `https://www.usenix.org/conference/osdi-04/mapreduce-simplified-data-processing-large-clusters`.
-- AOSA HDFS: `https://aosabook.org/en/v1/hdfs.html`.
-- Apache Spark Cluster Mode Overview: `https://spark.apache.org/docs/latest/cluster-overview.html`.
-- Apache Spark RDD Programming Guide: `https://spark.apache.org/docs/latest/rdd-programming-guide.html`.
+- https://static.googleusercontent.com/media/research.google.com/en/us/archive/gfs.html
+- https://research.google.com/archive/mapreduce.html
+- https://www.usenix.org/conference/osdi-04/mapreduce-simplified-data-processing-large-clusters
+- https://aosabook.org/en/v1/hdfs.html
+- https://spark.apache.org/docs/latest/cluster-overview.html
+- https://spark.apache.org/docs/latest/rdd-programming-guide.html
