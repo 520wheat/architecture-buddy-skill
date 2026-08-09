@@ -202,6 +202,28 @@ AI 让「加一段实现」变便宜，却不降低理解与修改成本。若�
 
 **未过 S6 完成门禁，禁止宣称「架构设计已完成」。**
 
+## 阶段 Prompt 编排与加载
+
+`prompts/` 中的文件是分阶段运行提示词。它们是当前 Skill 的运行时资源，不是开发计划，也不是用户必须逐字阅读的脚本。主 Skill 负责判断加载时机；每次只加载当前阶段需要的一个 Prompt，Prompt 的输出作为下一阶段的显式输入。
+
+| 主流程阶段 | 加载条件 | Prompt | 主要产物/交接 |
+|------------|----------|--------|----------------|
+| S0、S2、S2.5 | 开始交付、问题类未锁定，或架构层级/边界不清 | `prompts/clarify-problem.md` | 问题框架、目标、约束、非目标、架构定位和一个待回答问题 |
+| S1 | 问题框架得到确认或明确允许继续 | `prompts/first-principles.md` | 假设、基本事实、待验证事实、机制和不超过两个策略方向 |
+| S4 | 发现会改变边界/质量属性/失败语义的高影响互斥分叉，或用户主动要求多视角 | `prompts/roundtable.md` | 圆桌过程记录、用户反馈、综合结论及正式设计/ADR 回写位置 |
+| S5、S7 | 关键事实和策略已确认，准备形成或交付正式设计 | `prompts/synthesize-adr.md` | 正式架构设计、架构 ADR、决策过程记录 |
+| S6 | 准备宣称 `design-ready` 或用户要求审阅架构设计 | `prompts/review-deliverable.md` | 完成门禁结果、阻塞问题、修订项和交付状态 |
+
+### 编排规则
+
+1. `deliverable` 默认按 S0 → S1 → S2 → S2.5 → S3 → S4 → S5 → S6 → S7 推进；每次回复只推进当前一个问题或一个产物交接。
+2. `clarify-problem` 的问题框架是 `first-principles` 的输入；第一性原理的机制/策略分叉是圆桌预检和成稿的输入；圆桌反馈必须显式进入 `synthesize-adr` 的输入。
+3. 任何 Prompt 都不能替用户决定未确认的策略。缺少事实时输出待验证事实、一期默认、触发条件和回退路径，并按需将状态标为 `draft` 或 `blocked`。
+4. 进入圆桌前先执行 `roundtable` 的授权和选席检查。用户未同意时只保留提议和主持人提问，不加载透镜；任务上下文明确授权时，必须记录“用户同意圆桌（任务上下文已授权）”。
+5. `synthesize-adr` 产出的正式架构设计是主要成品；会议/决策过程记录只保留推理过程，不能替代正式设计。未通过 `review-deliverable` 和 `references/deliverable-gate.md`，不得宣称完成。
+6. `draft` 只按当前卡点按需加载澄清、第一性原理或圆桌 Prompt；除非用户要求正式交付，不加载综合和完成审阅 Prompt，也不生成 design-ready 结论。
+7. Prompt 之间不得依赖隐藏上下文。若没有文件工具，将每阶段产物以明确的 Markdown 区块呈现在对话中，并在下一阶段引用该区块；若用户指定输出文件，才写入该路径。
+
 ## 正式架构设计文件
 
 `templates/architecture-deliverable.md` 是当前的质量检查模板。层 A/层 B 用于提醒设计覆盖叙事、机制、策略和组合边界；它们不是行业统一目录，也不是用户可见架构设计文件唯一合法的标题格式。
@@ -277,6 +299,11 @@ AI 让「加一段实现」变便宜，却不降低理解与修改成本。若�
 | `references/anti-patterns.md` | 反模式与红线 |
 | `references/lens-catalog.md` | 圆桌选席 |
 | `templates/problem-class-template.md` | 类问题模板 |
+| `prompts/clarify-problem.md` | 问题澄清阶段 Prompt |
+| `prompts/first-principles.md` | 第一性原理阶段 Prompt |
+| `prompts/roundtable.md` | 圆桌阶段 Prompt |
+| `prompts/synthesize-adr.md` | 正式设计与 ADR 综合 Prompt |
+| `prompts/review-deliverable.md` | 正式交付审阅 Prompt |
 
 ## Top N / 对照成熟系统（可选）
 
