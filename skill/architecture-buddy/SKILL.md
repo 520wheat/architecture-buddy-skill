@@ -262,7 +262,7 @@ AI 让「加一段实现」变便宜，却不降低理解与修改成本。若�
 
 宣称完成前，读并执行 `references/deliverable-gate.md`（完成门禁 / 完成检查）。
 
-旧 `templates/architecture-note.md`（M1–M9）已降级：仅内部映射，见 `references/note-mapping.md`；用户可见正文不以 M 编号为权威结构。
+旧 M1–M9 结构已降级：仅保留内部映射，见 `references/note-mapping.md`；用户可见正文不以 M 编号为权威结构。
 
 ## 参考文件（需要时再打开）
 
@@ -271,7 +271,7 @@ AI 让「加一段实现」变便宜，却不降低理解与修改成本。若�
 | `templates/architecture-deliverable.md` | **权威**双层成品骨架 |
 | `references/deliverable-gate.md` | S6 完成门禁 / 完成检查清单 |
 | `references/note-mapping.md` | 旧 M1–M9 ↔ 双层节映射（内部） |
-| `templates/architecture-note.md` | **已降级**；勿当用户可见权威成品 |
+| `references/note-mapping.md` | 旧 M1–M9 ↔ 当前结构的内部映射 |
 | `references/mechanisms.md` | 机制锚点（写层 B 时用） |
 | `references/strategies-cheatsheet.md` | 策略分叉速查 |
 | `references/anti-patterns.md` | 反模式与红线 |

@@ -37,6 +37,6 @@ done
 
 ## 包内资源
 
-`architecture-buddy/references/` 与 `architecture-buddy/templates/` 是主 Skill 的运行时资源，必须随主包安装，不能单独拆出。
+`architecture-buddy/prompts/`、`references/`、`templates/` 和 `scripts/` 是主 Skill 的运行时资源目录，必须随主包安装，不能单独拆出。当前新增的 Prompt、脚本和 Agent UI 文件为空占位，尚未改变 `0.3.6` 的运行行为。
 
 完整机器可读清单见 [`release-manifest.tsv`](release-manifest.tsv)。
