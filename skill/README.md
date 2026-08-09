@@ -18,13 +18,13 @@
 
 推荐安装主包和全部可选透镜。透镜默认不主动触发，只由主持 Skill 在圆桌中依据决策点选择；它们提供做法视角，不扮演真人。
 
-## 安装
+## 通用安装
 
-`SRC` 必须指向本目录。安装脚本只遍历带有 `SKILL.md` 的直接子目录，不会安装 `README.md` 或 manifest。
+`SRC` 指向本目录，`DST` 指向你所使用 Agent 的 Skills 目录。安装时只处理带有 `SKILL.md` 的直接子目录，不会安装 `README.md` 或 manifest。
 
 ```bash
 SRC="/path/to/architecture-buddy-skill/skill"
-DST="$HOME/.cursor/skills"
+DST="/path/to/your/agent/skills"
 mkdir -p "$DST"
 for d in "$SRC"/*/; do
   [ -f "$d/SKILL.md" ] || continue
@@ -33,7 +33,7 @@ for d in "$SRC"/*/; do
 done
 ```
 
-安装 Codex 或其他兼容 Agent Skills 的运行时，只需将 `DST` 换成对应的用户级 skills 目录。
+如果运行时不支持符号链接，可以把这些 Skill 子目录复制到 `DST`；安装后按所用 Agent 的文档重新加载 Skill。
 
 ## 包内资源
 
