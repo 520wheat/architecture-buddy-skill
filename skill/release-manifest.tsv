@@ -1,5 +1,5 @@
 package	kind	required	version	status
-architecture-buddy	host	yes	0.4.0	release
+architecture-buddy	host	yes	0.4.1	release
 architecture-buddy-lens-scaffold	lens	no	0.1.0	release
 architecture-buddy-lens-agent-loop	lens	no	0.1.0	release
 architecture-buddy-lens-dynamo-ap	lens	no	0.1.0	release

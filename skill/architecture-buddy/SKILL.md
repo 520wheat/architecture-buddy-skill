@@ -6,7 +6,7 @@ description: >
   architecture deliverable. Not for roleplay or taking decisions for the user.
 metadata:
   display-name: Architecture Buddy
-  version: "0.4.0"
+  version: "0.4.1"
 ---
 
 # Architecture Buddy
