@@ -8,19 +8,13 @@ import sys
 from pathlib import Path
 
 
-REQUIRED_GROUPS = {
-    "设计标题": (("架构设计",),),
-    "问题类与目标": (("问题类",), ("目标",)),
-    "边界与上下文": (("边界",),),
-    "主路径": (("主路径",),),
-    "组件与契约": (("组件", "模块"), ("契约", "接口")),
-    "基本事实或领域不变量": (("基本事实", "不变量"),),
-    "失败证据": (("用户可见状态",), ("触发条件",), ("观察结果",), ("恢复动作",), ("残余风险",)),
-    "演进": (("演进",),),
-    "机制与策略": (("机制",), ("策略",)),
-    "取舍与理由": (("取舍", "决定"), ("理由", "依据")),
-    "验收": (("验收",),),
-    "组合边界": (("N+1",), ("反例",)),
+CORE_SECTIONS = {
+    "目标、背景与核心约束": ("目标", "背景", "约束"),
+    "实现原则": ("实现原则", "架构原则", "设计原则"),
+    "逻辑架构视图": ("逻辑架构", "架构视图", "模块架构", "组件架构"),
+    "技术选型与部署方案": ("技术选型", "部署方案", "部署架构", "物理部署"),
+    "数据架构与治理": ("数据架构", "数据管理", "数据治理"),
+    "非功能设计": ("非功能", "横切关注点", "质量属性"),
 }
 
 
@@ -34,6 +28,10 @@ def has_any(content: str, alternatives: tuple[str, ...]) -> bool:
     return any(item in content for item in alternatives)
 
 
+def has_heading(headings: list[str], alternatives: tuple[str, ...]) -> bool:
+    return any(has_any(heading, alternatives) for heading in headings)
+
+
 def validate(content: str) -> list[str]:
     errors: list[str] = []
     headings = [line.lstrip("#").strip() for line in content.splitlines() if line.startswith("#")]
@@ -45,13 +43,21 @@ def validate(content: str) -> list[str]:
     if is_process_record and not has_formal_heading:
         errors.append("文件看起来是会议记录，缺少正式架构设计正文")
 
-    for group, requirements in REQUIRED_GROUPS.items():
-        for alternatives in requirements:
-            if not has_any(content, alternatives):
-                errors.append(f"缺少结构证据：{group}（需要 { ' / '.join(alternatives) }）")
+    for section, alternatives in CORE_SECTIONS.items():
+        if not has_heading(headings, alternatives):
+            errors.append(f"缺少核心板块：{section}（标题需包含 { ' / '.join(alternatives) } 之一）")
 
-    if content.count("用户可见状态") < 1 or content.count("残余风险") < 1:
-        errors.append("失败证据必须包含结构化失败表，而不是只写重试或降级")
+    if not has_any(content, ("取舍", "关键决策", "决策理由", "选择理由")):
+        errors.append("缺少架构决策或取舍：需要说明选择了什么")
+    if not has_any(content, ("理由", "依据", "因为", "由于")):
+        errors.append("缺少决策理由：需要说明为什么这样选择")
+    if not has_any(content, ("验收", "验收条件", "成功标准", "可观察")):
+        errors.append("缺少可验证的验收条件")
+
+    if not has_any(content, ("模块", "组件", "服务")):
+        errors.append("逻辑架构缺少模块/组件/服务职责证据")
+    if not has_any(content, ("协作", "调用", "通信", "接口", "契约", "数据流")):
+        errors.append("逻辑架构缺少协作或契约证据")
     return errors
 
 
@@ -72,11 +78,11 @@ def main(argv: list[str] | None = None) -> int:
         print("结构校验失败：")
         for error in errors:
             print(f"- {error}")
-        print("说明：此脚本只判断结构证据，不判断架构设计是否优秀。")
+        print("说明：此脚本只判断核心结构证据，不判断架构方案是否正确或优秀。")
         return 1
 
-    print("结构校验通过：已发现正式架构设计所需的主要结构证据。")
-    print("说明：通过不等于架构方案正确或优秀，仍需人工审阅和领域验证。")
+    print("结构校验通过：已发现六个核心板块及基本决策、协作和验收证据。")
+    print("说明：通过不等于架构方案正确或优秀；失败深度、领域不变量、反例和演进按适用性人工审阅。")
     return 0
 
 
