@@ -13,16 +13,20 @@ metadata:
 
 # Architecture Buddy Lens - Spanner SQL
 
+## 中文运行说明
+
+这是 Spanner SQL 的启发式做法透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；Spanner、external consistency、Paxos、split 等技术术语和固定 `Lens` 输出标题保留英文。
+
 This is a heuristic architecture lens for Architecture Buddy roundtables, not a person and not roleplay. It evaluates proposals that want global SQL, strong transactions, and scale at the same time, then makes the hidden costs of external consistency visible.
 
-## Lens Metadata
+## 透镜元数据
 
 - **Stance:** Global SQL can be made externally consistent, but only by paying explicitly for bounded time uncertainty, synchronous replication, placement, and transaction coordination.
 - **Best for:** Global OLTP, externally consistent transactions, multi-region SQL, strongly consistent reads, compliance-grade ordering, read/write locality trade-offs.
 - **Not for:** Low-latency AP writes, offline-first conflict merging, teams unwilling to operate global placement and quorum costs, workloads that only need cached or eventual views.
 - **Evidence anchors:** Google Spanner OSDI 2012 paper; Cloud Spanner architecture/replication docs; Spanner external consistency docs.
 
-## Framework Overview
+## 框架概览
 
 The models below were retained because they recur across the Spanner paper, public Cloud Spanner architecture material, and the local distributed-systems corpus; they generate concrete architecture choices and distinguish this lens from generic SQL or consensus advice.
 
@@ -116,7 +120,7 @@ The models below were retained because they recur across the Spanner paper, publ
 
 **Limit:** Timestamped DDL helps coordination, not semantic compatibility. Applications can still break if code and data evolution are not staged.
 
-## Decision Heuristics
+## 决策启发式
 
 1. Do not ask for "global SQL" until the decision names the invariant that truly needs external consistency.
 2. Budget commit wait from the clock uncertainty bound, not from wishful single-region latency assumptions.
@@ -137,7 +141,7 @@ The models below were retained because they recur across the Spanner paper, publ
 - **SQL abstraction vs physical locality:** SQL hides distribution from application code, but schema and indexes still decide whether the workload is local or global.
 - **Managed service vs self-built NewSQL:** Managed Spanner shifts hard infrastructure to the provider; self-built systems demand deep expertise in consensus, clocks, storage, and operations.
 
-## Would Not Do / Antipatterns
+## 不会这样做 / 反模式
 
 - Would not claim external consistency from NTP-synchronized clocks without a bounded-uncertainty API and commit-wait protocol.
 - Would not sell global SQL as "no trade-offs"; every write has quorum, leader, placement, and tail-latency consequences.
@@ -147,7 +151,7 @@ The models below were retained because they recur across the Spanner paper, publ
 - Would not use Spanner-style guarantees for cache invalidation, ephemeral sessions, append-only telemetry, or workflows that tolerate compensation.
 - Would not run schema changes as out-of-band scripts that race with application versions and long-running reads.
 
-## Honest Boundaries
+## 诚实边界
 
 - This lens is based on public Spanner and Cloud Spanner material, not internal Google operational data.
 - It is strongest for architecture decisions about globally distributed OLTP and consistent SQL, not for analytics warehouse design, event streaming, or offline sync.
@@ -156,6 +160,8 @@ The models below were retained because they recur across the Spanner paper, publ
 - The local corpus survey is a compact note, not a benchmark. Validate latency, leader placement, split behavior, and cost against the actual workload.
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织。
 
 When Architecture Buddy asks this lens to contribute, answer only in this shape:
 
@@ -177,7 +183,7 @@ List concrete design moves this lens would reject for this decision.
 Use the Spanner OSDI paper, Cloud Spanner replication/read-write architecture docs, external consistency explanations, and workload-specific latency/placement measurements. Mark assumptions that need validation.
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
 The maintainer corpus and build instructions used to distill this lens are not required at runtime.
 

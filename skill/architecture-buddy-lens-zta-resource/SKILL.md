@@ -16,15 +16,19 @@ metadata:
 
 # Architecture Buddy Lens — ZTA Resource
 
+## 中文运行说明
+
+这是 Zero Trust resource 的启发式做法透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；NIST、PE/PA/PEP、ASVS、SAMM 等技术术语和固定 `Lens` 输出标题保留英文。
+
 This is a **heuristic lens**, not a person or roleplay character. It applies the zero trust resource stance from NIST SP 800-207 to Architecture Buddy roundtables: every protected resource needs an explicit decision path, enforcement point, and revocation story.
 
-## Seat Metadata
+## 席位元数据
 
 - **Best for:** Zero Trust Architecture, resource-centric access, PEP placement, identity/device posture, least privilege, segmentation, continuous authorization.
 - **Not for:** Broad security review without an access decision point, compliance-only checkboxing, or replacing ASVS/SAMM verification.
 - **Evidence anchors:** NIST SP 800-207 for ZTA principles and PE/PA/PEP logic; OWASP ASVS V1 for verifiable architecture controls; OWASP SAMM Secure Architecture for organizational maturity and reusable patterns.
 
-## Framework Overview
+## 框架概览
 
 ### 1. Network Location Is Not Trust
 
@@ -91,7 +95,7 @@ This is a **heuristic lens**, not a person or roleplay character. It applies the
 
 **Limit:** Maturity models do not choose the correct PEP placement for a specific workflow. They ensure the organization can repeat and verify the choice.
 
-## Decision Heuristics
+## 决策启发式
 
 1. If the argument says "trusted network," translate it into named subjects, devices, workloads, resources, and policies.
 2. Put the PEP as close to the protected resource as the workflow and legacy constraints allow.
@@ -104,7 +108,7 @@ This is a **heuristic lens**, not a person or roleplay character. It applies the
 9. Pair ZTA design with ASVS-style verifiable controls and SAMM-style organizational adoption.
 10. When legacy constraints force enclave trust, label the enclave boundary, data flows, and residual lateral-movement risk.
 
-## Schools / Design Tensions
+## 设计分歧与张力
 
 - **Identity-first vs resource/gateway-first:** Enhanced identity governance works well for SaaS, BYOD, and open networks; gateway or micro-segmentation patterns often fit legacy resources and finer network control. Strong designs usually combine them.
 - **Static policy vs adaptive risk:** Static policies are easier to reason about and audit; adaptive risk scoring can respond to live context but adds explainability and operations burden.
@@ -112,7 +116,7 @@ This is a **heuristic lens**, not a person or roleplay character. It applies the
 - **Portal simplicity vs concentration risk:** A resource portal simplifies user flow and browser access, but it becomes a high-value enforcement and availability dependency.
 - **Security rigor vs operability:** Continuous evaluation and posture checks improve control, but poor tuning creates outages, false denies, and support load.
 
-## Would Not Do / Anti-Patterns
+## 不会这样做 / 反模式
 
 - Would not approve "inside the VPN/VPC" as the main authorization claim.
 - Would not place authorization enforcement only in an untrusted client or front-end.
@@ -123,7 +127,7 @@ This is a **heuristic lens**, not a person or roleplay character. It applies the
 - Would not accept a policy decision without an enforcement, monitoring, and revocation path.
 - Would not turn ZTA into product selection before naming trust assumptions and protected resources.
 
-## Honest Boundaries
+## 诚实边界
 
 - This lens does not replace threat modeling; it provides questions that should feed threat modeling.
 - This lens does not guarantee compliance with NIST, ASVS, or SAMM; it helps align architecture discussion with their concepts.
@@ -132,6 +136,8 @@ This is a **heuristic lens**, not a person or roleplay character. It applies the
 - The lens is strongest for access-path and resource-protection decisions; it is weaker for unrelated security topics such as secure coding details, cryptographic primitive choice, or incident response process.
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织。
 
 ```text
 ## Lens: ZTA Resource
@@ -151,7 +157,7 @@ Call out the specific anti-pattern this proposal should avoid.
 Anchor claims in NIST SP 800-207 terms first, then use ASVS V1 for verifiable architecture requirements and SAMM for maturity or reference-architecture questions.
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
 - NIST SP 800-207, Zero Trust Architecture:
   - Source: https://csrc.nist.gov/pubs/sp/800/207/final

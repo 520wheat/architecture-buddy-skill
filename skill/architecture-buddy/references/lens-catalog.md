@@ -1,9 +1,9 @@
-# Lens Catalog (runtime)
+# 透镜目录（运行时）
 
-Runtime catalog for Architecture Buddy host. The full research catalog is maintained outside the installable package.
-Dynamic seating: pick ≤3 installed lenses by best-for / not-for (ADR-0017). Distills practices, not voice (ADR-0016).
+这是 Architecture Buddy 主持 Skill 的运行时选席目录。完整研究目录由维护者在发行包外保存。
+动态选席：根据 `best-for` / `not-for` 为当前决策点选择不超过 3 个已安装透镜（ADR-0017）。透镜提炼做法，不模仿名人声音（ADR-0016）。
 
-| shortname | package dir | best-for (summary) | not-for (summary) | tensions with |
+| shortname | package dir | 适合（摘要） | 不适合（摘要） | 主要冲突 |
 |-----------|-------------|--------------------|-------------------|---------------|
 | raft-cp | architecture-buddy-lens-raft-cp | CP metadata, membership, fencing, control plane | bulk business data; AP write paths | dynamo-ap, spanner-sql (scope of strong consistency) |
 | dynamo-ap | architecture-buddy-lens-dynamo-ap | available KV, global writes, conflict-tolerant data | linearizable ledgers/locks | raft-cp, spanner-sql |
@@ -13,4 +13,4 @@ Dynamic seating: pick ≤3 installed lenses by best-for / not-for (ADR-0017). Di
 | zta-resource | architecture-buddy-lens-zta-resource | Zero Trust resource access, PEP placement | perimeter-only security as sole model | orthogonal; seat when trust boundary is the fork |
 | agent-loop | architecture-buddy-lens-agent-loop | LLM tool loops, permissions/HITL, session bounds, tracing, agent runtime | product module maps as architecture; unguarded full autonomy; no observe loop | often pairs with zta-resource on trust; not a substitute for log-stream/CP/AP stores |
 
-Scaffold (`architecture-buddy-lens-scaffold`) is for contract testing only — prefer real stance lenses when installed.
+Scaffold（`architecture-buddy-lens-scaffold`）仅用于契约测试；存在匹配的真实做法透镜时，优先使用真实透镜。

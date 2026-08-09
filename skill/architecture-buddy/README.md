@@ -2,7 +2,7 @@
 
 安装：将本目录链到 `~/.cursor/skills/architecture-buddy`，Reload Window 后 `@architecture-buddy`。
 
-透镜：同级的 `../architecture-buddy-lens-*` 一并安装；圆桌时按需选用。
+透镜：同级的 `../architecture-buddy-lens-*` 一并安装；圆桌时按需选用。透镜是启发式做法立场，不是名人角色。
 
 ## 模式
 
@@ -11,7 +11,7 @@
 
 ## 成品
 
-正式架构设计文件是必需成品；可以采用自然的架构设计或 ADR 结构。`templates/architecture-deliverable.md` 的 A/B 内容用于质量映射和训练检查，不是用户可见文档唯一格式。
+正式架构设计文件是必需成品；可以采用自然的架构设计或 ADR 结构。`templates/architecture-deliverable.md` 的 A/B 内容用于质量映射和检查，不是用户可见文档唯一格式。
 圆桌和主持人提问产生的决策过程记录用于整理架构 ADR，再由正式架构设计文件统合相关决策。
 旧 M1–M9 结构已降级为内部映射。
 
@@ -21,8 +21,8 @@
 
 ## 运行时目录
 
-- `prompts/`：分阶段运行提示词的预留目录，当前为空。
+- `prompts/`：分阶段运行提示词目录；后续阶段提示词在这里加载。
 - `references/`：运行时架构知识和完成门禁。
 - `templates/`：正式架构设计、问题类和 ADR 模板。
-- `scripts/`：运行时确定性工具的预留目录，当前为空。
-- `agents/`：Agent UI 元数据的预留目录，当前为空。
+- `scripts/`：运行时确定性工具目录；工具不联网、不修改用户项目。
+- `agents/`：Agent UI 元数据目录。

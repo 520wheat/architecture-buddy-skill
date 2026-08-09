@@ -16,16 +16,20 @@ metadata:
 
 # Architecture Buddy Lens - Dynamo AP
 
+## 中文运行说明
+
+这是 Dynamo/AP 的启发式做法透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；Dynamo、AP、KV、CRDT 等技术术语和固定 `Lens` 输出标题保留英文。
+
 This is a heuristic architecture lens for Architecture Buddy roundtables, not a persona and not roleplay. It applies the Dynamo/AP lineage as a design stance: preserve availability during common server, network, zone, and regional failures when the business domain can tolerate stale reads, concurrent writes, and explicit repair.
 
-## Lens Metadata
+## 透镜元数据
 
 - **Stance:** Keep the user path available under failure by partitioning data, replicating widely, accepting bounded divergence, and making reconciliation an explicit product contract.
 - **Best for:** Available key-value data, global writes, session/cart/preference state, multi-datacenter replicas, tunable consistency, conflict-tolerant business data.
 - **Not for:** Linearizable ledgers, locks, uniqueness-critical writes, cross-item invariants, irreversible side effects without reconciliation.
 - **Evidence anchors:** Dynamo paper; DynamoDB architecture; Apache Cassandra Dynamo lineage.
 
-## Framework Overview
+## 框架概览
 
 The models below were retained because they recur across Dynamo, DynamoDB, and Cassandra-family practice; they generate concrete architecture decisions; and they distinguish an AP data-plane stance from generic "distributed database" advice.
 
@@ -119,7 +123,7 @@ The models below were retained because they recur across Dynamo, DynamoDB, and C
 
 **Limit:** Modern DynamoDB is not the original leaderless Dynamo. It uses leader-based Multi-Paxos within partition replication groups for writes and strong reads, so lineage must not be flattened into "all Dynamo-family systems are masterless AP."
 
-## Decision Heuristics
+## 决策启发式
 
 1. Use this lens when the business can tolerate stale, duplicated, reordered, or concurrently edited item state better than it can tolerate rejected reads or writes.
 2. Declare the invariant scope: item-local, partition-local, tenant-local, region-local, or global. Anything global is suspect in an AP data path.
@@ -140,7 +144,7 @@ The models below were retained because they recur across Dynamo, DynamoDB, and C
 - **Always writable vs invariant preservation:** Carts, sessions, preferences, and telemetry often prefer acceptance plus repair; ledgers, locks, uniqueness, and authorization may need CP or transactional constraints.
 - **Decentralized replicas vs managed automation:** Masterless peer systems reduce central bottlenecks but push repair, data modeling, and failure visibility to operators. Managed services hide more mechanics but still require key design and consistency choices.
 
-## Would Not Do / Anti-Patterns
+## 不会这样做 / 反模式
 
 - Do not use AP replication as the authority for distributed locks, leader election, money balances, uniqueness-critical identifiers, or entitlement decisions.
 - Do not claim "multi-region active-active" without specifying conflict resolution, read-your-writes expectations, idempotency, and failback behavior.
@@ -151,7 +155,7 @@ The models below were retained because they recur across Dynamo, DynamoDB, and C
 - Do not move cross-item transactions into application retries without a duplicate, compensation, or reconciliation story.
 - Do not equate Dynamo, DynamoDB, and Cassandra as the same architecture; use the shared AP lessons but verify the concrete product semantics.
 
-## Honest Boundaries
+## 诚实边界
 
 - This lens is strongest for available data-plane state with item-level or partition-local semantics. It is intentionally weak for metadata coordination, linearizable decisions, and cross-entity invariants.
 - "Eventually consistent" is not a complete requirement. The acceptable inconsistency window, merge rule, user-visible behavior, and repair SLO must be named.
@@ -160,6 +164,8 @@ The models below were retained because they recur across Dynamo, DynamoDB, and C
 - Source coverage here is based on the local Architecture Buddy corpus plus public Dynamo, DynamoDB, and Cassandra documents available during distillation; validate managed-service behavior against current vendor documentation before final design.
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织。
 
 When Architecture Buddy asks this lens to contribute, answer only the decision point using this format:
 
@@ -181,7 +187,7 @@ When Architecture Buddy asks this lens to contribute, answer only the decision p
 <Prefer failure-mode evidence, partition/load tests, conflict-resolution examples, consistency-level traces, repair-lag metrics, hot-key analysis, and precedent from Dynamo/DynamoDB/Cassandra semantics.>
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
 The maintainer corpus and build instructions used to distill this lens are not required at runtime.
 

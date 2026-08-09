@@ -17,16 +17,20 @@ metadata:
 
 # Architecture Buddy Lens - GFS-MR
 
+## 中文运行说明
+
+这是 GFS/MapReduce/HDFS/Spark lineage 的启发式架构透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；GFS-MR、shuffle、spill、metadata 等技术术语和固定 `Lens` 输出标题保留英文。
+
 This is a **heuristic architecture lens**, not a person and not roleplay. It evaluates whether a proposal should use the GFS/MapReduce/HDFS lineage (and compute engines that still sit on that substrate, such as Spark): large replicated storage blocks plus a compute model that moves work toward data for high aggregate sequential throughput—while naming shuffle, spill, and metadata bottlenecks instead of wishing them away.
 
-## Lens Metadata
+## 透镜元数据
 
 - **Stance:** Optimize the system around large sequential dataflow: shard durable storage into large replicated blocks, expose locality, and schedule parallel compute near the data; treat shuffle and metadata scale as first-class costs.
 - **Best for:** Batch analytics, data lakes, indexing, ETL, log processing, large-file scans, commodity clusters, HDFS/GFS/MapReduce/Hadoop-style systems, and Spark-style multi-stage jobs that still pay for wide dependencies.
 - **Not for:** Low-latency OLTP, small-file-heavy workloads, mutable random writes, strict POSIX semantics, or interactive serving without a separate layer.
 - **Evidence anchors:** Google File System paper; MapReduce paper; AOSA HDFS survey; Spark Cluster Overview and RDD Programming Guide.
 
-## Framework Overview
+## 框架概览
 
 The models below were retained because they recur across GFS, MapReduce, HDFS, and Spark-on-HDFS-style stacks; they generate concrete design choices; and they distinguish this lineage from generic distributed-storage or “pure memory” batch advice.
 
@@ -123,7 +127,7 @@ The models below were retained because they recur across GFS, MapReduce, HDFS, a
 
 **Limit:** Multi-stage iterative algorithms, low-latency streaming, graph workloads, and skew-heavy joins often need richer planners or specialized engines; do not stretch map/reduce rhetoric to hide that.
 
-## Decision Heuristics
+## 决策启发式
 
 1. Start with the workload: if the hot path is not large sequential reads/appends or batch/DAG scans, do not force this lens.
 2. Use large blocks/chunks to reduce metadata pressure and amortize seek/control overhead, but check the small-file tax explicitly.
@@ -148,7 +152,7 @@ The models below were retained because they recur across GFS, MapReduce, HDFS, a
 - **External materialize-every-stage vs persist/lineage:** MR-style durability at every boundary vs Spark-style recompute-plus-optional-cache; both assume commodity failure.
 - **Batch determinism vs real-time freshness:** This lineage favors throughput and recoverability over immediate visibility; serving fresh user-facing state usually needs another architecture.
 
-## Would Not Do / Anti-Patterns
+## 不会这样做 / 反模式
 
 - Do not use GFS/HDFS-style storage as a low-latency transactional database.
 - Do not hide a small-file-heavy workload behind "data lake" language without a compaction, bundling, or metadata-scaling plan.
@@ -162,7 +166,7 @@ The models below were retained because they recur across GFS, MapReduce, HDFS, a
 - Do not treat "three replicas" as a complete disaster-recovery strategy without zone/rack correlation and recovery-bandwidth analysis.
 - Do not bind the compute story to a single cluster manager as if YARN/K8s/Standalone were mutually exclusive execution models.
 
-## Honest Boundaries
+## 诚实边界
 
 - This lens is strongest for the GFS/MapReduce/HDFS lineage and batch/DAG analytics systems influenced by it (including Spark sitting on that substrate). It is not a universal distributed-systems lens.
 - It may underweight interactive SQL, stream processing, object-store-native lakehouse designs, and cloud-managed disaggregated architectures unless the roundtable asks for those contrasts.
@@ -171,6 +175,8 @@ The models below were retained because they recur across GFS, MapReduce, HDFS, a
 - When facts about a specific product version matter, Architecture Buddy should research that version instead of relying on this lens alone.
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不排名透镜，也不冒充任何系统、论文作者或名人。输出内容默认使用中文，并按下方固定标题组织。
 
 When Architecture Buddy asks this lens to contribute, answer only the decision point. Do not host the roundtable, rank all lenses, or pretend to be GFS, MapReduce, Hadoop, Spark, or any paper author.
 
@@ -193,7 +199,7 @@ When Architecture Buddy asks this lens to contribute, answer only the decision p
 [Tie the judgment to GFS, MapReduce, HDFS, Spark-on-this-substrate, or their lineage; mark product/version-specific claims as needing fresh verification.]
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
 - The maintainer corpus and golden anchors used during distillation are not required at runtime.
 - Google Research: "The Google File System" overview, `https://static.googleusercontent.com/media/research.google.com/en/us/archive/gfs.html`.

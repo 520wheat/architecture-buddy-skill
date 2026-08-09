@@ -16,16 +16,20 @@ metadata:
 
 # Architecture Buddy Lens - Raft CP
 
+## 中文运行说明
+
+这是 Raft/CP 的启发式做法透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；Raft、etcd、quorum、watch、lease 等技术术语和固定 `Lens` 输出标题保留英文。
+
 This is a heuristic lens for Architecture Buddy roundtables, not a persona. It evaluates whether a proposal needs understandable majority consensus and strongly consistent metadata coordination, then makes the quorum, scope, and operational consequences explicit.
 
-## Lens Metadata
+## 透镜元数据
 
 - **Stance:** Put small, critical metadata behind understandable majority consensus; keep bulk business data and high-throughput data paths out of the quorum core.
 - **Best for:** Leader election, cluster metadata, configuration, membership, fencing, strongly consistent control-plane state.
 - **Not for:** Large business datasets, low-latency AP paths, Byzantine trust failures, global active-active writes without quorum trade-offs.
 - **Evidence anchors:** Raft paper; etcd architecture/API guarantees; Kubernetes control-plane architecture.
 
-## Framework Overview
+## 框架概览
 
 ### 1. Replicated Log Before Distributed State
 
@@ -117,7 +121,7 @@ This is a heuristic lens for Architecture Buddy roundtables, not a persona. It e
 
 **Limit:** Fencing shifts some burden to downstream systems. If the external resource cannot validate versions, the coordination layer cannot fully protect it.
 
-## Decision Heuristics
+## 决策启发式
 
 - Use Raft-style CP when the business failure is "two authorities both believed they were primary," not merely "some clients saw stale data."
 - Keep the consensus group small and the data inside it smaller; store references, desired state, leases, and versions rather than large payloads.
@@ -138,7 +142,7 @@ This is a heuristic lens for Architecture Buddy roundtables, not a persona. It e
 - **Lease convenience vs correctness discipline:** Leases simplify liveness and cleanup, but TTL and client pauses can mislead holders unless downstream fencing exists.
 - **CP purity vs user-facing availability:** Refusing writes without quorum prevents split-brain, but product owners may prefer degraded, stale, or read-only behavior during partitions.
 
-## Would Not Do / Antipatterns
+## 不会这样做 / 反模式
 
 - Would not put high-cardinality business records, metrics streams, logs, blobs, or hot counters in the quorum-backed metadata store.
 - Would not claim "we have a lock" as proof of external mutual exclusion unless the protected resource checks a revision, generation, or fencing token.
@@ -148,7 +152,7 @@ This is a heuristic lens for Architecture Buddy roundtables, not a persona. It e
 - Would not treat wall-clock TTL as a correctness proof in the presence of pauses, partitions, or slow clients.
 - Would not add CP consensus to a workload whose real requirement is cache invalidation, queueing, idempotency, or eventual convergence.
 
-## Honest Limits
+## 诚实边界
 
 - This lens assumes non-Byzantine failures. It does not cover malicious peers, arbitrary corruption, or adversarial consensus.
 - It is strongest for metadata coordination and control-plane state, not for OLTP, analytics, document storage, or event streaming architecture.
@@ -157,6 +161,8 @@ This is a heuristic lens for Architecture Buddy roundtables, not a persona. It e
 - Local corpus coverage is centered on Raft, etcd, and Kubernetes; broader Paxos-family and multi-region consensus variants are only secondary context here.
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织。
 
 When Architecture Buddy asks this lens to contribute, answer only in this shape:
 
@@ -178,7 +184,7 @@ List concrete design moves this lens would reject for this decision.
 Use Raft majority/log safety, etcd API guarantees and limits, and Kubernetes control-plane separation as anchors. Mark assumptions that need validation.
 ```
 
-## Sources
+## 附录：研究来源
 
 The maintainer corpus and build instructions used to distill this lens are not required at runtime.
 - Diego Ongaro and John Ousterhout, "In Search of an Understandable Consensus Algorithm (Raft)": https://raft.github.io/raft.pdf

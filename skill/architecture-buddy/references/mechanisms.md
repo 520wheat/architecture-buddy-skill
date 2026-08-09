@@ -1,8 +1,8 @@
-# Mechanisms (runtime cheat sheet)
-Runtime mechanism vocabulary distilled from the maintainer research corpus.
-User-visible authority is templates/architecture-deliverable.md (dual layer A/B).
-M1–M9 below are internal mapping only; see references/note-mapping.md.
-Do not invent new M numbers; do not put M numbers in user-facing deliverable body.
+# 机制（运行时速查）
+
+以下是运行时使用的机制词汇，来自维护者整理的研究资料。用户可见的权威骨架是
+`templates/architecture-deliverable.md`（双层 A/B）。下方 M1–M9 仅用于内部映射，详见
+`references/note-mapping.md`；不要新增 M 编号，也不要把 M 编号写进用户可见正文。
 
 ## 映射到笔记锚点（M）
 

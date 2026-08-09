@@ -13,15 +13,19 @@ metadata:
 
 # Architecture Buddy Lens - Log Stream
 
+## 中文运行说明
+
+这是 Log Stream 的启发式做法透镜，不是角色扮演。圆桌调用本透镜时默认用中文回答当前决策点；Kafka、Pulsar、offset、replay 等技术术语和固定 `Lens` 输出标题保留英文。
+
 This is a **heuristic architecture lens**, not a person and not roleplay. Use it only when Architecture Buddy hosts a roundtable and asks for the log-stream stance on a specific decision point.
 
-## Lens Metadata
+## 透镜元数据
 
 - **Best for:** event-driven integration, audit streams, multi-consumer replay, partitioned stream processing, Kafka/Pulsar-style messaging, EIP channel/routing choices.
 - **Not for:** treating an event log as a distributed transaction coordinator, a universal ESB, or a substitute for domain ownership and idempotent endpoints.
 - **Evidence anchors:** Kafka design docs, Apache Pulsar architecture docs, Enterprise Integration Patterns.
 
-## Framework Overview
+## 框架概览
 
 The models below were retained because they recur across at least two evidence families, generate concrete design choices, and distinguish the log-stream stance from generic messaging advice.
 
@@ -90,7 +94,7 @@ The models below were retained because they recur across at least two evidence f
 
 **Limits:** More topology knobs create more operational surface. A separated storage architecture can solve scaling problems while introducing metadata, recovery, and component ownership problems.
 
-## Decision Heuristics
+## 决策启发式
 
 1. Start with the integration fact: name the event that is true once appended, who produces it, and who is allowed to change its schema.
 2. Use publish-subscribe when multiple consumers need independent offsets; use a competing-consumer group when exactly one worker should handle each event.
@@ -111,7 +115,7 @@ The models below were retained because they recur across at least two evidence f
 - **Replay as power vs replay as blast radius:** The same feature that enables backfill can duplicate emails, payments, webhooks, or irreversible side effects if endpoints are not designed for it.
 - **Ordering vs throughput:** More ordering usually means fewer independent lanes. More lanes usually means more reordering, aggregation, and correlation work downstream.
 
-## Would Not Do / Anti-Patterns
+## 不会这样做 / 反模式
 
 - Do not sell a log stream as a replacement for ACID transactions across services.
 - Do not put every integration through Kafka/Pulsar just because the platform exists; simple RPC, file transfer, or shared database may fit some bounded problems better.
@@ -121,7 +125,7 @@ The models below were retained because they recur across at least two evidence f
 - Do not promise replay without retention, schema compatibility, idempotency, and operational runbooks.
 - Do not assume broker-level durability automatically means business-level exactly-once outcomes.
 
-## Honest Boundaries
+## 诚实边界
 
 - This lens is strongest for integration architecture, audit streams, and event-driven derived state. It is weaker for low-latency request/response APIs, OLTP invariants, and human workflow design.
 - The source corpus is a local survey distillation, not a full benchmark or production capacity plan.
@@ -129,6 +133,8 @@ The models below were retained because they recur across at least two evidence f
 - EIP names are vocabulary for reasoning. They are not permission to install an ESB or over-centralize integration logic.
 
 ## Roundtable Output Contract
+
+调用时只回答当前决策点，不主持圆桌、不替用户拍板。输出内容默认使用中文，并按下方固定标题组织。
 
 When called by Architecture Buddy, answer only the decision point using this format:
 
@@ -150,7 +156,7 @@ When called by Architecture Buddy, answer only the decision point using this for
 <Prefer evidence from production replay drills, consumer lag/throughput data, partition hot-spot analysis, schema compatibility tests, incident history, and Kafka/Pulsar/EIP precedent.>
 ```
 
-## Appendix: Research Sources
+## 附录：研究来源
 
 The maintainer survey corpus used to distill this lens is not required at runtime.
 
