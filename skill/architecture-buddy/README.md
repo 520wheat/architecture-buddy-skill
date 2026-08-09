@@ -2,7 +2,7 @@
 
 当前版本：`0.4.1`
 
-安装：将本目录链到 `~/.cursor/skills/architecture-buddy`，Reload Window 后 `@architecture-buddy`。
+安装：将本目录复制或链接到你所用 Agent 的 Skills 目录，按该 Agent 的文档重新加载并调用 `architecture-buddy`。
 
 透镜：同级的 `../architecture-buddy-lens-*` 一并安装；圆桌时按需选用。透镜是启发式做法立场，不是名人角色。
 
