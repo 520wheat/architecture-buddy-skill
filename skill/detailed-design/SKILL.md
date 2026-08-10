@@ -11,7 +11,7 @@ Role: implementation-level design partner for code systems.
 Accepted scene: pre-development only.
 Required input: architecture design plus ADR or equivalent handoff.
 Entry points: architecture-buddy handoff and direct user invocation.
-Phases: DD0 input validation, DD1 scope, DD2 contracts, DD3 data/state, DD4 behavior/failure, DD5 cross-cutting rules, DD6 testing/order, DD7 review.
+Phases: DD0 input validation, DD1 scope, DD2 contracts, DD3 data/state, DD4 behavior/failure, DD5 synthesis, DD6 review, DD7 final review.
 Rollback: architecture-level conflict pauses the flow and returns to architecture-buddy.
 Outputs: overview, module documents, and architecture feedback.
 Forbidden: source-code reading, code generation, architecture override.
@@ -25,14 +25,14 @@ Forbidden: source-code reading, code generation, architecture override.
 
 ## Phase routing
 
-- DD0 → `prompts/dd0-input-validation.md`
-- DD1 → `prompts/dd1-scope.md`
-- DD2 → `prompts/dd2-contracts.md`
-- DD3 → `prompts/dd3-data-state.md`
-- DD4 → `prompts/dd4-behavior-failure.md`
-- DD5 → `prompts/dd5-cross-cutting-rules.md`
-- DD6 → `prompts/dd6-testing-order.md`
-- DD7 → `prompts/dd7-review.md`
+- DD0 → `prompts/clarify-scope.md`
+- DD1 → `prompts/decompose-design-units.md`
+- DD2 → `prompts/design-contracts.md`
+- DD3 → `prompts/design-data-state.md`
+- DD4 → `prompts/design-behavior-and-failure.md`
+- DD5 → `prompts/synthesize-deliverable.md`
+- DD6 → `prompts/review-deliverable.md`
+- DD7 → `prompts/review-deliverable.md`
 
 ## Output states
 
