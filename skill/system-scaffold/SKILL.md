@@ -32,6 +32,9 @@ If any required field is missing, stay in draft, recommend the missing stack cho
 - SC0 input validation: validate architecture, detailed-design, and stack completeness; route missing or ambiguous stack fields to `prompts/clarify-stack.md`.
 - SC1 recommendation: use `prompts/clarify-stack.md` to derive at most two concrete stack directions and one current question.
 - SC2 confirmation: use `prompts/confirm-stack.md` to lock the user's choice into a single technology-stack decision.
+- SC3 design mapping: use `prompts/map-design-to-skeleton.md` to map each design unit to the smallest code target, preserve module boundaries, and stop on contradictions.
+- SC4 skeleton generation: use `prompts/generate-skeleton.md` with `templates/skeleton-manifest.md` to emit only the minimum stack syntax scaffold and list every generated file before writing.
+- SC5 unimplemented-item recording: use `prompts/record-unimplemented.md` with `templates/unimplemented-items.md` to record every empty method and `not implemented` path.
 - 不得在 SC2 用户确认之前创建或修改任何文件。
 
 ## Entry points
@@ -50,6 +53,7 @@ If any required field is missing, stay in draft, recommend the missing stack cho
 ## Core rules
 
 - Use one language-neutral skeleton rule set plus confirmed stack parameters.
+- Do not introduce per-language adapter packages or duplicate stack-specific rule sets.
 - Do not read existing business code.
 - Do not override architecture.
 - Do not implement business logic.
@@ -63,6 +67,7 @@ If any required field is missing, stay in draft, recommend the missing stack cho
 Produce:
 
 - stack decision
+- skeleton manifest
 - skeleton files
 - unimplemented-items list
 - verification result
