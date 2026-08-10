@@ -25,6 +25,17 @@
 
 - `references/architecture-handoff.md`：输入契约
 - `references/detailed-design-gate.md`：完成门禁
+- `templates/detailed-design-overview.md`：总览模板
+- `templates/module-detailed-design.md`：模块模板
+- `templates/architecture-feedback.md`：架构反馈模板
+
+## 产物规则
+
+- 先落盘 overview，再按已确认设计单元顺序落盘模块文档。
+- 每个 architecture feedback 条目必须可从 overview 追溯。
+- 模板只定义详细设计文档契约，不包含实现代码。
+- pending facts 默认保留 `待确认`，直到有显式确认或回退。
+- rollback 项必须与触发事实和恢复条件同时记录。
 
 ## 边界
 
