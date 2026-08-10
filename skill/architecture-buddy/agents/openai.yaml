@@ -1,3 +1,7 @@
-display_name: "Architecture Buddy"
-short_description: "协作完成架构设计，并在用户同意后交接详细设计"
-default_prompt: "Use $architecture-buddy to co-design a pre-development architecture, pass the design-ready gate, ask whether to continue with detailed design, and hand off explicit fields to detailed-design only after user consent."
+interface:
+  display_name: "Architecture Buddy"
+  short_description: "共同澄清架构问题、比较取舍，并在用户同意后交接详细设计"
+  default_prompt: "使用 $architecture-buddy 在开发前和我共同澄清问题类、比较架构取舍，产出正式架构设计；通过 design-ready 门禁后询问是否交给 detailed-design。"
+
+policy:
+  allow_implicit_invocation: true
