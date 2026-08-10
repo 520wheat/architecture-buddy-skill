@@ -1,11 +1,4 @@
 ---
-name: architecture-buddy-lens-log-stream
-description: >
-  Use when Architecture Buddy roundtable needs a log-stream lens for event-driven integration,
-  append-only logs as source of truth, offsets, replay, audit streams, partitioned consumers,
-  Kafka/Pulsar-style messaging, or EIP channel trade-offs. Not for roleplay; this is a heuristic
-  lens for architecture decisions.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Log Stream)
   version: "0.1.0"

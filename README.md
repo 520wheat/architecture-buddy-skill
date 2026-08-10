@@ -1,6 +1,6 @@
 # architecture-buddy-skill
 
-Architecture Buddy 是一个用于架构共思的 Agent Skill：帮助开发者在编码前澄清问题类、约束、边界、机制、策略和取舍，并产出一份可检验的正式架构设计。它可以在高影响的架构分叉上提议圆桌，按问题动态加载领域透镜，再把讨论结果写回设计和 ADR。
+Architecture Buddy 是一个用于架构共思的 Agent Skill：帮助开发者在编码前澄清问题类、约束、边界、机制、策略和取舍，并产出可检验的正式架构设计。它可以在高影响架构分叉上提议圆桌，按问题动态加载内置领域透镜，再把讨论结果写回设计和 ADR。
 
 本仓库只包含运行时发行包和必要的安装说明。安装时直接使用 `skill/`。
 
@@ -30,8 +30,8 @@ Architecture Buddy 是一个用于架构共思的 Agent Skill：帮助开发者�
 
 ```text
 skill/                      ← 唯一需要安装的东西（运行时），见 skill/README.md
-  architecture-buddy/       ← 必装的主持 Skill
-  architecture-buddy-lens-*/← 可选的圆桌立场透镜
+  architecture-buddy/       ← 必装的架构主持 Skill，内置圆桌透镜
+  detailed-design/          ← 可选的详细设计 Skill
   README.md                 ← 发行包索引，不是 Skill
   release-manifest.tsv      ← 包清单，不是 Skill
 ```
@@ -58,14 +58,25 @@ for d in "$SRC"/*/; do
 done
 ```
 
-只安装主 Skill 时选择 `skill/architecture-buddy`；需要圆桌领域视角时，再安装相应的 `architecture-buddy-lens-*` 子目录。生效方式和显式调用语法以所用 Agent 的 Skill 文档为准。
+### Codex（及兼容 Agent Skills 的 CLI）
+
+```bash
+SRC="/path/to/architecture-buddy-skill/skill"
+DST="${CODEX_HOME:-$HOME/.codex}/skills"
+mkdir -p "$DST"
+for d in "$SRC"/*/; do
+  [ -f "$d/SKILL.md" ] || continue
+  name=$(basename "$d")
+  ln -sfn "$d" "$DST/$name"
+done
+```
+
+生效方式：新开会话后，用自然语言说明场景，或按产品文档用 Skill 调用语法点名 `architecture-buddy` / `detailed-design`。透镜由主持 Skill 在圆桌时按需加载，不单独安装。
 
 ## 包内容
 
-必须安装的包是 `architecture-buddy`；
-`architecture-buddy-lens-*` 是可选圆桌透镜，建议在需要对应领域时一并安装。
-包清单见 [`skill/release-manifest.tsv`](skill/release-manifest.tsv)，包级说明见 [`skill/README.md`](skill/README.md)。
+必须安装的包是 `architecture-buddy`；`detailed-design` 在架构交接后按需安装或调用。机器可读清单见 [`skill/release-manifest.tsv`](skill/release-manifest.tsv)，包级说明见 [`skill/README.md`](skill/README.md)。
 
 ## 能力边界
 
-Architecture Buddy 负责架构问题澄清、架构决策协作、圆桌和正式架构设计；详细设计、系统架构落地、空骨架代码和 PR Review 属于后续能力。透镜提供经过蒸馏的实践视角，不扮演名人，也不替用户拍板。
+Architecture Buddy 负责架构问题澄清、架构决策协作、圆桌、授权后的调查证据和正式架构设计；详细设计由用户同意后交给 `detailed-design`。透镜提供经过蒸馏的实践视角，不扮演名人，也不替用户拍板。

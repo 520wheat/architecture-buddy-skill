@@ -1,11 +1,4 @@
 ---
-name: architecture-buddy-lens-agent-loop
-description: >
-  Use when Architecture Buddy roundtable needs an agent-loop lens for LLM tool orchestration,
-  plan/act/observe cycles, session boundaries, guardrails, HITL checkpoints, trajectory tracing,
-  or workflow-vs-autonomous-agent complexity. Not for roleplay; this is a heuristic lens for
-  architecture decisions.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Agent Loop)
   version: "0.1.0"
