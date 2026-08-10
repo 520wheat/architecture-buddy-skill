@@ -107,7 +107,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         initialize_workspace(output_dir, args.name, args.force)
     except (FileExistsError, ValueError, OSError) as err:
-        print(f"init-design: {err}", file=sys.stderr)
+        print(f"初始化失败：{err}", file=sys.stderr)
         return 1
 
     print(f"Initialized detailed-design workspace at {output_dir}")

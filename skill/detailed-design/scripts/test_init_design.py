@@ -62,6 +62,21 @@ class InitDesignCLITest(unittest.TestCase):
             self.assertEqual(overview_path.read_text(), "sentinel\n")
             self.assertNotEqual(overview_path.read_text(), original_content)
 
+    def test_reports_overwrite_error_with_chinese_prefix(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir) / "design"
+            first_result = self.run_init_design(
+                "--output", str(output_dir), "--name", "SRE Buddy"
+            )
+            self.assertEqual(first_result.returncode, 0, msg=first_result.stderr)
+
+            result = self.run_init_design(
+                "--output", str(output_dir), "--name", "SRE Buddy"
+            )
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("初始化失败：", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

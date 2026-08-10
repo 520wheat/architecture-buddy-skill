@@ -141,7 +141,7 @@ def overview(
 """
 
 
-def module_doc(*, include_fallback: bool = True, pending_fact_ok: bool = True) -> str:
+def module_doc(*, name: str = "auth", include_fallback: bool = True, pending_fact_ok: bool = True) -> str:
     pending_row = (
         "| PF-1 | 事实 | 默认值 | 原因 | 验证条件 | 回退路径 | 重新打开条件 |"
         if pending_fact_ok
@@ -152,7 +152,7 @@ def module_doc(*, include_fallback: bool = True, pending_fact_ok: bool = True) -
 
 ## 职责与边界
 
-- 模块名：auth
+- 模块名：{name}
 - 责任：鉴权
 - 处理边界：输入验证
 - 明确不负责：计费
@@ -260,9 +260,11 @@ class ValidateDeliverableCLITest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
             write_file(root / "detailed-design-overview.md", overview())
+            write_file(root / "architecture-feedback.md", "# 架构反馈\n")
             modules = root / "modules"
             modules.mkdir()
             write_file(modules / "auth.md", module_doc())
+            write_file(modules / "billing.md", module_doc(name="billing"))
 
             result = self.run_validator(str(root))
 
@@ -343,6 +345,22 @@ class ValidateDeliverableCLITest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("待确认", result.stderr)
+
+    def test_rejects_missing_module_coverage_and_broken_references(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            content = overview()
+            content = content.replace("- 模块 A：auth\n- 模块 B：billing", "- 模块 A：ghost\n- 模块 B：billing")
+            content = content.replace("| RB-1 | PF-1 |", "| RB-1 | PF-999 |")
+            write_file(root / "detailed-design-overview.md", content)
+            modules = root / "modules"
+            modules.mkdir()
+            write_file(modules / "auth.md", module_doc())
+
+            result = self.run_validator(str(root))
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("模块", result.stderr)
 
 
 if __name__ == "__main__":

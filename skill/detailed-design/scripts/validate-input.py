@@ -8,11 +8,13 @@ from pathlib import Path
 
 from validator_helpers import (
     extract_field,
+    line_has_substance,
     markdown_files_referenced,
     non_empty,
     parse_tables,
     read_text,
     section_body,
+    section_body_containing,
 )
 
 
@@ -100,11 +102,11 @@ def validate_architecture(path: Path, adrs: list[Path]) -> list[str]:
     except OSError as exc:
         return [f"架构文件无法读取：{path}（{exc}）"]
 
-    scene = extract_field(content, ["场景", "scene"])
+    scene = extract_field(content, ["场景", "scene", "架构任务场景"])
     if scene != "pre-development":
         errors.append(f"场景必须是 pre-development，当前为：{scene or '缺失'}")
 
-    state = extract_field(content, ["状态", "state"])
+    state = extract_field(content, ["状态", "state", "设计状态"])
     if state == "complete":
         errors.append("状态不能是 complete，请使用 draft、blocked 或 design-ready")
     elif state != "design-ready":
@@ -112,13 +114,23 @@ def validate_architecture(path: Path, adrs: list[Path]) -> list[str]:
 
     boundary = extract_field(content, ["架构边界", "confirmed boundaries", "confirmed boundary", "边界"])
     if not non_empty(boundary):
+        boundary_section = section_body_containing(content, ["边界"])
+        if boundary_section and line_has_substance(boundary_section):
+            boundary = boundary_section
+    if not non_empty(boundary):
         errors.append("缺少架构边界证据")
 
     pending_errors = validate_pending_tables(content)
     errors.extend(pending_errors)
 
     referenced_md = markdown_files_referenced(content, path.parent)
-    handoff_candidates = [path] + [ref for ref in referenced_md if ref.name == "architecture-handoff.md"]
+    handoff_candidates = [
+        ref
+        for ref in referenced_md
+        if "handoff" in ref.name.lower() or "交接" in ref.name
+    ]
+    if "Architecture Handoff Contract" in content or "## Required fields" in content:
+        handoff_candidates.append(path)
     seen: set[Path] = set()
     for handoff_path in handoff_candidates:
         if handoff_path in seen:
@@ -131,8 +143,7 @@ def validate_architecture(path: Path, adrs: list[Path]) -> list[str]:
         except OSError as exc:
             errors.append(f"架构交接文件无法读取：{handoff_path}（{exc}）")
             continue
-        if "Architecture Handoff Contract" in handoff_content or "Required fields" in handoff_content:
-            errors.extend(validate_handoff_content(handoff_content))
+        errors.extend(validate_handoff_content(handoff_content))
 
     for adr in adrs:
         if not adr.exists() or not adr.is_file():

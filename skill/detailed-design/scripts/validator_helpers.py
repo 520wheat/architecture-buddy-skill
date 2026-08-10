@@ -18,7 +18,7 @@ def read_text(path: Path) -> str:
 def extract_field(content: str, labels: list[str]) -> str | None:
     for label in labels:
         pattern = re.compile(
-            rf"^\s*[-*]?\s*{re.escape(label)}\s*[:：][^\S\r\n]*(?P<value>[^\r\n]*)$",
+            rf"^\s*>?\s*[-*]?\s*{re.escape(label)}\s*[:：][^\S\r\n]*(?P<value>[^\r\n]*)$",
             re.MULTILINE,
         )
         match = pattern.search(content)
@@ -55,11 +55,33 @@ def section_body(content: str, heading: str) -> str | None:
     return "\n".join(collected).strip()
 
 
+def section_body_containing(content: str, terms: list[str]) -> str | None:
+    lines = content.splitlines()
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped.startswith("#"):
+            continue
+        marks, _, title = stripped.partition(" ")
+        if not any(term in title for term in terms):
+            continue
+        collected: list[str] = []
+        level = len(marks)
+        for following in lines[index + 1 :]:
+            next_stripped = following.strip()
+            if next_stripped.startswith("#"):
+                next_marks, _, _ = next_stripped.partition(" ")
+                if len(next_marks) <= level:
+                    break
+            collected.append(following)
+        return "\n".join(collected).strip()
+    return None
+
+
 def is_separator_row(line: str) -> bool:
     stripped = line.strip()
     if "|" not in stripped:
         return False
-    core = stripped.strip("|").replace(" ", "")
+    core = stripped.strip("|").replace(" ", "").replace("|", "")
     return bool(core) and set(core) <= {"-", ":"}
 
 
@@ -145,7 +167,7 @@ def line_has_substance(block: str) -> bool:
 def markdown_files_referenced(content: str, base_dir: Path) -> list[Path]:
     refs: list[Path] = []
     seen: set[Path] = set()
-    for raw in re.findall(r"([A-Za-z0-9_./\\-]+\.md)", content):
+    for raw in re.findall(r"\[[^\]]*\]\(([^)]+\.md)\)", content):
         path = Path(raw)
         if not path.is_absolute():
             path = (base_dir / path).resolve()
@@ -153,4 +175,26 @@ def markdown_files_referenced(content: str, base_dir: Path) -> list[Path]:
             continue
         seen.add(path)
         refs.append(path)
+
+    for line in content.splitlines():
+        if ".md" not in line or not any(
+            marker in line.lower() for marker in ("handoff", "交接")
+        ):
+            continue
+        candidate = line.strip()
+        if "](" in candidate:
+            continue
+        if "：" in candidate:
+            candidate = candidate.split("：", 1)[1].strip()
+        elif ":" in candidate:
+            candidate = candidate.split(":", 1)[1].strip()
+        candidate = candidate.strip("- *`[]()")
+        if not candidate.endswith(".md"):
+            continue
+        path = Path(candidate).expanduser()
+        if not path.is_absolute():
+            path = (base_dir / path).resolve()
+        if path not in seen:
+            seen.add(path)
+            refs.append(path)
     return refs

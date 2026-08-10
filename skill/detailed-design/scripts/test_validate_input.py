@@ -196,6 +196,48 @@ class ValidateInputCLITest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("默认值", result.stderr)
 
+    def test_accepts_architecture_buddy_blockquote_fields_and_boundary_section(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            arch = root / "architecture.md"
+            adr = root / "ADR-1.md"
+            write_file(adr, "# ADR\n")
+            write_file(
+                arch,
+                minimal_architecture(boundary="", confirmed_boundaries="").replace(
+                    "- 场景：pre-development\n- 状态：design-ready\n",
+                    "> 架构任务场景：pre-development\n> 设计状态：design-ready\n",
+                )
+                + "\n## A2 上下文与边界\n\n系统边界由 API 与数据归属确定。\n",
+            )
+
+            result = self.run_validator(str(arch), "--adr", str(adr))
+
+            self.assertEqual(result.returncode, 0, msg=result.stderr)
+
+    def test_rejects_missing_handoff_field_in_unicode_path_without_contract_title(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            arch = root / "architecture.md"
+            adr = root / "ADR-1.md"
+            handoff = root / "架构 交接.md"
+            write_file(adr, "# ADR\n")
+            write_file(
+                handoff,
+                "# 架构交接\n\n- architecture file\n- ADR paths\n"
+                "- pre-development\n- design-ready\n- scope\n"
+                "- confirmed boundaries\n- pending facts\n- non-goals\n",
+            )
+            write_file(
+                arch,
+                minimal_architecture() + "\n## Handoff\n\n- handoff: 架构 交接.md\n",
+            )
+
+            result = self.run_validator(str(arch), "--adr", str(adr))
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("quality targets", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

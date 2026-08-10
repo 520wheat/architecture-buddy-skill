@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
 from validator_helpers import (
     extract_field,
+    find_table,
     find_rows,
     line_has_substance,
     parse_tables,
@@ -119,6 +121,92 @@ def validate_rollback_section(content: str, section: str) -> list[str]:
     return validate_table_section(content, section, ROLLBACK_HEADERS)
 
 
+def table_rows_for_section(content: str, section: str, headers: list[str]) -> tuple[list[str], list[list[str]]]:
+    body = section_body(content, section) or ""
+    table = find_table(body, headers)
+    if table is None:
+        return [], []
+    return table.header, table.rows
+
+
+def row_value(header: list[str], row: list[str], label: str) -> str:
+    index = next((i for i, cell in enumerate(header) if label in cell), None)
+    if index is None or index >= len(row):
+        return ""
+    return row[index].strip()
+
+
+def reference_tokens(value: str) -> set[str]:
+    return {
+        token.strip().strip("`[]()")
+        for token in re.split(r"\s*(?:->|→|,|，|、)\s*", value)
+        if token.strip()
+    }
+
+
+def validate_overview_references(content: str, output_dir: Path) -> list[str]:
+    errors: list[str] = []
+    unit_header, unit_rows = table_rows_for_section(
+        content, "设计单元索引", ["顺序", "单元", "责任", "产物"]
+    )
+    module_files = {
+        path.stem: path.name
+        for path in (output_dir / "modules").glob("*.md")
+        if path.is_file()
+    }
+    unit_names = {row_value(unit_header, row, "单元") for row in unit_rows}
+    unit_names.discard("")
+    expected_files = {
+        Path(row_value(unit_header, row, "产物")).name
+        for row in unit_rows
+        if row_value(unit_header, row, "产物")
+    }
+    for expected_file in sorted(expected_files):
+        if expected_file not in module_files.values():
+            errors.append(f"设计单元缺少模块文档：{expected_file}")
+
+    valid_names = unit_names | set(module_files)
+    relation_body = section_body(content, "单元关系") or ""
+    for label in ("上游单元", "下游单元", "依赖顺序"):
+        value = extract_field(relation_body, [label])
+        if not value:
+            continue
+        unknown = reference_tokens(value) - valid_names
+        if unknown:
+            errors.append(f"单元关系引用不存在的模块：{'、'.join(sorted(unknown))}")
+
+    contract_body = section_body(content, "跨模块契约") or ""
+    for label in ("模块 A", "模块 B"):
+        value = extract_field(contract_body, [label])
+        if value and value not in valid_names:
+            errors.append(f"跨模块契约引用不存在的模块：{value}")
+
+    feedback_header, feedback_rows = table_rows_for_section(
+        content, "架构反馈索引", ["编号", "标题", "影响模块", "当前状态", "反馈文档引用"]
+    )
+    for row in feedback_rows:
+        impacted = row_value(feedback_header, row, "影响模块")
+        unknown = reference_tokens(impacted) - valid_names
+        if unknown:
+            errors.append(f"架构反馈引用不存在的模块：{'、'.join(sorted(unknown))}")
+        feedback_ref = row_value(feedback_header, row, "反馈文档引用")
+        if feedback_ref and not (output_dir / Path(feedback_ref).name).is_file():
+            errors.append(f"架构反馈文档不存在：{feedback_ref}")
+
+    pending_header, pending_rows = table_rows_for_section(
+        content, "待确认事实", PENDING_HEADERS
+    )
+    pending_ids = {row_value(pending_header, row, "编号") for row in pending_rows}
+    rollback_header, rollback_rows = table_rows_for_section(
+        content, "回退项", ROLLBACK_HEADERS
+    )
+    for row in rollback_rows:
+        fact = row_value(rollback_header, row, "关联待确认事实")
+        if fact and fact not in pending_ids and fact not in {"无", "N/A", "none"}:
+            errors.append(f"回退项引用不存在的待确认事实：{fact}")
+    return errors
+
+
 def validate_nonempty_section(content: str, section: str) -> list[str]:
     body = section_body(content, section)
     if body is None:
@@ -154,6 +242,9 @@ def validate_overview(content: str) -> list[str]:
 
 def validate_module(content: str, module_path: Path) -> list[str]:
     errors: list[str] = []
+    module_name = extract_field(content, ["模块名"])
+    if module_name and module_name != module_path.stem:
+        errors.append(f"模块名与文件名不一致：{module_name} != {module_path.stem}")
     for section in MODULE_SECTIONS:
         if section in {"待确认事实", "回退项"}:
             continue
@@ -161,6 +252,18 @@ def validate_module(content: str, module_path: Path) -> list[str]:
 
     errors.extend(validate_pending_section(content, "待确认事实"))
     errors.extend(validate_rollback_section(content, "回退项"))
+
+    pending_header, pending_rows = table_rows_for_section(
+        content, "待确认事实", PENDING_HEADERS
+    )
+    pending_ids = {row_value(pending_header, row, "编号") for row in pending_rows}
+    rollback_header, rollback_rows = table_rows_for_section(
+        content, "回退项", ROLLBACK_HEADERS
+    )
+    for row in rollback_rows:
+        fact = row_value(rollback_header, row, "关联待确认事实")
+        if fact and fact not in pending_ids and fact not in {"无", "N/A", "none"}:
+            errors.append(f"模块回退项引用不存在的待确认事实：{fact}")
 
     return errors
 
@@ -196,6 +299,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     errors.extend(validate_overview(overview_content))
+    errors.extend(validate_overview_references(overview_content, root))
 
     for module_path in module_files:
         try:
