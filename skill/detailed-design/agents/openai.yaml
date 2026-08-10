@@ -1,3 +1,3 @@
 display_name: "Detailed Design"
 short_description: "将架构 handoff 转成代码系统的详细设计包"
-default_prompt: "Use $detailed-design to validate an explicit architecture handoff, walk DD0-DD7 one question at a time, and stop on architecture-level conflicts by returning to architecture-buddy."
+default_prompt: "Use $detailed-design after an explicit architecture-buddy handoff or direct request to validate a pre-development design-ready architecture, walk DD0-DD7 one question at a time, and stop on architecture-level conflicts by returning to architecture-buddy."

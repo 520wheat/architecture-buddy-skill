@@ -15,7 +15,7 @@
 - 已确认的问题框架和第一性原理结果；
 - 当前唯一的高影响决策点及候选方向；
 - `references/lens-catalog.md` 的 `best-for` / `not-for`；
-- 已安装的 `architecture-buddy-lens-*`；
+- 主包内置的 `lenses/*.md`；
 - 用户是否已经同意圆桌，或任务上下文是否明确授权假设同意。
 
 ## 执行顺序

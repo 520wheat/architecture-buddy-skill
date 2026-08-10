@@ -6,17 +6,10 @@
 
 | 包 | 类型 | 是否必装 | 当前版本 | 用途 |
 |---|---|---:|---:|---|
-| `architecture-buddy` | 主持 Skill | 是 | `0.3.6` | 主持架构共思、正式架构设计、ADR 和圆桌流程 |
-| `architecture-buddy-lens-scaffold` | 通用透镜 | 否 | `0.1.0` | 没有领域透镜时提供通用取舍视角 |
-| `architecture-buddy-lens-agent-loop` | 领域透镜 | 否 | `0.1.0` | Agent loop、工具编排、HITL 和轨迹 |
-| `architecture-buddy-lens-dynamo-ap` | 领域透镜 | 否 | `0.1.0` | AP、副本、分区和冲突修复 |
-| `architecture-buddy-lens-gfs-mr` | 领域透镜 | 否 | `0.2.0` | GFS/HDFS、批处理、数据局部性和 MapReduce |
-| `architecture-buddy-lens-log-stream` | 领域透镜 | 否 | `0.1.0` | Kafka/Pulsar、日志流、回放和消费者进度 |
-| `architecture-buddy-lens-raft-cp` | 领域透镜 | 否 | `0.1.0` | Raft、共识、控制面和防脑裂 |
-| `architecture-buddy-lens-spanner-sql` | 领域透镜 | 否 | `0.1.0` | 全球 SQL、外部一致性和多区域事务 |
-| `architecture-buddy-lens-zta-resource` | 安全透镜 | 否 | `0.1.0` | 零信任、资源访问、策略执行和信任边界 |
+| `architecture-buddy` | 主持 Skill | 是 | `0.3.6` | 主持架构共思、正式架构设计、ADR 和圆桌流程；内置透镜 |
+| `detailed-design` | 后续 Skill | 否 | `0.1.0` | 承接 design-ready 架构交接并产出面向实现的详细设计 |
 
-推荐安装主包和全部可选透镜。透镜默认不主动触发，只由主持 Skill 在圆桌中依据决策点选择；它们提供做法视角，不扮演真人。
+架构设计完成后，用户可同意将显式 handoff 交给 `detailed-design`。内置透镜默认不主动触发，只由主持 Skill 在圆桌中依据决策点选择；它们提供做法视角，不扮演真人。
 
 ## 安装
 

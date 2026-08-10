@@ -1,6 +1,6 @@
 # detailed-design
 
-安装：将本目录放入 `~/.codex/skills/detailed-design`，Reload 后使用 `$detailed-design`。
+安装：将本目录放入 `~/.codex/skills/detailed-design`，Reload 后使用 `$detailed-design`。它也可以由 `architecture-buddy` 在用户同意 handoff 后调用。
 
 ## 入口
 
@@ -68,4 +68,3 @@ python3 scripts/validate-deliverable.py "<输出目录>"
 ## 边界
 
 本包只产出文档：详细设计契约、审查材料和架构反馈；不生成代码。
-本包只产出文档，永远不生成代码。

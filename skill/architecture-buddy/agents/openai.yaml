@@ -1,0 +1,3 @@
+display_name: "Architecture Buddy"
+short_description: "协作完成架构设计，并在用户同意后交接详细设计"
+default_prompt: "Use $architecture-buddy to co-design a pre-development architecture, pass the design-ready gate, ask whether to continue with detailed design, and hand off explicit fields to detailed-design only after user consent."

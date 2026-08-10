@@ -10,8 +10,8 @@ Architecture Buddy 是一个用于架构共思的 Agent Skill：帮助开发者�
 
 ```text
 skill/                      ← 唯一需要安装的东西（运行时），见 skill/README.md
-  architecture-buddy/       ← 必装的主持 Skill
-  architecture-buddy-lens-*/← 可选的圆桌立场透镜
+  architecture-buddy/       ← 必装的架构主持 Skill，内置圆桌透镜
+  detailed-design/           ← 可选的详细设计 Skill
   README.md                 ← 发行说明，不是 Skill
   release-manifest.tsv      ← 发行清单，不是 Skill
 ```
@@ -60,11 +60,11 @@ done
 
 若你的 Codex / Cursor 已统一读 `~/.agents/skills` 或其它目录，把 `DST` 改成该路径即可；**原则不变：只链 `skill/*`**。
 
-生效方式：新开会话后，用自然语言说明场景（例如「一起做一份架构设计」），或按产品文档用 skill 调用语法点名 `architecture-buddy`。透镜默认 `disable-model-invocation: true`，由主持 Skill 在圆桌时按需加载。
+生效方式：新开会话后，用自然语言说明场景（例如「一起做一份架构设计」），或按产品文档用 skill 调用语法点名 `architecture-buddy` / `detailed-design`。内置透镜由主持 Skill 在圆桌时按需加载，不单独安装。
 
 ## 发行内容
 
-必须安装的包是 `architecture-buddy`；`architecture-buddy-lens-*` 是可选圆桌透镜，建议在需要对应领域时一并安装。机器可读清单见 [`skill/release-manifest.tsv`](skill/release-manifest.tsv)，包级说明见 [`skill/README.md`](skill/README.md)。
+必须安装的包是 `architecture-buddy`；`detailed-design` 在架构交接后按需安装或调用。机器可读清单见 [`skill/release-manifest.tsv`](skill/release-manifest.tsv)，包级说明见 [`skill/README.md`](skill/README.md)。
 
 ## 能力边界
 
