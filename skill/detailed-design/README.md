@@ -32,10 +32,11 @@
 ## 产物规则
 
 - 先落盘 overview，再按已确认设计单元顺序落盘模块文档。
-- 每个 architecture feedback 条目必须可从 overview 追溯。
+- overview 必须包含可列出多条记录的 architecture feedback 索引，至少包含编号、标题、影响模块、状态、反馈文档引用。
+- 每个 architecture feedback 条目必须可从 overview 索引追溯。
 - 模板只定义详细设计文档契约，不包含实现代码。
-- pending facts 默认保留 `待确认`，直到有显式确认或回退。
-- rollback 项必须与触发事实和恢复条件同时记录。
+- 每个 pending fact 必须显式记录：事实、单阶段默认值、默认原因、验证条件、回退路径、重新打开条件。
+- pending facts 默认保留 `待确认`，直到有显式确认、验证完成或按回退路径回退。
 
 ## 边界
 
