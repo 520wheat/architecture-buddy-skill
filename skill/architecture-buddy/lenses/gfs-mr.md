@@ -1,11 +1,4 @@
 ---
-name: architecture-buddy-lens-gfs-mr
-description: >
-  Use when Architecture Buddy roundtable needs a GFS-MR lens for large-scale sequential
-  throughput, distributed block storage, commodity-node failure, batch analytics,
-  HDFS/GFS/MapReduce/Hadoop lineage, Spark-style DAG on that substrate, or moving compute
-  to data.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (GFS-MR)
   version: "0.2.0"

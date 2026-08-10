@@ -1,10 +1,4 @@
 ---
-name: architecture-buddy-lens-raft-cp
-description: >
-  Use when Architecture Buddy roundtable needs a Raft-CP lens for majority consensus,
-  strongly consistent metadata coordination, leader election, config state, leases, watches,
-  or avoiding split-brain.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Raft CP)
   version: "0.1.0"

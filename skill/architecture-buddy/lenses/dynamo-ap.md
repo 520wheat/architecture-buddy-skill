@@ -1,10 +1,4 @@
 ---
-name: architecture-buddy-lens-dynamo-ap
-description: >
-  Use when Architecture Buddy roundtable needs a Dynamo-AP lens for availability under partitions,
-  decentralized replicas, eventual or tunable consistency, multi-region or multi-primary data,
-  conflict repair, or Cassandra/DynamoDB-style KV and wide-column trade-offs.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Dynamo AP)
   version: "0.1.0"

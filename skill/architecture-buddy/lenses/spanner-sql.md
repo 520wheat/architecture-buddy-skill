@@ -1,10 +1,4 @@
 ---
-name: architecture-buddy-lens-spanner-sql
-description: >
-  Use when Architecture Buddy roundtable needs a Spanner- SQL lens for globally distributed SQL,
-  external consistency, strict serializability, TrueTime-style bounded clocks, Paxos-replicated
-  splits, multi-region OLTP, lock-free reads, schema changes, or SQL at global scale.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (Spanner SQL)
   version: "0.1.0"

@@ -1,10 +1,4 @@
 ---
-name: architecture-buddy-lens-zta-resource
-description: >
-  Use when Architecture Buddy roundtable needs a Zero Trust resource lens for trust assumptions,
-  access paths, policy enforcement, identity or device posture, micro-segmentation, or continuous
-  authorization without network-location trust.
-disable-model-invocation: true
 metadata:
   display-name: Architecture Buddy Lens (ZTA Resource)
   version: "0.1.0"
