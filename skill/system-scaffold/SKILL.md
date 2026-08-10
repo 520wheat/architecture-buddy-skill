@@ -17,9 +17,13 @@ Before editing anything, confirm all stack fields are present:
 
 - language/runtime and version
 - framework and version, if any
+- core_dependencies
 - dependency manager or package tool
-- startup entrypoint or launch command
-- any required build, test, or deploy constraints
+- build_command
+- test_command
+- format_command
+- start_command
+- deployment constraints
 
 If any required field is missing, stay in draft, recommend the missing stack choice, and do not create files.
 
