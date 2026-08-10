@@ -1,0 +1,8 @@
+interface:
+  display_name: "System Scaffold"
+  short_description: "按已确认技术栈生成可编译、可验证的最小项目骨架契约"
+  default_prompt: "Use $system-scaffold to generate a minimal project scaffold only after the technology stack is explicitly confirmed."
+
+policy:
+  allow_implicit_invocation: false
+
