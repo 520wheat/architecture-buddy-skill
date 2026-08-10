@@ -2,7 +2,7 @@
 
 ## 元数据与架构输入
 
-- 状态：draft / blocked / complete
+- 状态：draft / blocked / design-ready
 - 项目：
 - 版本：
 - 架构输入：

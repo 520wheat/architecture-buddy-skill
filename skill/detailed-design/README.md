@@ -29,6 +29,16 @@
 - `templates/module-detailed-design.md`：模块模板
 - `templates/architecture-feedback.md`：架构反馈模板
 
+## 脚本
+
+在本目录中执行：
+
+```bash
+python3 scripts/init-design.py --output "<输出目录>" --name "<设计名称>"
+```
+
+脚本会初始化 `detailed-design-overview.md`、`modules/`、`architecture-feedback.md`；支持空格和 Unicode 路径。默认拒绝覆盖任一已存在目标，只有用户明确要求时才加 `--force`。
+
 ## 产物规则
 
 - 先落盘 overview，再按已确认设计单元顺序落盘模块文档。

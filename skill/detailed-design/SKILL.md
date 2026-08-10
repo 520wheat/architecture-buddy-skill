@@ -23,6 +23,11 @@ Forbidden: source-code reading, code generation, architecture override.
 - If the handoff is incomplete, classify missing non-critical facts as `draft` inputs and blocking architecture facts as `blocked`.
 - If a question exposes an architecture-level conflict, stop detailed design and hand back to architecture-buddy.
 
+## Deterministic helper
+
+- `scripts/init-design.py --output DIR --name NAME [--force]` initializes `detailed-design-overview.md`, `modules/`, and `architecture-feedback.md`.
+- The helper is path-safe for spaces and Unicode, refuses overwrite by default, and only overwrites when `--force` is supplied explicitly.
+
 ## Phase routing
 
 - DD0 → `prompts/clarify-scope.md`
