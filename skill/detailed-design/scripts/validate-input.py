@@ -39,6 +39,13 @@ PENDING_HEADERS = [
     "重新打开条件",
 ]
 
+REQUIRED_INPUT_FIELDS = {
+    "scope": ["scope", "设计范围", "已确认范围"],
+    "quality targets": ["quality targets", "质量目标"],
+    "pending facts": ["pending facts", "待确认事实", "待验证事实"],
+    "non-goals": ["non-goals", "非目标", "明确不做"],
+}
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="校验详细设计输入契约。")
@@ -92,6 +99,19 @@ def validate_handoff_content(content: str) -> list[str]:
     return errors
 
 
+def validate_required_input_fields(content: str) -> list[str]:
+    errors: list[str] = []
+    for field, labels in REQUIRED_INPUT_FIELDS.items():
+        value = extract_field(content, labels)
+        if non_empty(value):
+            continue
+        section = section_body_containing(content, labels)
+        if section and line_has_substance(section):
+            continue
+        errors.append(f"架构交接缺少字段：{field}")
+    return errors
+
+
 def validate_architecture(path: Path, adrs: list[Path]) -> list[str]:
     errors: list[str] = []
     if not path.exists() or not path.is_file():
@@ -119,6 +139,8 @@ def validate_architecture(path: Path, adrs: list[Path]) -> list[str]:
             boundary = boundary_section
     if not non_empty(boundary):
         errors.append("缺少架构边界证据")
+
+    errors.extend(validate_required_input_fields(content))
 
     pending_errors = validate_pending_tables(content)
     errors.extend(pending_errors)

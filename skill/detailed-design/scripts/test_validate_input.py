@@ -135,6 +135,25 @@ class ValidateInputCLITest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("架构边界", result.stderr)
 
+    def test_rejects_architecture_without_required_handoff_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            arch = root / "architecture.md"
+            adr = root / "ADR-1.md"
+            write_file(adr, "# ADR\n")
+            write_file(
+                arch,
+                "# 架构输入\n\n"
+                "- 场景：pre-development\n"
+                "- 状态：design-ready\n"
+                "- 架构边界：清晰\n",
+            )
+
+            result = self.run_validator(str(arch), "--adr", str(adr))
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("scope", result.stderr)
+
     def test_rejects_missing_adr(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
