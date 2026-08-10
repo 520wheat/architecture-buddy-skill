@@ -8,7 +8,9 @@
 
 ## Minimal interfaces
 
-- Make interfaces consumer-owned.
+- Do not create an interface by default.
+- Let the consuming side define the smallest useful interface.
+- Create a new interface only when it clearly helps replace an implementation, isolate an external dependency, vary strategy, or isolate tests.
 - Include only required fields and required entry points.
 - Keep empty methods or stubs only where the selected stack requires a concrete symbol to compile.
 
@@ -30,4 +32,3 @@
 - Do not add feature logic beyond scaffold wiring.
 - Do not synthesize hidden workflows, fallback behavior, or assumed integrations.
 - Do not create helper code that changes the design contract.
-

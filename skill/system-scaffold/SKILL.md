@@ -11,9 +11,17 @@ Act as a greenfield project skeleton partner. Create the minimum implementation 
 
 ## Accepted input
 
-Accept an architecture-buddy design-ready architecture, a detailed-design design-ready package, and a user-confirmed technology-stack decision.
+Accept an architecture-buddy design-ready architecture, a detailed-design design-ready package, and a fully confirmed technology stack.
 
-If any of those inputs are missing, stay in draft or blocked and do not create files.
+Before editing anything, confirm all stack fields are present:
+
+- language/runtime and version
+- framework and version, if any
+- dependency manager or package tool
+- startup entrypoint or launch command
+- any required build, test, or deploy constraints
+
+If any required field is missing, stay in draft, recommend the missing stack choice, and do not create files.
 
 ## Entry points
 
@@ -23,7 +31,7 @@ If any of those inputs are missing, stay in draft or blocked and do not create f
 ## First phase
 
 1. Review the handoff package.
-2. If the technology stack is missing or ambiguous, recommend one stack and ask for explicit confirmation.
+2. If the technology stack is missing or ambiguous, recommend the missing choice and ask for explicit confirmation.
 3. Explain why each question is being asked before the question itself.
 4. Create no files before the user confirms the technology stack.
 5. If a confirmed stack conflicts with the architecture or design handoff, mark the run blocked and rollback the scaffold plan.
@@ -50,8 +58,8 @@ Produce:
 
 ## States
 
-- draft: waiting for a complete handoff or stack confirmation
-- blocked: missing preferences, unresolved conflicts, or rollback needed
+- draft: waiting for a complete handoff or missing stack preferences while recommendation is pending
+- blocked: architecture, design, or confirmed-stack conflict requiring rollback
 - skeleton-ready: minimum scaffold created and verification passed
 
 ## Verification and stop conditions
