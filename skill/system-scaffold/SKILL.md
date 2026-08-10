@@ -23,6 +23,13 @@ Before editing anything, confirm all stack fields are present:
 
 If any required field is missing, stay in draft, recommend the missing stack choice, and do not create files.
 
+## Phase routing
+
+- SC0 input validation: validate architecture, detailed-design, and stack completeness; route missing or ambiguous stack fields to `prompts/clarify-stack.md`.
+- SC1 recommendation: use `prompts/clarify-stack.md` to derive at most two concrete stack directions and one current question.
+- SC2 confirmation: use `prompts/confirm-stack.md` to lock the user's choice into a single technology-stack decision.
+- 不得在 SC2 用户确认之前创建或修改任何文件。
+
 ## Entry points
 
 - Direct entry: the user asks to generate a minimal skeleton after stack confirmation.
