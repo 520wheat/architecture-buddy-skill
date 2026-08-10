@@ -21,8 +21,9 @@
 
 - Absolute paths: use as-is.
 - Relative paths in file-based handoff: resolve from the handoff file directory.
-- Relative paths in message-based handoff: resolve from the workspace root that contains the target skill package.
-- If resolution is ambiguous, treat it as a blocking architecture fact.
+- Relative paths in message-based handoff: resolve from the active repository/worktree root that contains both the target Skill package and the architecture input.
+- If more than one root could satisfy that rule, require the user to select one and mark the handoff `blocked` until the root is explicit.
+- If resolution is still ambiguous after selection, treat it as a blocking architecture fact.
 
 ## Missing facts
 
