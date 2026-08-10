@@ -35,9 +35,24 @@
 
 ```bash
 python3 scripts/init-design.py --output "<输出目录>" --name "<设计名称>"
+python3 scripts/validate-input.py "<架构文件.md>" --adr "<adr-1.md>" --adr "<adr-2.md>"
+python3 scripts/validate-deliverable.py "<输出目录>"
 ```
 
 脚本会初始化 `detailed-design-overview.md`、`modules/`、`architecture-feedback.md`；支持空格和 Unicode 路径。默认拒绝覆盖任一已存在目标，只有用户明确要求时才加 `--force`。
+`validate-input.py` 要求正好一个架构 Markdown 文件，`--adr` 至少出现一次且可重复；会检查 `pre-development` 场景、`design-ready` 状态、边界证据、handoff 必填字段、ADR 可读性，以及 pending fact 的默认值 / 原因 / 验证条件 / 回退路径 / 重新打开条件闭环。
+`validate-deliverable.py` 只检查一个详细设计输出目录；要求存在 `detailed-design-overview.md` 与至少一个 `modules/*.md`，拒绝 `blocked`，并检查 overview / module 模板证据、跨模块契约、独立 `回退项` 和 pending fact 闭环。
+
+退出码语义：
+
+- `0`：结构校验通过。
+- 非 `0`：初始化失败或校验失败；脚本会输出中文错误说明。
+
+边界说明：
+
+- `init-design.py` 只初始化文档工作区，不修改用户项目代码。
+- `validate-input.py` 只判断输入契约是否齐全，不推进设计。
+- `validate-deliverable.py` 只判断详细设计结构证据是否完整，不判断架构方案或设计质量。
 
 ## 产物规则
 

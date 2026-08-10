@@ -27,6 +27,10 @@ Forbidden: source-code reading, code generation, architecture override.
 
 - `scripts/init-design.py --output DIR --name NAME [--force]` initializes `detailed-design-overview.md`, `modules/`, and `architecture-feedback.md`.
 - The helper is path-safe for spaces and Unicode, refuses overwrite by default, and only overwrites when `--force` is supplied explicitly.
+- `scripts/validate-input.py ARCHITECTURE.md --adr ADR.md [--adr ADR-2.md ...]` validates one architecture input plus repeatable ADR paths; `--adr` is required, rejects non-`pre-development`, non-`design-ready`, missing boundary evidence, unreadable ADRs, incomplete handoff fields, and pending facts without default / reason / trigger / rollback / reopen fields.
+- `scripts/validate-deliverable.py OUTPUT_DIR` validates one detailed-design output directory; it requires `detailed-design-overview.md`, at least one module document, cross-module contract evidence, independent rollback sections, and pending-fact closure, and rejects `blocked`.
+- Exit code `0` means the structure is acceptable; any non-zero exit means initialization or validation failed.
+- Validation helpers only check structural evidence and input contract completeness; they do not judge architecture quality.
 
 ## Phase routing
 
