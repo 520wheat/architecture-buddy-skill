@@ -13,4 +13,4 @@
 | zta-resource | architecture-buddy/lenses/zta-resource.md | Zero Trust resource access、PEP placement | 只依赖 perimeter 的安全模型 | 正交；信任边界是分叉时选席 |
 | agent-loop | architecture-buddy/lenses/agent-loop.md | LLM tool loop、permission/HITL、session 边界、trace、agent runtime | 把产品模块图当架构、无护栏自治、没有 observe loop | 常与 zta-resource 配合；不替代 log-stream/CP/AP 存储透镜 |
 
-Scaffold（`architecture-buddy/lenses/scaffold.md`）仅用于契约测试；存在匹配的真实做法透镜时，优先使用真实透镜。
+`architecture-buddy/lenses/scaffold.md` 仅用于契约测试；存在匹配的真实做法透镜时，优先使用真实透镜。
