@@ -1,3 +1,4 @@
 package	kind	required	version	status
 architecture-buddy	host	yes	0.5.0	release
 detailed-design	follow-up	no	0.1.0	release
+system-scaffold	follow-up	no	0.1.0	release

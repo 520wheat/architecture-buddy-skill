@@ -1,0 +1,7 @@
+interface:
+  display_name: "System Scaffold"
+  short_description: "面向 greenfield、pre-development、design-ready handoff 的最小骨架生成"
+  default_prompt: "Use $system-scaffold when a greenfield project needs a minimum scaffold from design-ready architecture and detailed-design handoffs."
+
+policy:
+  allow_implicit_invocation: false
