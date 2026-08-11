@@ -22,7 +22,8 @@ Forbidden: source-code reading, code generation, architecture override.
 - Each phase must explain why the current question is being asked before asking exactly one question.
 - If the handoff is incomplete, classify missing non-critical facts as `draft` inputs and blocking architecture facts as `blocked`.
 - If a question exposes an architecture-level conflict, stop detailed design and hand back to architecture-buddy.
-- If DD6 or DD7 reaches `design-ready`, ask exactly `是否继续生成项目骨架代码？` before any scaffold handoff.
+- DD6 is pre-review only: never trigger scaffold handoff and never ask the user to continue from DD6.
+- If DD7 reaches `design-ready`, ask exactly `是否继续生成项目骨架代码？` before any scaffold handoff.
 - Agreement to continue transfers the architecture path, detailed-design output path, confirmed boundaries, contracts, data and state rules, failure rules, non-goals, and user preferences to `system-scaffold`.
 - User refusal ends detailed design normally without invoking `system-scaffold`.
 - If later scaffold work exposes an architecture-boundary or quality-attribute conflict, rollback to `architecture-buddy`; if it exposes a detailed-design ambiguity, return to `detailed-design`.
@@ -56,7 +57,7 @@ Forbidden: source-code reading, code generation, architecture override.
 
 ## Handoff after design-ready
 
-When the design gate passes, detailed-design still owns the final user confirmation. Ask exactly `是否继续生成项目骨架代码？` and explain that a yes hands the architecture artifact path, detailed-design output path, confirmed boundaries, contracts, data and state rules, failure rules, non-goals, and user preferences to `system-scaffold`.
+When the DD7 final review gate passes, detailed-design still owns the final user confirmation. Ask exactly `是否继续生成项目骨架代码？` and explain that a yes hands the architecture artifact path, detailed-design output path, confirmed boundaries, contracts, data and state rules, failure rules, non-goals, and user preferences to `system-scaffold`.
 
 - If the user says no, end the detailed-design run normally with the package left at `design-ready`.
 - If the user says yes, transfer only the confirmed handoff bundle and let `system-scaffold` enforce stack confirmation before any file creation.

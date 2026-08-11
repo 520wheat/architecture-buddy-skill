@@ -3,7 +3,6 @@
 ## 元数据
 
 - decision_id: <id>
-- task: Task 2
 - status: draft | confirmed
 - date: <YYYY-MM-DD>
 - source: <architecture / detailed-design / user-confirmation>

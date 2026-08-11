@@ -12,10 +12,14 @@ Use this handoff only when the architecture and design are already design-ready.
 - user technology preferences, fully confirmed as:
   - language/runtime and version
   - framework and version, if any
+  - core_dependencies
   - dependency manager or package tool
-  - startup entrypoint or launch command
-  - any build, test, or deploy constraints
-- known build, test, and deploy constraints
+  - build_command
+  - test_command
+  - format_command
+  - start_command
+  - deployment_constraint
+- known build, test, format, start, and deployment constraints
 
 Do not edit any file until every required stack field above is explicitly confirmed.
 

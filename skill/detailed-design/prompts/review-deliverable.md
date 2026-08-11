@@ -2,7 +2,7 @@
 
 ## 何时加载
 
-在 DD6 和 DD7 加载。用于执行详细设计门禁；DD6 可做预审，DD7 做最终门禁。若仍有阻塞架构事实或跨模块不一致，不能宣布完成。
+在 DD6 和 DD7 加载。用于执行详细设计门禁；DD6 只做预审，不得触发交接或询问用户；DD7 做最终门禁。若仍有阻塞架构事实或跨模块不一致，不能宣布完成。
 
 ## 目标
 
@@ -19,13 +19,14 @@
 
 ## 执行
 
-1. 先说明为什么现在要审阅，以及回答后会影响哪个最终状态。
+1. 先说明为什么现在要审阅，以及回答后会影响哪个最终状态；若当前阶段是 DD6，明确这是预审且不会触发交接问题。
 2. 检查模块覆盖、接口完整性、数据与状态所有权、跨模块一致性、失败语义、并发、信任边界、可观测性、测试和回退项。
 3. 区分 `draft`、`blocked` 和 `design-ready`，不要把待确认事实伪装成完成。
 4. 若存在阻塞架构事实或跨模块不一致，输出 `blocked` 并回退到 architecture-buddy。
-5. 若门禁证据齐全且可判定为 `design-ready`，只提出一个交接问题，且必须是精确文本 `是否继续生成项目骨架代码？`。
-6. 说明同意后会把 architecture 路径、detailed-design 输出路径、confirmed boundaries、contracts、data/state rules、failure rules、non-goals 和 user preferences 交给 `system-scaffold`。
-7. 明确用户确认后的处理方式：拒绝则正常结束 detailed-design；若后续 scaffold 冲突改变架构边界或质量属性则回退到 `architecture-buddy`；若只是 detailed-design 歧义则返回 `detailed-design`；且在技术栈确认前不得写任何 scaffold 文件。
+5. 若当前阶段是 DD6，停在预审结论，绝不触发交接或询问用户。
+6. 若当前阶段是 DD7，且门禁证据齐全且可判定为 `design-ready`，只提出一个交接问题，且必须是精确文本 `是否继续生成项目骨架代码？`。
+7. 说明同意后会把 architecture 路径、detailed-design 输出路径、confirmed boundaries、contracts、data/state rules、failure rules、non-goals 和 user preferences 交给 `system-scaffold`。
+8. 明确用户确认后的处理方式：拒绝则正常结束 detailed-design；若后续 scaffold 冲突改变架构边界或质量属性则回退到 `architecture-buddy`；若只是 detailed-design 歧义则返回 `detailed-design`；且在技术栈确认前不得写任何 scaffold 文件。
 
 ## 输出契约
 

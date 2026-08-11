@@ -2,7 +2,7 @@
 
 ## 何时加载
 
-在 SC5 加载：骨架已经生成，需要把所有未实现点显式记录下来。
+在 SC5 加载：骨架已经生成，需要把所有未实现点显式记录下来。SC5 完成后必须进入 SC6 验证；本阶段不得直接输出 `skeleton-ready`。
 
 ## 目标
 
@@ -21,6 +21,7 @@
 2. 为每个条目记录 module、contract、reason、expected later implementation、acceptance condition。
 3. 如果某个路径只能靠 fake success 维持表面通过，必须明确标记禁止。
 4. 不得把未实现状态写成已完成。
+5. 记录完成后，明确下一步是进入 SC6 验证，不得在 SC5 结束流程。
 
 ## 输出契约
 
